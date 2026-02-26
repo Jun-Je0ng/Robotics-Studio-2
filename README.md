@@ -17,7 +17,7 @@ For Real Robot moving
 Start by turning on the power and connecting the robot,
 
 Get the ip of your laptop my case (192.168.0.193), --> for both ip and host name,
-Connect it on the teach pendant --> Program --> URCAps --> TCP --> Control by --> type in hostname and ip,
+Connect it on the teach pendant --> Installation --> URCaps --> External Control --> type in hostname and ip,
 
 Run controller with robot id [ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur3e robot_ip:=192.168.0.197 launch_rviz:=true],
 
