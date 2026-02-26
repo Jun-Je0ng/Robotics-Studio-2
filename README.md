@@ -7,6 +7,10 @@
 
 2. Open Polyscope in browser:
    http://192.168.56.101:6080/vnc.html
+   Start Robot
+   Program → URCaps → External Control
+   Press ▶ Play (or "Play from selection") on the teach pendant
+
 
 3. Start the driver (connect to simulator IP):
    `ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur3e robot_ip:=192.168.56.101 launch_rviz:=true`
