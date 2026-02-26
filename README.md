@@ -10,6 +10,7 @@ The ip is the ip for the simulator,
 
 Then run the move it [rviz ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur3e launch_rviz:=true],
 
+------------------------------------------------
 
 For Real Robot moving
 
@@ -24,7 +25,7 @@ Click the play button on the bottom right and click "Play from selection",
 
 Run the rviz move it [ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur3e launch_rviz:=true],
 
-
+------------------------------------------------
 
 To get ip --> hostname -I --> your ip is the last one starting with 192
 
