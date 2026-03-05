@@ -1,0 +1,9 @@
+# ignore build/install/log folders
+build/
+install/
+log/
+# ignore .env file
+.env
+
+# ignore vs code settings
+.vscode/
