@@ -6,6 +6,7 @@
 #include <std_srvs/srv/trigger.hpp>
 #include <moveit/planning_scene/planning_scene.h>
 #include <moveit/collision_detection/collision_common.h>
+#include <std_msgs/msg/float64_multi_array.hpp> 
 
 #include <iostream>
 #include <fstream>
@@ -26,6 +27,9 @@ void printMenu()
             << "  c  →  Toggle Cartesian / joint-space planning\n"
             << "  b  →  Add box obstacle\n"
             << "  q  →  Quit\n"
+            << "  o  →  Open gripper\n"
+            << "  p  →  Close gripper\n"
+            << "  w  →  Set custom gripper width\n"
             << ">> ";
   std::cout.flush();
 }
@@ -176,7 +180,7 @@ void handleExecuteSequence(
 
       moveit::planning_interface::MoveGroupInterface::Plan plan;
       bool ok = (move_group.plan(plan) ==
-                 moveit::planning_interface::MoveItErrorCode::SUCCESS);
+           moveit::core::MoveItErrorCode::SUCCESS);
       if (ok) {
         visual_tools.publishText(text_pose, "Planning Success!", rvt::GREEN, rvt::XLARGE);
         visual_tools.publishTrajectoryLine(
@@ -189,7 +193,7 @@ void handleExecuteSequence(
         // execute and check if execution was successful
         auto execute_result = move_group.execute(plan);
 
-        if (execute_result == moveit::planning_interface::MoveItErrorCode::SUCCESS)
+        if (execute_result == moveit::core::MoveItErrorCode::SUCCESS)
         {
             RCLCPP_INFO(LOGGER, "Execution completed successfully!");
             visual_tools.publishText(text_pose, "Motion Complete!", rvt::GREEN, rvt::XLARGE);
@@ -292,51 +296,123 @@ void placeGround(
   planning_scene_interface.addCollisionObjects({ ground });
 }
 
+void publishGripperWidth(
+    const rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr& gripper_pub,
+    moveit_visual_tools::MoveItVisualTools& visual_tools,
+    const Eigen::Isometry3d& text_pose,
+    double width_m)
+{
+  // Clamp to a safe range.
+  // Adjust if your RG2 setup supports a different practical opening range.
+  width_m = std::max(0.0, std::min(0.11, width_m));
+
+  std_msgs::msg::Float64MultiArray msg;
+  msg.data = {width_m};
+  gripper_pub->publish(msg);
+
+  RCLCPP_INFO(LOGGER, "Published gripper width command: %.3f m", width_m);
+
+  visual_tools.publishText(
+      text_pose,
+      "Gripper width: " + std::to_string(width_m) + " m",
+      rvt::WHITE, rvt::XLARGE);
+  visual_tools.trigger();
+}
+
+
+void handleOpenGripper(
+    const rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr& gripper_pub,
+    moveit_visual_tools::MoveItVisualTools& visual_tools,
+    const Eigen::Isometry3d& text_pose)
+{
+  RCLCPP_INFO(LOGGER, "Opening gripper...");
+  publishGripperWidth(gripper_pub, visual_tools, text_pose, 0.085);  // example open width
+}
+
+void handleCloseGripper(
+    const rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr& gripper_pub,
+    moveit_visual_tools::MoveItVisualTools& visual_tools,
+    const Eigen::Isometry3d& text_pose)
+{
+  RCLCPP_INFO(LOGGER, "Closing gripper...");
+  publishGripperWidth(gripper_pub, visual_tools, text_pose, 0.0);  // closed
+}
+
+void handleCustomGripperWidth(
+    const rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr& gripper_pub,
+    moveit_visual_tools::MoveItVisualTools& visual_tools,
+    const Eigen::Isometry3d& text_pose,
+    std::ifstream& tty)
+{
+  std::cout << "Enter gripper width in metres (e.g. 0.05): ";
+  std::cout.flush();
+
+  std::string line;
+  if (!std::getline(tty, line) || line.empty()) {
+    RCLCPP_WARN(LOGGER, "No width entered.");
+    return;
+  }
+
+  try {
+    double width = std::stod(line);
+    publishGripperWidth(gripper_pub, visual_tools, text_pose, width);
+  } catch (const std::exception&) {
+    RCLCPP_WARN(LOGGER, "Invalid width input.");
+  }
+}
+
+
+
+
+
+
 //  main 
 int main(int argc, char** argv)
 {
-
-  // typical ROS2 node setup with 
+  // typical ROS2 node setup
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("ur3e_demo_node");
+
+  // gripper command publisher
+  auto gripper_pub =
+      node->create_publisher<std_msgs::msg::Float64MultiArray>(
+          "/finger_width_controller/commands", 10);
 
   // a single-threaded executor
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
 
-  // spin the executor in a separate thread so that we can call ROS services and have timers/callbacks work while we are in the menu loop
+  // spin the executor in a separate thread so that we can call ROS services
   std::thread([&executor]() { executor.spin(); }).detach();
 
-  // name of the planning group we want to control. the name for each robot is inside their srdf file 
+  // name of the planning group we want to control
   static const std::string PLANNING_GROUP = "ur_manipulator";
 
-  // MoveGroupInterface is the primary interface to the planner. This interface can be used to plan and execute motions:
-  moveit::planning_interface::MoveGroupInterface     move_group(node, PLANNING_GROUP);
+  // MoveGroupInterface is the primary interface to the planner
+  moveit::planning_interface::MoveGroupInterface move_group(node, PLANNING_GROUP);
 
-  // We will use the PlanningSceneInterface class to add and remove collision objects in our "virtual world" scene as well as to get the list of known collision objects in the scene.
+  // Planning scene interface
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
-  // an RViz visualisation tool to display text, trajectories, and other markers in RViz
-  moveit_visual_tools::MoveItVisualTools             visual_tools(node, "base_link");
+  // RViz visualisation tool
+  moveit_visual_tools::MoveItVisualTools visual_tools(node, "base_link");
 
   visual_tools.deleteAllMarkers();
-  visual_tools.loadRemoteControl();  // load the remote control which allows us to trigger pre-defined events via buttons in RViz
+  visual_tools.loadRemoteControl();
 
-
-  // TEst text visualisation
+  // test text visualisation
   Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
   text_pose.translation().z() = 1.0;
   visual_tools.publishText(text_pose, "UR3e Demo", rvt::WHITE, rvt::XLARGE);
   visual_tools.trigger();
 
-  //  state variables for the demo
+  // state variables for the demo
   std::vector<geometry_msgs::msg::Pose> saved_poses;
-  std::vector<std::vector<double>> joint_values;  // store joint values for each saved pose to bypass IK tolerances
+  std::vector<std::vector<double>> joint_values;
   bool use_cartesian = false;
   int box_count = 0;
 
-  //  open /dev/tty so input works even under ros2 launch 
-  // normal Cin and Std::getline do not work under ros2 launch because the launch system captures stdin, so we need to read directly from the terminal device to get user input for the menu
+  // open /dev/tty so input works even under ros2 launch
   std::ifstream tty("/dev/tty");
   if (!tty.is_open()) {
     RCLCPP_FATAL(LOGGER, "Could not open /dev/tty - cannot read keyboard input.");
@@ -344,10 +420,10 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  // place ground plane 
+  // place ground plane
   placeGround(move_group, planning_scene_interface, visual_tools);
 
-  //  menu loop 
+  // menu loop
   bool running = true;
   while (running && rclcpp::ok())
   {
@@ -358,39 +434,69 @@ int main(int argc, char** argv)
       std::cout << ">> ";
       std::cout.flush();
       if (!std::getline(tty, line)) {
-        RCLCPP_WARN(LOGGER, "Error reading Line");
+        RCLCPP_WARN(LOGGER, "Error reading line");
         break;
       }
     }
+
+    if (line.empty()) {
+      continue;
+    }
+
     char cmd = line[0];
 
     switch (cmd)
     {
-      case 'f': handleEnableFreedrive(node, visual_tools, text_pose);                                                                          
+      case 'f':
+        handleEnableFreedrive(node, visual_tools, text_pose);
         break;
-      case 'd': handleDisableFreedrive(node, visual_tools, text_pose);                                                                         
+
+      case 'd':
+        handleDisableFreedrive(node, visual_tools, text_pose);
         break;
-      case 's': 
-        handleSavePose(move_group, visual_tools, text_pose, saved_poses, joint_values);                                                
+
+      case 's':
+        handleSavePose(move_group, visual_tools, text_pose, saved_poses, joint_values);
         break;
-      case 'g': 
-        handleExecuteSequence(move_group, visual_tools, text_pose, saved_poses, joint_values, PLANNING_GROUP, use_cartesian);          
+
+      case 'g':
+        handleExecuteSequence(
+            move_group, visual_tools, text_pose, saved_poses,
+            joint_values, PLANNING_GROUP, use_cartesian);
         break;
-      case 'c': 
-        handleTogglePlanningMode(visual_tools, text_pose, use_cartesian);                                                              
+
+      case 'c':
+        handleTogglePlanningMode(visual_tools, text_pose, use_cartesian);
         break;
-      case 'b': 
-        handleAddBox(move_group, planning_scene_interface, visual_tools, text_pose, box_count);                                        
+
+      case 'b':
+        handleAddBox(move_group, planning_scene_interface, visual_tools, text_pose, box_count);
         break;
-      case 'q': 
-        RCLCPP_INFO(LOGGER, "Quitting demo."); running = false;                                                                        
-          break;
-      default:  std::cout << "Unknown command '" << cmd << "' - try again.\n";                                                                  
+
+      case 'o':
+        handleOpenGripper(gripper_pub, visual_tools, text_pose);
+        break;
+
+      case 'p':
+        handleCloseGripper(gripper_pub, visual_tools, text_pose);
+        break;
+
+      case 'w':
+        handleCustomGripperWidth(gripper_pub, visual_tools, text_pose, tty);
+        break;
+
+      case 'q':
+        RCLCPP_INFO(LOGGER, "Quitting demo.");
+        running = false;
+        break;
+
+      default:
+        std::cout << "Unknown command '" << cmd << "' - try again.\n";
         break;
     }
   }
 
-  //  cleanup ─
+  // cleanup
   visual_tools.deleteAllMarkers();
   visual_tools.trigger();
   rclcpp::shutdown();

@@ -12,6 +12,10 @@
 #include <std_srvs/srv/trigger.hpp>
 #include <moveit/planning_scene/planning_scene.h>
 #include <moveit/collision_detection/collision_common.h>
+#include <std_msgs/msg/float64_multi_array.hpp>
+#include <thread>
+#include <chrono>
+#include <algorithm>
 
 #include <iostream>
 #include <fstream>
@@ -88,30 +92,44 @@ void handleDisableFreedrive(
 }
 
 // *** ADDED: helper to move gripper to a named target (e.g. "open" / "close") ***
-void moveGripper(
-    moveit::planning_interface::MoveGroupInterface& gripper_move_group,
+void commandGripperWidth(
+    const rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr& gripper_pub,
     moveit_visual_tools::MoveItVisualTools& visual_tools,
     const Eigen::Isometry3d& text_pose,
-    const std::string& named_target)
+    double width_m)
 {
-  gripper_move_group.setNamedTarget(named_target);
-  moveit::planning_interface::MoveGroupInterface::Plan gripper_plan;
-  bool ok = (gripper_move_group.plan(gripper_plan) ==
-             moveit::planning_interface::MoveItErrorCode::SUCCESS);
-  if (ok) {
-    auto result = gripper_move_group.execute(gripper_plan);
-    if (result == moveit::planning_interface::MoveItErrorCode::SUCCESS) {
-      RCLCPP_INFO(LOGGER, "Gripper '%s' successful.", named_target.c_str());
-      visual_tools.publishText(text_pose, "Gripper: " + named_target, rvt::GREEN, rvt::XLARGE);
-    } else {
-      RCLCPP_ERROR(LOGGER, "Gripper execution failed.");
-      visual_tools.publishText(text_pose, "Gripper Execution Failed!", rvt::RED, rvt::XLARGE);
-    }
-  } else {
-    RCLCPP_ERROR(LOGGER, "Gripper planning failed.");
-    visual_tools.publishText(text_pose, "Gripper Planning Failed!", rvt::RED, rvt::XLARGE);
-  }
+  // Clamp to a safe range for RG2-style width control
+  width_m = std::max(0.0, std::min(0.11, width_m));
+
+  std_msgs::msg::Float64MultiArray msg;
+  msg.data = {width_m};
+  gripper_pub->publish(msg);
+
+  RCLCPP_INFO(LOGGER, "Published gripper width command: %.3f m", width_m);
+  visual_tools.publishText(
+      text_pose,
+      "Gripper width: " + std::to_string(width_m) + " m",
+      rvt::WHITE, rvt::XLARGE);
   visual_tools.trigger();
+
+  // Give controller time to respond
+  std::this_thread::sleep_for(std::chrono::milliseconds(700));
+}
+
+void moveGripperOpen(
+    const rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr& gripper_pub,
+    moveit_visual_tools::MoveItVisualTools& visual_tools,
+    const Eigen::Isometry3d& text_pose)
+{
+  commandGripperWidth(gripper_pub, visual_tools, text_pose, 0.085);
+}
+
+void moveGripperClose(
+    const rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr& gripper_pub,
+    moveit_visual_tools::MoveItVisualTools& visual_tools,
+    const Eigen::Isometry3d& text_pose)
+{
+  commandGripperWidth(gripper_pub, visual_tools, text_pose, 0.0);
 }
 
 //  s : save current pose (arm + gripper)
@@ -151,6 +169,7 @@ void handleSavePose(
 void handleExecuteSequence(
     moveit::planning_interface::MoveGroupInterface& ur_move_group,
     moveit::planning_interface::MoveGroupInterface& gripper_move_group,
+    const rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr& gripper_pub,
     moveit_visual_tools::MoveItVisualTools& visual_tools,
     const Eigen::Isometry3d& text_pose,
     const std::vector<geometry_msgs::msg::Pose>& saved_poses,
@@ -197,26 +216,12 @@ void handleExecuteSequence(
       auto arm_result = ur_move_group.execute(cart_plan);
       if (arm_result == moveit::planning_interface::MoveItErrorCode::SUCCESS) {
         // GRIPPER (same as joint-space branch)
-        gripper_move_group.setGoalJointTolerance(0.05);
-        gripper_move_group.setJointValueTarget(gripper_joint_values[i]);
-
-        moveit::planning_interface::MoveGroupInterface::Plan gripper_plan;
-        bool gripper_ok = (gripper_move_group.plan(gripper_plan) ==
-                          moveit::planning_interface::MoveItErrorCode::SUCCESS);
-        if (gripper_ok) {
-          // if ok move the gripper and check success
-          auto gripper_result = gripper_move_group.execute(gripper_plan);
-
-          if (gripper_result == moveit::planning_interface::MoveItErrorCode::SUCCESS) {
-            // RCLCPP_INFO(LOGGER, "Gripper execution successful for pose #%zu", i + 1);
-            visual_tools.publishText(text_pose, "Motion Complete!", rvt::GREEN, rvt::XLARGE);
-          } else {
-            // RCLCPP_ERROR(LOGGER, "Gripper execution failed for pose #%zu", i + 1);
-            visual_tools.publishText(text_pose, "Gripper Execution Failed!", rvt::RED, rvt::XLARGE);
-          }
+                if (!gripper_joint_values[i].empty()) {
+          double target_width = gripper_joint_values[i][0];
+          commandGripperWidth(gripper_pub, visual_tools, text_pose, target_width);
+          visual_tools.publishText(text_pose, "Motion Complete!", rvt::GREEN, rvt::XLARGE);
         } else {
-          // RCLCPP_ERROR(LOGGER, "Gripper planning failed for pose #%zu", i + 1);
-          visual_tools.publishText(text_pose, "Gripper Planning Failed!", rvt::RED, rvt::XLARGE);
+          visual_tools.publishText(text_pose, "No saved gripper width!", rvt::RED, rvt::XLARGE);
         }
       } else {
         // RCLCPP_ERROR(LOGGER, "Cartesian arm execution failed for pose #%zu", i + 1);
@@ -252,24 +257,14 @@ void handleExecuteSequence(
         continue;  // skip gripper if arm planning failed
       }
       
-      // GRIPPER (only runs if arm succeeded)
-      gripper_move_group.setGoalJointTolerance(0.05); // 5cm tolerance on finger width to allow for successful execution even if not perfectly at target
-      gripper_move_group.setJointValueTarget(gripper_joint_values[i]);
-
-      moveit::planning_interface::MoveGroupInterface::Plan gripper_plan;
-      bool gripper_ok = (gripper_move_group.plan(gripper_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-
-      if (gripper_ok) {
-        auto gripper_result = gripper_move_group.execute(gripper_plan);
-        if (gripper_result == moveit::planning_interface::MoveItErrorCode::SUCCESS) {
-          RCLCPP_INFO(LOGGER, "Gripper execution successful for pose #%zu", i + 1);
-          visual_tools.publishText(text_pose, "Motion Complete!", rvt::GREEN, rvt::XLARGE);
-        } else {
-          RCLCPP_ERROR(LOGGER, "Gripper execution failed for pose #%zu", i + 1);
-          visual_tools.publishText(text_pose, "Gripper Execution Failed!", rvt::RED, rvt::XLARGE);
-        }
+           if (!gripper_joint_values[i].empty()) {
+        double target_width = gripper_joint_values[i][0];
+        commandGripperWidth(gripper_pub, visual_tools, text_pose, target_width);
+        RCLCPP_INFO(LOGGER, "Gripper width command sent for pose #%zu", i + 1);
+        visual_tools.publishText(text_pose, "Motion Complete!", rvt::GREEN, rvt::XLARGE);
       } else {
-        RCLCPP_ERROR(LOGGER, "Gripper planning failed for pose #%zu", i + 1);
+        RCLCPP_ERROR(LOGGER, "No saved gripper width for pose #%zu", i + 1);
+        visual_tools.publishText(text_pose, "No saved gripper width!", rvt::RED, rvt::XLARGE);
       }
     }
 
@@ -393,9 +388,15 @@ int main(int argc, char** argv)
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("ur3e_demo_node");
 
+  auto gripper_pub =
+    node->create_publisher<std_msgs::msg::Float64MultiArray>(
+        "/finger_width_controller/commands", 10);
+
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
   std::thread([&executor]() { executor.spin(); }).detach();
+
+  
 
   // *** CHANGED: updated planning group name ***
   moveit::planning_interface::MoveGroupInterface ur_move_group(node, PLANNING_GROUP);
@@ -425,28 +426,28 @@ int main(int argc, char** argv)
   bool joint_state_trajectory = true;  // if false, will use end effector pose goals instead of joint space goals for the arm
 
   // get current opened or closed state of the gripper by checking the current joint values of the gripper move group
-  std::vector<double> current_gripper_joints = gripper_move_group.getCurrentJointValues();
-  /// likely a width value for the gripper, so we can check if it's closer to the open or closed position
+//  std::vector<double> current_gripper_joints = gripper_move_group.getCurrentJointValues();
+//   /// likely a width value for the gripper, so we can check if it's closer to the open or closed position
 
-  // print 
+//   // print 
 
-  for (int i = 0; i << current_gripper_joints.size(); i++){
-    std::cout << "Gripper joint value: " << current_gripper_joints[i] << std::endl;
-  }
+//   for (size_t i = 0; i < current_gripper_joints.size(); i++) {
+//    std::cout << "Gripper joint value: " << current_gripper_joints[i] << std::endl;
+//   }
 
 
-  double finger_width = current_gripper_joints[0];
-  RCLCPP_INFO(LOGGER, "Current gripper joint value: %.3f", finger_width);
-  // you may need to adjust these thresholds based on your specific gripper and its joint limits
-  if (finger_width < 0.02) {  // assuming fully closed position is near 0.0
-    gripper_is_open = false;
-    RCLCPP_INFO(LOGGER, "Gripper is currently CLOSED");
-  } else if (finger_width > 0.08) {  // assuming fully open position is near 0.1
-    gripper_is_open = true;
-    RCLCPP_INFO(LOGGER, "Gripper is currently OPEN");
-  } else {
-    RCLCPP_WARN(LOGGER, "Gripper is in an UNKNOWN state (finger width: %.3f)", finger_width);
-  }
+//   double finger_width = current_gripper_joints[0];
+//   RCLCPP_INFO(LOGGER, "Current gripper joint value: %.3f", finger_width);
+//   // you may need to adjust these thresholds based on your specific gripper and its joint limits
+//   if (finger_width < 0.02) {  // assuming fully closed position is near 0.0
+//     gripper_is_open = false;
+//     RCLCPP_INFO(LOGGER, "Gripper is currently CLOSED");
+//   } else if (finger_width > 0.08) {  // assuming fully open position is near 0.1
+//     gripper_is_open = true;
+//     RCLCPP_INFO(LOGGER, "Gripper is currently OPEN");
+//   } else {
+//     RCLCPP_WARN(LOGGER, "Gripper is in an UNKNOWN state (finger width: %.3f)", finger_width);
+//   }
 
 
 
@@ -457,7 +458,7 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  placeGround(ur_move_group, planning_scene_interface, visual_tools);
+  //placeGround(ur_move_group, planning_scene_interface, visual_tools);
 
   bool running = true;
   while (running && rclcpp::ok())
@@ -490,19 +491,17 @@ int main(int argc, char** argv)
         break;
       case 'g':
         // *** CHANGED: pass both move groups and separate joint value vectors ***
-        handleExecuteSequence(ur_move_group, gripper_move_group, visual_tools, text_pose,
+       handleExecuteSequence(ur_move_group, gripper_move_group, gripper_pub, visual_tools, text_pose,
           saved_poses, ur_joint_values, gripper_joint_values, use_cartesian);
         break;
       case 'c':
         handleTogglePlanningMode(visual_tools, text_pose, use_cartesian);
         break;
       case 'o':
-        // *** ADDED: open gripper - named target must exist in your SRDF ***
-        moveGripper(gripper_move_group, visual_tools, text_pose, "open");
+        moveGripperOpen(gripper_pub, visual_tools, text_pose);
         break;
       case 'p':
-        // *** ADDED: close gripper - named target must exist in your SRDF ***
-        moveGripper(gripper_move_group, visual_tools, text_pose, "close");
+        moveGripperClose(gripper_pub, visual_tools, text_pose);
         break;
       case 'b':
         handleAddBox(ur_move_group, planning_scene_interface, visual_tools, text_pose, box_count);
