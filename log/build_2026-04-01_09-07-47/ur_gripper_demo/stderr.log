@@ -1,0 +1,10 @@
+[01m[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:[m[K In function ‘[01m[Kvoid recoverWrappedJoints(moveit::planning_interface::MoveGroupInterface&, const SharedPtr&)[m[K’:
+[01m[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:880:25:[m[K [01;31m[Kerror: [m[K‘[01m[Kwait_for_message[m[K’ is not a member of ‘[01m[Krclcpp[m[K’
+  880 |   auto js_msg = rclcpp::[01;31m[Kwait_for_message[m[K<sensor_msgs::msg::JointState>(
+      |                         [01;31m[K^~~~~~~~~~~~~~~~[m[K
+[01m[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:880:70:[m[K [01;31m[Kerror: [m[Kexpected primary-expression before ‘[01m[K>[m[K’ token
+  880 |   auto js_msg = rclcpp::wait_for_message<sensor_msgs::msg::JointState[01;31m[K>[m[K(
+      |                                                                      [01;31m[K^[m[K
+gmake[2]: *** [CMakeFiles/gripper_pick_place.dir/build.make:76: CMakeFiles/gripper_pick_place.dir/src/unit_test_pick_n_place.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:220: CMakeFiles/gripper_pick_place.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2

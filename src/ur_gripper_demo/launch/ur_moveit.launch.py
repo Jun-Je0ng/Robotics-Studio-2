@@ -43,7 +43,7 @@ from launch.substitutions import (
     LaunchConfiguration,
     PathJoinSubstitution,
 )
-
+from launch.substitutions import PythonExpression
 
 def launch_setup(context, *args, **kwargs):
 
@@ -68,6 +68,10 @@ def launch_setup(context, *args, **kwargs):
     use_sim_time = LaunchConfiguration("use_sim_time")
     launch_rviz = LaunchConfiguration("launch_rviz")
     launch_servo = LaunchConfiguration("launch_servo")
+
+
+    # *** Changed: Load which node to run
+    demo_type = LaunchConfiguration("demo_type")
 
     # *** CHANGED: use ur_description_package for UR-specific config params ***
     joint_limit_params = PathJoinSubstitution(
@@ -224,6 +228,7 @@ def launch_setup(context, *args, **kwargs):
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
+        arguments=["--ros-args", "--log-level", "warn"],  # silence
         parameters=[
             robot_description,
             robot_description_semantic,
@@ -249,7 +254,7 @@ def launch_setup(context, *args, **kwargs):
         executable="rviz2",
         name="rviz2_moveit",
         output="log",
-        arguments=["-d", rviz_config_file],
+        arguments=["-d", rviz_config_file, "--ros-args", "--log-level", "error"],  # silence
         parameters=[
             robot_description,
             robot_description_semantic,
@@ -269,6 +274,7 @@ def launch_setup(context, *args, **kwargs):
         package="moveit_servo",
         condition=IfCondition(launch_servo),
         executable="servo_node_main",
+        arguments=["--ros-args", "--log-level", "warn"], # silence
         parameters=[
             servo_params,
             robot_description,
@@ -279,10 +285,15 @@ def launch_setup(context, *args, **kwargs):
 
     # Your custom demo node (kept from your original launch file)
     demo_node = Node(
+        
         package="ur_gripper_demo",
         executable="gripper_demo_node",
         name="ur3e_moveit_cpp",
         output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", demo_type, "' == 'demo'"])
+        ),
+        # arguments=["--ros-args", "--log-level", "info"], # silence
         parameters=[
             robot_description,
             robot_description_semantic,
@@ -296,7 +307,35 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
-    nodes_to_start = [move_group_node, rviz_node, servo_node, demo_node]
+    pick_place_node = Node(
+        package="ur_gripper_demo",
+        executable="gripper_pick_place",
+        name="ur_pick_place",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", demo_type, "' == 'pick_place'"])
+        ),
+        parameters=[
+            robot_description,
+            robot_description_semantic,
+            robot_description_kinematics,
+            robot_description_planning,
+            ompl_planning_pipeline_config,
+            trajectory_execution,
+            moveit_controllers,
+            planning_scene_monitor_parameters,
+            {"use_sim_time": use_sim_time},
+        ],
+    )
+
+    # nodes_to_start = [move_group_node, rviz_node, servo_node, demo_node]
+    nodes_to_start = [
+        move_group_node,
+        rviz_node,
+        servo_node,
+        demo_node,
+        pick_place_node,
+    ]
 
     return nodes_to_start
 
@@ -417,6 +456,17 @@ def generate_launch_description():
     )
     declared_arguments.append(
         DeclareLaunchArgument("launch_servo", default_value="true", description="Launch Servo?")
+    )
+
+
+
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "demo_type",
+            default_value="demo",
+            description="Which demo node to run",
+            choices=["demo", "pick_place", "none"],
+        )
     )
 
     return LaunchDescription(declared_arguments + [OpaqueFunction(function=launch_setup)])

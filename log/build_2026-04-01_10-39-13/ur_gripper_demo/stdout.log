@@ -1,0 +1,10 @@
+[  0%] Built target ament_cmake_python_symlink_ur_gripper_demo
+[ 25%] [32mBuilding CXX object CMakeFiles/gripper_pick_place.dir/src/unit_test_pick_n_place.cpp.o[0m
+[ 75%] Built target gripper_demo_node
+running egg_info
+writing ur_gripper_demo.egg-info/PKG-INFO
+writing dependency_links to ur_gripper_demo.egg-info/dependency_links.txt
+writing top-level names to ur_gripper_demo.egg-info/top_level.txt
+reading manifest file 'ur_gripper_demo.egg-info/SOURCES.txt'
+writing manifest file 'ur_gripper_demo.egg-info/SOURCES.txt'
+[ 75%] Built target ament_cmake_python_build_ur_gripper_demo_egg

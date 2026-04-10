@@ -1,0 +1,137 @@
+[0.087s] Invoking command in '/home/billy/git/Robotics-Studio-2/build/object_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/billy/git/Robotics-Studio-2/build/object_msgs -- -j16 -l16
+[0.234s] [  7%] Built target object_msgs__cpp
+[0.235s] [ 12%] Built target object_msgs__rosidl_generator_c
+[0.269s] [ 12%] Built target ament_cmake_python_symlink_object_msgs
+[0.448s] [ 35%] Built target object_msgs__rosidl_typesupport_cpp
+[0.448s] [ 43%] Built target object_msgs__rosidl_typesupport_introspection_c
+[0.449s] [ 43%] Built target object_msgs__rosidl_typesupport_fastrtps_c
+[0.449s] [ 53%] Built target object_msgs__rosidl_typesupport_c
+[0.449s] [ 74%] Built target object_msgs__rosidl_typesupport_introspection_cpp
+[0.449s] [ 74%] Built target object_msgs__rosidl_typesupport_fastrtps_cpp
+[0.452s] [ 74%] Built target object_msgs
+[0.452s] [ 76%] Built target object_msgs__py
+[0.490s] [ 84%] Built target object_msgs__rosidl_generator_py
+[0.551s] [100%] Built target object_msgs__rosidl_typesupport_introspection_c__pyext
+[0.551s] [100%] Built target object_msgs__rosidl_typesupport_fastrtps_c__pyext
+[0.551s] [100%] Built target object_msgs__rosidl_typesupport_c__pyext
+[0.785s] running egg_info
+[0.786s] writing object_msgs.egg-info/PKG-INFO
+[0.786s] writing dependency_links to object_msgs.egg-info/dependency_links.txt
+[0.787s] writing top-level names to object_msgs.egg-info/top_level.txt
+[0.791s] reading manifest file 'object_msgs.egg-info/SOURCES.txt'
+[0.795s] writing manifest file 'object_msgs.egg-info/SOURCES.txt'
+[0.854s] [100%] Built target ament_cmake_python_build_object_msgs_egg
+[0.886s] Invoked command in '/home/billy/git/Robotics-Studio-2/build/object_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/billy/git/Robotics-Studio-2/build/object_msgs -- -j16 -l16
+[0.891s] Invoking command in '/home/billy/git/Robotics-Studio-2/build/object_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/billy/git/Robotics-Studio-2/build/object_msgs
+[0.909s] -- Install configuration: ""
+[0.910s] -- Execute custom install script
+[0.911s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/ament_index/resource_index/rosidl_interfaces/object_msgs
+[0.912s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object__functions.h
+[0.913s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object__struct.h
+[0.913s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object__type_support.h
+[0.914s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object_array__functions.h
+[0.914s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object_array__struct.h
+[0.915s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object_array__type_support.h
+[0.915s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/object.h
+[0.917s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/object_array.h
+[0.918s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/rosidl_generator_c__visibility_control.h
+[0.919s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/environment/library_path.sh
+[0.920s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/environment/library_path.dsv
+[0.921s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object__rosidl_typesupport_fastrtps_c.h
+[0.924s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object_array__rosidl_typesupport_fastrtps_c.h
+[0.932s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[0.934s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object__rosidl_typesupport_introspection_c.h
+[0.934s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object_array__rosidl_typesupport_introspection_c.h
+[0.935s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[0.935s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object__builder.hpp
+[0.936s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object__struct.hpp
+[0.936s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object__traits.hpp
+[0.937s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object__type_support.hpp
+[0.937s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object_array__builder.hpp
+[0.937s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object_array__struct.hpp
+[0.938s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object_array__traits.hpp
+[0.938s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object_array__type_support.hpp
+[0.939s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/object.hpp
+[0.940s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/object_array.hpp
+[0.941s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/rosidl_generator_cpp__visibility_control.hpp
+[0.946s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object__rosidl_typesupport_fastrtps_cpp.hpp
+[0.946s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object_array__rosidl_typesupport_fastrtps_cpp.hpp
+[0.946s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[0.947s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object__rosidl_typesupport_introspection_cpp.hpp
+[0.947s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/include/object_msgs/object_msgs/msg/detail/object_array__rosidl_typesupport_introspection_cpp.hpp
+[0.948s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/environment/pythonpath.sh
+[0.948s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/environment/pythonpath.dsv
+[0.952s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs-0.0.1-py3.10.egg-info/PKG-INFO
+[0.952s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs-0.0.1-py3.10.egg-info/SOURCES.txt
+[0.952s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs-0.0.1-py3.10.egg-info/dependency_links.txt
+[0.953s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs-0.0.1-py3.10.egg-info/top_level.txt
+[0.953s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/__init__.py
+[0.953s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/_object_msgs_s.ep.rosidl_typesupport_c.c
+[0.953s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/_object_msgs_s.ep.rosidl_typesupport_fastrtps_c.c
+[0.953s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/_object_msgs_s.ep.rosidl_typesupport_introspection_c.c
+[0.954s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/libobject_msgs__rosidl_generator_py.so
+[0.954s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/msg/__init__.py
+[0.954s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/msg/_object.py
+[0.954s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/msg/_object_array.py
+[0.957s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/msg/_object_array_s.c
+[0.957s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/msg/_object_s.c
+[0.957s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/object_msgs_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[0.957s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/object_msgs_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[0.958s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/object_msgs_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[0.958s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/object_msgs_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[0.959s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/object_msgs_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[0.959s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/object_msgs_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[0.959s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/msg/Object.idl
+[0.959s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/msg/ObjectArray.idl
+[0.960s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/msg/Object.msg
+[0.960s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/msg/ObjectArray.msg
+[0.960s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/ament_index/resource_index/package_run_dependencies/object_msgs
+[0.960s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/ament_index/resource_index/parent_prefix_path/object_msgs
+[0.960s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/environment/ament_prefix_path.sh
+[0.961s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/environment/ament_prefix_path.dsv
+[0.961s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/environment/path.sh
+[0.961s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/environment/path.dsv
+[0.961s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/local_setup.bash
+[0.961s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/local_setup.sh
+[0.961s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/local_setup.zsh
+[0.962s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/local_setup.dsv
+[0.962s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/package.dsv
+[0.976s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/ament_index/resource_index/packages/object_msgs
+[0.977s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/rosidl_cmake-extras.cmake
+[0.978s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/ament_cmake_export_dependencies-extras.cmake
+[0.980s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/ament_cmake_export_include_directories-extras.cmake
+[0.982s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/ament_cmake_export_libraries-extras.cmake
+[0.982s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/ament_cmake_export_targets-extras.cmake
+[0.982s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[0.983s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[0.984s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/object_msgsConfig.cmake
+[0.985s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/object_msgsConfig-version.cmake
+[0.986s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/package.xml
+[0.986s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/lib/libobject_msgs__rosidl_generator_c.so
+[0.986s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/lib/libobject_msgs__rosidl_typesupport_fastrtps_c.so
+[0.987s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/lib/libobject_msgs__rosidl_typesupport_introspection_c.so
+[0.988s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/lib/libobject_msgs__rosidl_typesupport_c.so
+[0.988s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/lib/libobject_msgs__rosidl_typesupport_fastrtps_cpp.so
+[0.989s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/lib/libobject_msgs__rosidl_typesupport_introspection_cpp.so
+[0.990s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/lib/libobject_msgs__rosidl_typesupport_cpp.so
+[1.062s] Listing '/home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs'...
+[1.062s] Listing '/home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages/object_msgs/msg'...
+[1.079s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/lib/libobject_msgs__rosidl_generator_py.so
+[1.082s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/export_object_msgs__rosidl_generator_cExport.cmake
+[1.083s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/export_object_msgs__rosidl_generator_cExport-noconfig.cmake
+[1.084s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/export_object_msgs__rosidl_typesupport_fastrtps_cExport.cmake
+[1.085s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/export_object_msgs__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+[1.085s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/object_msgs__rosidl_typesupport_introspection_cExport.cmake
+[1.085s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/object_msgs__rosidl_typesupport_introspection_cExport-noconfig.cmake
+[1.085s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/object_msgs__rosidl_typesupport_cExport.cmake
+[1.086s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/object_msgs__rosidl_typesupport_cExport-noconfig.cmake
+[1.090s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/export_object_msgs__rosidl_generator_cppExport.cmake
+[1.090s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/export_object_msgs__rosidl_typesupport_fastrtps_cppExport.cmake
+[1.096s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/export_object_msgs__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+[1.097s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/object_msgs__rosidl_typesupport_introspection_cppExport.cmake
+[1.099s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/object_msgs__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+[1.100s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/object_msgs__rosidl_typesupport_cppExport.cmake
+[1.100s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/object_msgs__rosidl_typesupport_cppExport-noconfig.cmake
+[1.101s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/export_object_msgs__rosidl_generator_pyExport.cmake
+[1.101s] -- Up-to-date: /home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake/export_object_msgs__rosidl_generator_pyExport-noconfig.cmake
+[1.206s] Invoked command in '/home/billy/git/Robotics-Studio-2/build/object_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/billy/git/Robotics-Studio-2/build/object_msgs

@@ -1,0 +1,483 @@
+[0.000000] (-) TimerEvent: {}
+[0.000923] (-) JobUnselected: {'identifier': 'object_msgs'}
+[0.001034] (-) JobUnselected: {'identifier': 'onrobot_description'}
+[0.001156] (-) JobUnselected: {'identifier': 'onrobot_driver'}
+[0.001244] (-) JobUnselected: {'identifier': 'ur3_demo_cpp'}
+[0.001329] (-) JobUnselected: {'identifier': 'ur_onrobot_control'}
+[0.001412] (-) JobUnselected: {'identifier': 'ur_onrobot_description'}
+[0.001491] (-) JobUnselected: {'identifier': 'ur_onrobot_moveit_config'}
+[0.001541] (ur_gripper_demo) JobQueued: {'identifier': 'ur_gripper_demo', 'dependencies': OrderedDict()}
+[0.002394] (ur_gripper_demo) JobStarted: {'identifier': 'ur_gripper_demo'}
+[0.028816] (ur_gripper_demo) JobProgress: {'identifier': 'ur_gripper_demo', 'progress': 'cmake'}
+[0.030769] (ur_gripper_demo) JobProgress: {'identifier': 'ur_gripper_demo', 'progress': 'build'}
+[0.032092] (ur_gripper_demo) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo', '--', '-j16', '-l16'], 'cwd': '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'billy'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:/home/billy/git/Robotics-Studio-2/install/object_msgs/lib:/home/billy/install/object_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('WT_PROFILE_ID', '{61c54bbd-c2c6-5271-96e7-009a87ff44bf}'), ('HOME', '/home/billy'), ('OLDPWD', '/home/billy'), ('ROS_PYTHON_VERSION', '3'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install:/home/billy/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'billy'), ('NAME', 'BillyZen'), ('WSL_INTEROP', '/run/WSL/20340_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/home/billy/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/STMicroelectronics/STM32 ST-LINK Utility/ST-LINK Utility:/mnt/c/Program Files/nodejs/:/mnt/c/Program Files/PostgreSQL/18/bin:/mnt/c/Program Files/MATLAB/R2025b/bin:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Python313/Scripts/:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Python313/:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/bilgu/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/bilgu/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/bilgu/AppData/Local/GitHubDesktop/bin:/mnt/c/Users/bilgu/AppData/Roaming/npm:/snap/bin'), ('WT_SESSION', '4505dfb1-f64e-492f-ac51-da710ffbc908'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/install/object_msgs:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GALLIUM_DRIVER', 'llvmpipe'), ('PWD', '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages:/home/billy/install/object_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/install/object_msgs:/opt/ros/humble'), ('WSLENV', 'WT_SESSION:WT_PROFILE_ID:')]), 'shell': False}
+[0.099215] (-) TimerEvent: {}
+[0.199894] (-) TimerEvent: {}
+[0.225236] (ur_gripper_demo) StdoutLine: {'line': b'[  0%] Built target ament_cmake_python_symlink_ur_gripper_demo\n'}
+[0.238095] (ur_gripper_demo) StdoutLine: {'line': b'[ 25%] \x1b[32mBuilding CXX object CMakeFiles/gripper_pick_place.dir/src/unit_test_pick_n_place.cpp.o\x1b[0m\n'}
+[0.239151] (ur_gripper_demo) StdoutLine: {'line': b'[ 75%] Built target gripper_demo_node\n'}
+[0.300086] (-) TimerEvent: {}
+[0.400781] (-) TimerEvent: {}
+[0.501661] (-) TimerEvent: {}
+[0.602430] (-) TimerEvent: {}
+[0.699580] (ur_gripper_demo) StdoutLine: {'line': b'running egg_info\n'}
+[0.702057] (ur_gripper_demo) StdoutLine: {'line': b'writing ur_gripper_demo.egg-info/PKG-INFO\n'}
+[0.702644] (-) TimerEvent: {}
+[0.703060] (ur_gripper_demo) StdoutLine: {'line': b'writing dependency_links to ur_gripper_demo.egg-info/dependency_links.txt\n'}
+[0.703744] (ur_gripper_demo) StdoutLine: {'line': b'writing top-level names to ur_gripper_demo.egg-info/top_level.txt\n'}
+[0.713591] (ur_gripper_demo) StdoutLine: {'line': b"reading manifest file 'ur_gripper_demo.egg-info/SOURCES.txt'\n"}
+[0.714610] (ur_gripper_demo) StdoutLine: {'line': b"writing manifest file 'ur_gripper_demo.egg-info/SOURCES.txt'\n"}
+[0.795711] (ur_gripper_demo) StdoutLine: {'line': b'[ 75%] Built target ament_cmake_python_build_ur_gripper_demo_egg\n'}
+[0.802872] (-) TimerEvent: {}
+[0.904266] (-) TimerEvent: {}
+[1.005050] (-) TimerEvent: {}
+[1.105669] (-) TimerEvent: {}
+[1.206293] (-) TimerEvent: {}
+[1.307018] (-) TimerEvent: {}
+[1.407756] (-) TimerEvent: {}
+[1.508582] (-) TimerEvent: {}
+[1.609129] (-) TimerEvent: {}
+[1.709814] (-) TimerEvent: {}
+[1.810598] (-) TimerEvent: {}
+[1.911576] (-) TimerEvent: {}
+[2.012456] (-) TimerEvent: {}
+[2.113139] (-) TimerEvent: {}
+[2.213904] (-) TimerEvent: {}
+[2.314578] (-) TimerEvent: {}
+[2.415268] (-) TimerEvent: {}
+[2.516234] (-) TimerEvent: {}
+[2.616986] (-) TimerEvent: {}
+[2.717822] (-) TimerEvent: {}
+[2.818702] (-) TimerEvent: {}
+[2.919551] (-) TimerEvent: {}
+[3.020597] (-) TimerEvent: {}
+[3.121422] (-) TimerEvent: {}
+[3.222177] (-) TimerEvent: {}
+[3.322815] (-) TimerEvent: {}
+[3.423434] (-) TimerEvent: {}
+[3.524092] (-) TimerEvent: {}
+[3.624711] (-) TimerEvent: {}
+[3.725303] (-) TimerEvent: {}
+[3.826716] (-) TimerEvent: {}
+[3.928206] (-) TimerEvent: {}
+[4.029865] (-) TimerEvent: {}
+[4.130450] (-) TimerEvent: {}
+[4.231610] (-) TimerEvent: {}
+[4.332372] (-) TimerEvent: {}
+[4.433268] (-) TimerEvent: {}
+[4.534589] (-) TimerEvent: {}
+[4.635815] (-) TimerEvent: {}
+[4.736699] (-) TimerEvent: {}
+[4.837381] (-) TimerEvent: {}
+[4.938455] (-) TimerEvent: {}
+[5.039371] (-) TimerEvent: {}
+[5.140359] (-) TimerEvent: {}
+[5.241292] (-) TimerEvent: {}
+[5.342314] (-) TimerEvent: {}
+[5.443324] (-) TimerEvent: {}
+[5.544205] (-) TimerEvent: {}
+[5.645102] (-) TimerEvent: {}
+[5.745900] (-) TimerEvent: {}
+[5.846636] (-) TimerEvent: {}
+[5.947249] (-) TimerEvent: {}
+[6.048014] (-) TimerEvent: {}
+[6.148754] (-) TimerEvent: {}
+[6.250034] (-) TimerEvent: {}
+[6.350705] (-) TimerEvent: {}
+[6.451818] (-) TimerEvent: {}
+[6.552613] (-) TimerEvent: {}
+[6.653443] (-) TimerEvent: {}
+[6.754423] (-) TimerEvent: {}
+[6.855547] (-) TimerEvent: {}
+[6.956625] (-) TimerEvent: {}
+[7.057372] (-) TimerEvent: {}
+[7.157955] (-) TimerEvent: {}
+[7.258606] (-) TimerEvent: {}
+[7.359208] (-) TimerEvent: {}
+[7.459985] (-) TimerEvent: {}
+[7.560898] (-) TimerEvent: {}
+[7.661570] (-) TimerEvent: {}
+[7.762457] (-) TimerEvent: {}
+[7.863331] (-) TimerEvent: {}
+[7.964316] (-) TimerEvent: {}
+[8.065598] (-) TimerEvent: {}
+[8.166443] (-) TimerEvent: {}
+[8.267188] (-) TimerEvent: {}
+[8.367871] (-) TimerEvent: {}
+[8.468702] (-) TimerEvent: {}
+[8.569549] (-) TimerEvent: {}
+[8.670130] (-) TimerEvent: {}
+[8.770825] (-) TimerEvent: {}
+[8.871687] (-) TimerEvent: {}
+[8.972723] (-) TimerEvent: {}
+[9.073561] (-) TimerEvent: {}
+[9.174144] (-) TimerEvent: {}
+[9.275130] (-) TimerEvent: {}
+[9.375913] (-) TimerEvent: {}
+[9.476761] (-) TimerEvent: {}
+[9.577387] (-) TimerEvent: {}
+[9.678051] (-) TimerEvent: {}
+[9.778967] (-) TimerEvent: {}
+[9.879805] (-) TimerEvent: {}
+[9.980817] (-) TimerEvent: {}
+[10.081768] (-) TimerEvent: {}
+[10.182602] (-) TimerEvent: {}
+[10.283654] (-) TimerEvent: {}
+[10.384528] (-) TimerEvent: {}
+[10.485249] (-) TimerEvent: {}
+[10.586074] (-) TimerEvent: {}
+[10.686687] (-) TimerEvent: {}
+[10.787510] (-) TimerEvent: {}
+[10.888264] (-) TimerEvent: {}
+[10.989454] (-) TimerEvent: {}
+[11.090166] (-) TimerEvent: {}
+[11.191111] (-) TimerEvent: {}
+[11.292061] (-) TimerEvent: {}
+[11.392879] (-) TimerEvent: {}
+[11.493557] (-) TimerEvent: {}
+[11.594402] (-) TimerEvent: {}
+[11.695310] (-) TimerEvent: {}
+[11.796266] (-) TimerEvent: {}
+[11.896958] (-) TimerEvent: {}
+[11.997547] (-) TimerEvent: {}
+[12.098325] (-) TimerEvent: {}
+[12.199039] (-) TimerEvent: {}
+[12.299979] (-) TimerEvent: {}
+[12.400719] (-) TimerEvent: {}
+[12.501692] (-) TimerEvent: {}
+[12.602616] (-) TimerEvent: {}
+[12.703760] (-) TimerEvent: {}
+[12.804549] (-) TimerEvent: {}
+[12.905542] (-) TimerEvent: {}
+[13.006244] (-) TimerEvent: {}
+[13.107026] (-) TimerEvent: {}
+[13.207785] (-) TimerEvent: {}
+[13.308620] (-) TimerEvent: {}
+[13.409292] (-) TimerEvent: {}
+[13.510062] (-) TimerEvent: {}
+[13.610914] (-) TimerEvent: {}
+[13.711782] (-) TimerEvent: {}
+[13.812757] (-) TimerEvent: {}
+[13.913803] (-) TimerEvent: {}
+[14.015089] (-) TimerEvent: {}
+[14.115965] (-) TimerEvent: {}
+[14.216742] (-) TimerEvent: {}
+[14.317345] (-) TimerEvent: {}
+[14.418122] (-) TimerEvent: {}
+[14.518874] (-) TimerEvent: {}
+[14.619721] (-) TimerEvent: {}
+[14.720477] (-) TimerEvent: {}
+[14.821417] (-) TimerEvent: {}
+[14.922683] (-) TimerEvent: {}
+[15.023694] (-) TimerEvent: {}
+[15.125320] (-) TimerEvent: {}
+[15.226216] (-) TimerEvent: {}
+[15.326997] (-) TimerEvent: {}
+[15.427570] (-) TimerEvent: {}
+[15.528225] (-) TimerEvent: {}
+[15.629217] (-) TimerEvent: {}
+[15.730262] (-) TimerEvent: {}
+[15.831449] (-) TimerEvent: {}
+[15.932194] (-) TimerEvent: {}
+[16.033188] (-) TimerEvent: {}
+[16.134135] (-) TimerEvent: {}
+[16.235155] (-) TimerEvent: {}
+[16.336680] (-) TimerEvent: {}
+[16.437782] (-) TimerEvent: {}
+[16.538527] (-) TimerEvent: {}
+[16.639265] (-) TimerEvent: {}
+[16.740252] (-) TimerEvent: {}
+[16.840979] (-) TimerEvent: {}
+[16.941659] (-) TimerEvent: {}
+[17.042393] (-) TimerEvent: {}
+[17.143232] (-) TimerEvent: {}
+[17.244263] (-) TimerEvent: {}
+[17.345151] (-) TimerEvent: {}
+[17.445926] (-) TimerEvent: {}
+[17.547037] (-) TimerEvent: {}
+[17.647903] (-) TimerEvent: {}
+[17.748700] (-) TimerEvent: {}
+[17.850054] (-) TimerEvent: {}
+[17.951157] (-) TimerEvent: {}
+[18.052056] (-) TimerEvent: {}
+[18.153063] (-) TimerEvent: {}
+[18.253748] (-) TimerEvent: {}
+[18.330306] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:\x1b[m\x1b[K In function \xe2\x80\x98\x1b[01m\x1b[Kbool moveTopose(moveit::planning_interface::MoveGroupInterface&, const Pose&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[18.330726] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:394:43:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[Kno matching function for call to \xe2\x80\x98\x1b[01m\x1b[Kmoveit::core::RobotState::setFromIK(const moveit::core::JointModelGroup*&, const Pose&, int, double, moveTopose(moveit::planning_interface::MoveGroupInterface&, const Pose&)::<lambda(moveit::core::RobotState*, const moveit::core::JointModelGroup*, const double*)>)\x1b[m\x1b[K\xe2\x80\x99\n'}
+[18.330848] (ur_gripper_demo) StderrLine: {'line': b'  394 |   bool ik_found = \x1b[01;31m\x1b[Kcurrent_state->setFromIK(\x1b[m\x1b[K\n'}
+[18.330923] (ur_gripper_demo) StderrLine: {'line': b'      |                   \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~^\x1b[m\x1b[K\n'}
+[18.330985] (ur_gripper_demo) StderrLine: {'line': b'  395 | \x1b[01;31m\x1b[K    jmg, pose, 10,   // 10 attempts\x1b[m\x1b[K\n'}
+[18.331060] (ur_gripper_demo) StderrLine: {'line': b'      |     \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K        \n'}
+[18.331124] (ur_gripper_demo) StderrLine: {'line': b'  396 | \x1b[01;31m\x1b[K    0.1,             // 100ms timeout per attempt\x1b[m\x1b[K\n'}
+[18.331215] (ur_gripper_demo) StderrLine: {'line': b'      |     \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.331307] (ur_gripper_demo) StderrLine: {'line': b'  397 | \x1b[01;31m\x1b[K    [&](moveit::core::RobotState* state,\x1b[m\x1b[K\n'}
+[18.331374] (ur_gripper_demo) StderrLine: {'line': b'      |     \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K   \n'}
+[18.331440] (ur_gripper_demo) StderrLine: {'line': b'  398 | \x1b[01;31m\x1b[K        const moveit::core::JointModelGroup* jmg,\x1b[m\x1b[K\n'}
+[18.331517] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.331575] (ur_gripper_demo) StderrLine: {'line': b'  399 | \x1b[01;31m\x1b[K        const double* joint_vals) {\x1b[m\x1b[K\n'}
+[18.331930] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K        \n'}
+[18.332040] (ur_gripper_demo) StderrLine: {'line': b'  400 | \x1b[01;31m\x1b[K      // Validity callback \xe2\x80\x94 reject solutions where any joint moved > 2.5 rad\x1b[m\x1b[K\n'}
+[18.332112] (ur_gripper_demo) StderrLine: {'line': b'      |       \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.332320] (ur_gripper_demo) StderrLine: {'line': b'  401 | \x1b[01;31m\x1b[K      // from current to avoid the 270\xc2\xb0 base spin\x1b[m\x1b[K\n'}
+[18.332396] (ur_gripper_demo) StderrLine: {'line': b'      |       \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.332478] (ur_gripper_demo) StderrLine: {'line': b'  402 | \x1b[01;31m\x1b[K      std::vector<double> current_joints;\x1b[m\x1b[K\n'}
+[18.332588] (ur_gripper_demo) StderrLine: {'line': b'      |       \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K  \n'}
+[18.332668] (ur_gripper_demo) StderrLine: {'line': b'  403 | \x1b[01;31m\x1b[K      arm.getCurrentState()->copyJointGroupPositions(jmg, current_joints);\x1b[m\x1b[K\n'}
+[18.332734] (ur_gripper_demo) StderrLine: {'line': b'      |       \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.332804] (ur_gripper_demo) StderrLine: {'line': b'  404 | \x1b[01;31m\x1b[K      for (size_t i = 0; i < jmg->getVariableCount(); ++i)\x1b[m\x1b[K\n'}
+[18.333074] (ur_gripper_demo) StderrLine: {'line': b'      |       \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.333511] (ur_gripper_demo) StderrLine: {'line': b'  405 | \x1b[01;31m\x1b[K      {\x1b[m\x1b[K\n'}
+[18.333640] (ur_gripper_demo) StderrLine: {'line': b'      |       \x1b[01;31m\x1b[K~\x1b[m\x1b[K                                    \n'}
+[18.334130] (ur_gripper_demo) StderrLine: {'line': b'  406 | \x1b[01;31m\x1b[K        double diff = std::abs(joint_vals[i] - current_joints[i]);\x1b[m\x1b[K\n'}
+[18.334414] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.334826] (ur_gripper_demo) StderrLine: {'line': b'  407 | \x1b[01;31m\x1b[K        // Normalize diff to (-\xcf\x80, \xcf\x80)\x1b[m\x1b[K\n'}
+[18.334927] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K       \n'}
+[18.334994] (ur_gripper_demo) StderrLine: {'line': b'  408 | \x1b[01;31m\x1b[K        while (diff >  M_PI) diff -= 2.0 * M_PI;\x1b[m\x1b[K\n'}
+[18.335057] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.335132] (ur_gripper_demo) StderrLine: {'line': b'  409 | \x1b[01;31m\x1b[K        while (diff < -M_PI) diff += 2.0 * M_PI;\x1b[m\x1b[K\n'}
+[18.335226] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.335318] (ur_gripper_demo) StderrLine: {'line': b'  410 | \x1b[01;31m\x1b[K        diff = std::abs(diff);\x1b[m\x1b[K\n'}
+[18.335398] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K             \n'}
+[18.335469] (ur_gripper_demo) StderrLine: {'line': b'  411 | \x1b[01;31m\x1b[K        if (diff > 2.5)  // reject if any joint moves more than ~143\xc2\xb0\x1b[m\x1b[K\n'}
+[18.335664] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.335781] (ur_gripper_demo) StderrLine: {'line': b'  412 | \x1b[01;31m\x1b[K        {\x1b[m\x1b[K\n'}
+[18.335869] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K~\x1b[m\x1b[K                                  \n'}
+[18.335950] (ur_gripper_demo) StderrLine: {'line': b'  413 | \x1b[01;31m\x1b[K          return false;\x1b[m\x1b[K\n'}
+[18.336045] (ur_gripper_demo) StderrLine: {'line': b'      |           \x1b[01;31m\x1b[K~~~~~~~~~~~~~\x1b[m\x1b[K                    \n'}
+[18.336124] (ur_gripper_demo) StderrLine: {'line': b'  414 | \x1b[01;31m\x1b[K        }\x1b[m\x1b[K\n'}
+[18.336312] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K~\x1b[m\x1b[K                                  \n'}
+[18.336405] (ur_gripper_demo) StderrLine: {'line': b'  415 | \x1b[01;31m\x1b[K      }\x1b[m\x1b[K\n'}
+[18.336486] (ur_gripper_demo) StderrLine: {'line': b'      |       \x1b[01;31m\x1b[K~\x1b[m\x1b[K                                    \n'}
+[18.336562] (ur_gripper_demo) StderrLine: {'line': b'  416 | \x1b[01;31m\x1b[K      return true;\x1b[m\x1b[K\n'}
+[18.336656] (ur_gripper_demo) StderrLine: {'line': b'      |       \x1b[01;31m\x1b[K~~~~~~~~~~~~\x1b[m\x1b[K                         \n'}
+[18.336732] (ur_gripper_demo) StderrLine: {'line': b'  417 | \x1b[01;31m\x1b[K    }\x1b[m\x1b[K\n'}
+[18.336805] (ur_gripper_demo) StderrLine: {'line': b'      |     \x1b[01;31m\x1b[K~\x1b[m\x1b[K                                      \n'}
+[18.336943] (ur_gripper_demo) StderrLine: {'line': b'  418 | \x1b[01;31m\x1b[K  )\x1b[m\x1b[K;\n'}
+[18.337045] (ur_gripper_demo) StderrLine: {'line': b'      |   \x1b[01;31m\x1b[K~\x1b[m\x1b[K                                        \n'}
+[18.337150] (ur_gripper_demo) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/humble/include/moveit/move_group_interface/move_group_interface.h:41\x1b[m\x1b[K,\n'}
+[18.337233] (ur_gripper_demo) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:3\x1b[m\x1b[K:\n'}
+[18.337312] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:952:8:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Kbool moveit::core::RobotState::setFromIK(const moveit::core::JointModelGroup*, const Pose&, double, const GroupStateValidityCallbackFn&, const kinematics::KinematicsQueryOptions&, const IKCostFn&)\x1b[m\x1b[K\xe2\x80\x99\n'}
+[18.337482] (ur_gripper_demo) StderrLine: {'line': b'  952 |   bool \x1b[01;36m\x1b[KsetFromIK\x1b[m\x1b[K(const JointModelGroup* group, const geometry_msgs::msg::Pose& pose, double timeout = 0.0,\n'}
+[18.337577] (ur_gripper_demo) StderrLine: {'line': b'      |        \x1b[01;36m\x1b[K^~~~~~~~~\x1b[m\x1b[K\n'}
+[18.337662] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:953:54:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  no known conversion for argument 4 from \xe2\x80\x98\x1b[01m\x1b[Kdouble\x1b[m\x1b[K\xe2\x80\x99 to \xe2\x80\x98\x1b[01m\x1b[Kconst GroupStateValidityCallbackFn&\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst std::function<bool(moveit::core::RobotState*, const moveit::core::JointModelGroup*, const double*)>&\x1b[m\x1b[K\xe2\x80\x99}\n'}
+[18.337762] (ur_gripper_demo) StderrLine: {'line': b'  953 |                  \x1b[01;36m\x1b[Kconst GroupStateValidityCallbackFn& constraint = GroupStateValidityCallbackFn()\x1b[m\x1b[K,\n'}
+[18.337844] (ur_gripper_demo) StderrLine: {'line': b'      |                  \x1b[01;36m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.337920] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:964:8:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Kbool moveit::core::RobotState::setFromIK(const moveit::core::JointModelGroup*, const Pose&, const string&, double, const GroupStateValidityCallbackFn&, const kinematics::KinematicsQueryOptions&, const IKCostFn&)\x1b[m\x1b[K\xe2\x80\x99\n'}
+[18.338002] (ur_gripper_demo) StderrLine: {'line': b'  964 |   bool \x1b[01;36m\x1b[KsetFromIK\x1b[m\x1b[K(const JointModelGroup* group, const geometry_msgs::msg::Pose& pose, const std::string& tip,\n'}
+[18.338079] (ur_gripper_demo) StderrLine: {'line': b'      |        \x1b[01;36m\x1b[K^~~~~~~~~\x1b[m\x1b[K\n'}
+[18.338153] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:964:105:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  no known conversion for argument 3 from \xe2\x80\x98\x1b[01m\x1b[Kint\x1b[m\x1b[K\xe2\x80\x99 to \xe2\x80\x98\x1b[01m\x1b[Kconst string&\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst std::__cxx11::basic_string<char>&\x1b[m\x1b[K\xe2\x80\x99}\n'}
+[18.338244] (ur_gripper_demo) StderrLine: {'line': b'  964 |   bool setFromIK(const JointModelGroup* group, const geometry_msgs::msg::Pose& pose, \x1b[01;36m\x1b[Kconst std::string& tip\x1b[m\x1b[K,\n'}
+[18.338382] (ur_gripper_demo) StderrLine: {'line': b'      |                                                                                      \x1b[01;36m\x1b[K~~~~~~~~~~~~~~~~~~~^~~\x1b[m\x1b[K\n'}
+[18.338474] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:975:8:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Kbool moveit::core::RobotState::setFromIK(const moveit::core::JointModelGroup*, const Isometry3d&, double, const GroupStateValidityCallbackFn&, const kinematics::KinematicsQueryOptions&, const IKCostFn&)\x1b[m\x1b[K\xe2\x80\x99\n'}
+[18.338572] (ur_gripper_demo) StderrLine: {'line': b'  975 |   bool \x1b[01;36m\x1b[KsetFromIK\x1b[m\x1b[K(const JointModelGroup* group, const Eigen::Isometry3d& pose, double timeout = 0.0,\n'}
+[18.338720] (ur_gripper_demo) StderrLine: {'line': b'      |        \x1b[01;36m\x1b[K^~~~~~~~~\x1b[m\x1b[K\n'}
+[18.338823] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:975:73:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  no known conversion for argument 2 from \xe2\x80\x98\x1b[01m\x1b[Kconst Pose\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst geometry_msgs::msg::Pose_<std::allocator<void> >\x1b[m\x1b[K\xe2\x80\x99} to \xe2\x80\x98\x1b[01m\x1b[Kconst Isometry3d&\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst Eigen::Transform<double, 3, 1>&\x1b[m\x1b[K\xe2\x80\x99}\n'}
+[18.338917] (ur_gripper_demo) StderrLine: {'line': b'  975 |   bool setFromIK(const JointModelGroup* group, \x1b[01;36m\x1b[Kconst Eigen::Isometry3d& pose\x1b[m\x1b[K, double timeout = 0.0,\n'}
+[18.339061] (ur_gripper_demo) StderrLine: {'line': b'      |                                                \x1b[01;36m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~^~~~\x1b[m\x1b[K\n'}
+[18.339178] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:986:8:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Kbool moveit::core::RobotState::setFromIK(const moveit::core::JointModelGroup*, const Isometry3d&, const string&, double, const GroupStateValidityCallbackFn&, const kinematics::KinematicsQueryOptions&, const IKCostFn&)\x1b[m\x1b[K\xe2\x80\x99\n'}
+[18.339267] (ur_gripper_demo) StderrLine: {'line': b'  986 |   bool \x1b[01;36m\x1b[KsetFromIK\x1b[m\x1b[K(const JointModelGroup* group, const Eigen::Isometry3d& pose, const std::string& tip,\n'}
+[18.339354] (ur_gripper_demo) StderrLine: {'line': b'      |        \x1b[01;36m\x1b[K^~~~~~~~~\x1b[m\x1b[K\n'}
+[18.339433] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:986:73:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  no known conversion for argument 2 from \xe2\x80\x98\x1b[01m\x1b[Kconst Pose\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst geometry_msgs::msg::Pose_<std::allocator<void> >\x1b[m\x1b[K\xe2\x80\x99} to \xe2\x80\x98\x1b[01m\x1b[Kconst Isometry3d&\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst Eigen::Transform<double, 3, 1>&\x1b[m\x1b[K\xe2\x80\x99}\n'}
+[18.339540] (ur_gripper_demo) StderrLine: {'line': b'  986 |   bool setFromIK(const JointModelGroup* group, \x1b[01;36m\x1b[Kconst Eigen::Isometry3d& pose\x1b[m\x1b[K, const std::string& tip,\n'}
+[18.339617] (ur_gripper_demo) StderrLine: {'line': b'      |                                                \x1b[01;36m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~^~~~\x1b[m\x1b[K\n'}
+[18.339693] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:999:8:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Kbool moveit::core::RobotState::setFromIK(const moveit::core::JointModelGroup*, const Isometry3d&, const string&, const std::vector<double, std::allocator<double> >&, double, const GroupStateValidityCallbackFn&, const kinematics::KinematicsQueryOptions&, const IKCostFn&)\x1b[m\x1b[K\xe2\x80\x99\n'}
+[18.339780] (ur_gripper_demo) StderrLine: {'line': b'  999 |   bool \x1b[01;36m\x1b[KsetFromIK\x1b[m\x1b[K(const JointModelGroup* group, const Eigen::Isometry3d& pose, const std::string& tip,\n'}
+[18.339856] (ur_gripper_demo) StderrLine: {'line': b'      |        \x1b[01;36m\x1b[K^~~~~~~~~\x1b[m\x1b[K\n'}
+[18.339931] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:999:73:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  no known conversion for argument 2 from \xe2\x80\x98\x1b[01m\x1b[Kconst Pose\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst geometry_msgs::msg::Pose_<std::allocator<void> >\x1b[m\x1b[K\xe2\x80\x99} to \xe2\x80\x98\x1b[01m\x1b[Kconst Isometry3d&\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst Eigen::Transform<double, 3, 1>&\x1b[m\x1b[K\xe2\x80\x99}\n'}
+[18.340017] (ur_gripper_demo) StderrLine: {'line': b'  999 |   bool setFromIK(const JointModelGroup* group, \x1b[01;36m\x1b[Kconst Eigen::Isometry3d& pose\x1b[m\x1b[K, const std::string& tip,\n'}
+[18.340092] (ur_gripper_demo) StderrLine: {'line': b'      |                                                \x1b[01;36m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~^~~~\x1b[m\x1b[K\n'}
+[18.340167] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:1014:8:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Kbool moveit::core::RobotState::setFromIK(const moveit::core::JointModelGroup*, const vector_Isometry3d&, const std::vector<std::__cxx11::basic_string<char> >&, double, const GroupStateValidityCallbackFn&, const kinematics::KinematicsQueryOptions&, const IKCostFn&)\x1b[m\x1b[K\xe2\x80\x99\n'}
+[18.340848] (ur_gripper_demo) StderrLine: {'line': b' 1014 |   bool \x1b[01;36m\x1b[KsetFromIK\x1b[m\x1b[K(const JointModelGroup* group, const EigenSTL::vector_Isometry3d& poses,\n'}
+[18.341206] (ur_gripper_demo) StderrLine: {'line': b'      |        \x1b[01;36m\x1b[K^~~~~~~~~\x1b[m\x1b[K\n'}
+[18.341310] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:1014:83:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  no known conversion for argument 2 from \xe2\x80\x98\x1b[01m\x1b[Kconst Pose\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst geometry_msgs::msg::Pose_<std::allocator<void> >\x1b[m\x1b[K\xe2\x80\x99} to \xe2\x80\x98\x1b[01m\x1b[Kconst vector_Isometry3d&\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst std::vector<Eigen::Transform<double, 3, 1>, Eigen::aligned_allocator<Eigen::Transform<double, 3, 1> > >&\x1b[m\x1b[K\xe2\x80\x99}\n'}
+[18.341418] (ur_gripper_demo) StderrLine: {'line': b' 1014 |   bool setFromIK(const JointModelGroup* group, \x1b[01;36m\x1b[Kconst EigenSTL::vector_Isometry3d& poses\x1b[m\x1b[K,\n'}
+[18.341483] (ur_gripper_demo) StderrLine: {'line': b'      |                                                \x1b[01;36m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~\x1b[m\x1b[K\n'}
+[18.341544] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:1030:8:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kcandidate: \xe2\x80\x98\x1b[01m\x1b[Kbool moveit::core::RobotState::setFromIK(const moveit::core::JointModelGroup*, const vector_Isometry3d&, const std::vector<std::__cxx11::basic_string<char> >&, const std::vector<std::vector<double, std::allocator<double> > >&, double, const GroupStateValidityCallbackFn&, const kinematics::KinematicsQueryOptions&, const IKCostFn&)\x1b[m\x1b[K\xe2\x80\x99\n'}
+[18.341606] (ur_gripper_demo) StderrLine: {'line': b' 1030 |   bool \x1b[01;36m\x1b[KsetFromIK\x1b[m\x1b[K(const JointModelGroup* group, const EigenSTL::vector_Isometry3d& poses,\n'}
+[18.341672] (ur_gripper_demo) StderrLine: {'line': b'      |        \x1b[01;36m\x1b[K^~~~~~~~~\x1b[m\x1b[K\n'}
+[18.341730] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/humble/include/moveit/robot_state/robot_state.h:1030:83:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K  no known conversion for argument 2 from \xe2\x80\x98\x1b[01m\x1b[Kconst Pose\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst geometry_msgs::msg::Pose_<std::allocator<void> >\x1b[m\x1b[K\xe2\x80\x99} to \xe2\x80\x98\x1b[01m\x1b[Kconst vector_Isometry3d&\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst std::vector<Eigen::Transform<double, 3, 1>, Eigen::aligned_allocator<Eigen::Transform<double, 3, 1> > >&\x1b[m\x1b[K\xe2\x80\x99}\n'}
+[18.341806] (ur_gripper_demo) StderrLine: {'line': b' 1030 |   bool setFromIK(const JointModelGroup* group, \x1b[01;36m\x1b[Kconst EigenSTL::vector_Isometry3d& poses\x1b[m\x1b[K,\n'}
+[18.341870] (ur_gripper_demo) StderrLine: {'line': b'      |                                                \x1b[01;36m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~\x1b[m\x1b[K\n'}
+[18.354076] (-) TimerEvent: {}
+[18.363758] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:439:10:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[KexecuteWithWrapFix\x1b[m\x1b[K\xe2\x80\x99 was not declared in this scope\n'}
+[18.364343] (ur_gripper_demo) StderrLine: {'line': b'  439 |   return \x1b[01;31m\x1b[KexecuteWithWrapFix\x1b[m\x1b[K(arm, plan);\n'}
+[18.364503] (ur_gripper_demo) StderrLine: {'line': b'      |          \x1b[01;31m\x1b[K^~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.395529] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:\x1b[m\x1b[K In function \xe2\x80\x98\x1b[01m\x1b[Kbool pickObject(moveit::planning_interface::MoveGroupInterface&, const SharedPtr&, moveit::planning_interface::PlanningSceneInterface&, const Object&, const string&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[18.396013] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:471:8:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[KmoveCartesianDown\x1b[m\x1b[K\xe2\x80\x99 was not declared in this scope\n'}
+[18.396150] (ur_gripper_demo) StderrLine: {'line': b'  471 |   if (!\x1b[01;31m\x1b[KmoveCartesianDown\x1b[m\x1b[K(arm, grasp))         return false;\n'}
+[18.396263] (ur_gripper_demo) StderrLine: {'line': b'      |        \x1b[01;31m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.422582] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:483:8:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[KmoveCartesianDown\x1b[m\x1b[K\xe2\x80\x99 was not declared in this scope\n'}
+[18.423098] (ur_gripper_demo) StderrLine: {'line': b'  483 |   if (!\x1b[01;31m\x1b[KmoveCartesianDown\x1b[m\x1b[K(arm, pregrasp))      return false;\n'}
+[18.423180] (ur_gripper_demo) StderrLine: {'line': b'      |        \x1b[01;31m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.451014] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:\x1b[m\x1b[K In function \xe2\x80\x98\x1b[01m\x1b[Kbool placeObject(moveit::planning_interface::MoveGroupInterface&, const SharedPtr&, moveit::planning_interface::PlanningSceneInterface&, const Pose&, const string&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[18.451595] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:508:8:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[KmoveCartesianDown\x1b[m\x1b[K\xe2\x80\x99 was not declared in this scope\n'}
+[18.451706] (ur_gripper_demo) StderrLine: {'line': b'  508 |   if (!\x1b[01;31m\x1b[KmoveCartesianDown\x1b[m\x1b[K(arm, place))         return false;\n'}
+[18.451780] (ur_gripper_demo) StderrLine: {'line': b'      |        \x1b[01;31m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.454320] (-) TimerEvent: {}
+[18.481954] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/unit_test_pick_n_place.cpp:516:8:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[KmoveCartesianDown\x1b[m\x1b[K\xe2\x80\x99 was not declared in this scope\n'}
+[18.482680] (ur_gripper_demo) StderrLine: {'line': b'  516 |   if (!\x1b[01;31m\x1b[KmoveCartesianDown\x1b[m\x1b[K(arm, pre_place))     return false;\n'}
+[18.482834] (ur_gripper_demo) StderrLine: {'line': b'      |        \x1b[01;31m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[18.554671] (-) TimerEvent: {}
+[18.655587] (-) TimerEvent: {}
+[18.756562] (-) TimerEvent: {}
+[18.857600] (-) TimerEvent: {}
+[18.958434] (-) TimerEvent: {}
+[19.059230] (-) TimerEvent: {}
+[19.159940] (-) TimerEvent: {}
+[19.260760] (-) TimerEvent: {}
+[19.361713] (-) TimerEvent: {}
+[19.462451] (-) TimerEvent: {}
+[19.563472] (-) TimerEvent: {}
+[19.664479] (-) TimerEvent: {}
+[19.765340] (-) TimerEvent: {}
+[19.866186] (-) TimerEvent: {}
+[19.967619] (-) TimerEvent: {}
+[20.068781] (-) TimerEvent: {}
+[20.169900] (-) TimerEvent: {}
+[20.270689] (-) TimerEvent: {}
+[20.371622] (-) TimerEvent: {}
+[20.472387] (-) TimerEvent: {}
+[20.573180] (-) TimerEvent: {}
+[20.674708] (-) TimerEvent: {}
+[20.775566] (-) TimerEvent: {}
+[20.876491] (-) TimerEvent: {}
+[20.977386] (-) TimerEvent: {}
+[21.078316] (-) TimerEvent: {}
+[21.179396] (-) TimerEvent: {}
+[21.280039] (-) TimerEvent: {}
+[21.380659] (-) TimerEvent: {}
+[21.481422] (-) TimerEvent: {}
+[21.582413] (-) TimerEvent: {}
+[21.683047] (-) TimerEvent: {}
+[21.784215] (-) TimerEvent: {}
+[21.885064] (-) TimerEvent: {}
+[21.985797] (-) TimerEvent: {}
+[22.086709] (-) TimerEvent: {}
+[22.187433] (-) TimerEvent: {}
+[22.288282] (-) TimerEvent: {}
+[22.389093] (-) TimerEvent: {}
+[22.489704] (-) TimerEvent: {}
+[22.590326] (-) TimerEvent: {}
+[22.691381] (-) TimerEvent: {}
+[22.792423] (-) TimerEvent: {}
+[22.893406] (-) TimerEvent: {}
+[22.994180] (-) TimerEvent: {}
+[23.094903] (-) TimerEvent: {}
+[23.195716] (-) TimerEvent: {}
+[23.296689] (-) TimerEvent: {}
+[23.397538] (-) TimerEvent: {}
+[23.498549] (-) TimerEvent: {}
+[23.599559] (-) TimerEvent: {}
+[23.700393] (-) TimerEvent: {}
+[23.801024] (-) TimerEvent: {}
+[23.901731] (-) TimerEvent: {}
+[24.002283] (-) TimerEvent: {}
+[24.102955] (-) TimerEvent: {}
+[24.204336] (-) TimerEvent: {}
+[24.305309] (-) TimerEvent: {}
+[24.406151] (-) TimerEvent: {}
+[24.507238] (-) TimerEvent: {}
+[24.608304] (-) TimerEvent: {}
+[24.709275] (-) TimerEvent: {}
+[24.810801] (-) TimerEvent: {}
+[24.911504] (-) TimerEvent: {}
+[25.012284] (-) TimerEvent: {}
+[25.112946] (-) TimerEvent: {}
+[25.213647] (-) TimerEvent: {}
+[25.315216] (-) TimerEvent: {}
+[25.416342] (-) TimerEvent: {}
+[25.517591] (-) TimerEvent: {}
+[25.618267] (-) TimerEvent: {}
+[25.720012] (-) TimerEvent: {}
+[25.821828] (-) TimerEvent: {}
+[25.922822] (-) TimerEvent: {}
+[26.023689] (-) TimerEvent: {}
+[26.124434] (-) TimerEvent: {}
+[26.225263] (-) TimerEvent: {}
+[26.325958] (-) TimerEvent: {}
+[26.426906] (-) TimerEvent: {}
+[26.527564] (-) TimerEvent: {}
+[26.628608] (-) TimerEvent: {}
+[26.729383] (-) TimerEvent: {}
+[26.830257] (-) TimerEvent: {}
+[26.931267] (-) TimerEvent: {}
+[27.032182] (-) TimerEvent: {}
+[27.133017] (-) TimerEvent: {}
+[27.233668] (-) TimerEvent: {}
+[27.334642] (-) TimerEvent: {}
+[27.435778] (-) TimerEvent: {}
+[27.536718] (-) TimerEvent: {}
+[27.637616] (-) TimerEvent: {}
+[27.738559] (-) TimerEvent: {}
+[27.839582] (-) TimerEvent: {}
+[27.940454] (-) TimerEvent: {}
+[28.041405] (-) TimerEvent: {}
+[28.142426] (-) TimerEvent: {}
+[28.243452] (-) TimerEvent: {}
+[28.344407] (-) TimerEvent: {}
+[28.445818] (-) TimerEvent: {}
+[28.546609] (-) TimerEvent: {}
+[28.647309] (-) TimerEvent: {}
+[28.748057] (-) TimerEvent: {}
+[28.848824] (-) TimerEvent: {}
+[28.949652] (-) TimerEvent: {}
+[29.050369] (-) TimerEvent: {}
+[29.151704] (-) TimerEvent: {}
+[29.252603] (-) TimerEvent: {}
+[29.353549] (-) TimerEvent: {}
+[29.454530] (-) TimerEvent: {}
+[29.555511] (-) TimerEvent: {}
+[29.656765] (-) TimerEvent: {}
+[29.757465] (-) TimerEvent: {}
+[29.858432] (-) TimerEvent: {}
+[29.959406] (-) TimerEvent: {}
+[30.060313] (-) TimerEvent: {}
+[30.161083] (-) TimerEvent: {}
+[30.262024] (-) TimerEvent: {}
+[30.363076] (-) TimerEvent: {}
+[30.463998] (-) TimerEvent: {}
+[30.566048] (-) TimerEvent: {}
+[30.666882] (-) TimerEvent: {}
+[30.767989] (-) TimerEvent: {}
+[30.869089] (-) TimerEvent: {}
+[30.971008] (-) TimerEvent: {}
+[31.073395] (-) TimerEvent: {}
+[31.174220] (-) TimerEvent: {}
+[31.275316] (-) TimerEvent: {}
+[31.377898] (-) TimerEvent: {}
+[31.478890] (-) TimerEvent: {}
+[31.579657] (-) TimerEvent: {}
+[31.680594] (-) TimerEvent: {}
+[31.781347] (-) TimerEvent: {}
+[31.882158] (-) TimerEvent: {}
+[31.983077] (-) TimerEvent: {}
+[32.083869] (-) TimerEvent: {}
+[32.184798] (-) TimerEvent: {}
+[32.285662] (-) TimerEvent: {}
+[32.386612] (-) TimerEvent: {}
+[32.487905] (-) TimerEvent: {}
+[32.588996] (-) TimerEvent: {}
+[32.689833] (-) TimerEvent: {}
+[32.790666] (-) TimerEvent: {}
+[32.891411] (-) TimerEvent: {}
+[32.992269] (-) TimerEvent: {}
+[33.093286] (-) TimerEvent: {}
+[33.194202] (-) TimerEvent: {}
+[33.295155] (-) TimerEvent: {}
+[33.396105] (-) TimerEvent: {}
+[33.497034] (-) TimerEvent: {}
+[33.598088] (-) TimerEvent: {}
+[33.698797] (-) TimerEvent: {}
+[33.799754] (-) TimerEvent: {}
+[33.900716] (-) TimerEvent: {}
+[34.001519] (-) TimerEvent: {}
+[34.102399] (-) TimerEvent: {}
+[34.203229] (-) TimerEvent: {}
+[34.304391] (-) TimerEvent: {}
+[34.405259] (-) TimerEvent: {}
+[34.444569] (ur_gripper_demo) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/gripper_pick_place.dir/build.make:76: CMakeFiles/gripper_pick_place.dir/src/unit_test_pick_n_place.cpp.o] Error 1\n'}
+[34.445325] (ur_gripper_demo) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:220: CMakeFiles/gripper_pick_place.dir/all] Error 2\n'}
+[34.445961] (ur_gripper_demo) StderrLine: {'line': b'gmake: *** [Makefile:146: all] Error 2\n'}
+[34.453153] (ur_gripper_demo) CommandEnded: {'returncode': 2}
+[34.476796] (ur_gripper_demo) JobEnded: {'identifier': 'ur_gripper_demo', 'rc': 2}
+[34.488800] (-) EventReactorShutdown: {}

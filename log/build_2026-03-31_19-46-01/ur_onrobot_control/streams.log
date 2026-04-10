@@ -1,0 +1,49 @@
+[0.223s] Invoking command in '/home/billy/git/Robotics-Studio-2/build/ur_onrobot_control': AMENT_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:${LD_LIBRARY_PATH} /usr/bin/cmake /home/billy/git/Robotics-Studio-2/src/ur_onrobot/ur_onrobot_control -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control
+[0.419s] -- The C compiler identification is GNU 11.4.0
+[0.954s] -- The CXX compiler identification is GNU 11.4.0
+[1.357s] -- Detecting C compiler ABI info
+[1.574s] -- Detecting C compiler ABI info - done
+[1.585s] -- Check for working C compiler: /usr/bin/cc - skipped
+[1.585s] -- Detecting C compile features
+[1.586s] -- Detecting C compile features - done
+[1.591s] -- Detecting CXX compiler ABI info
+[1.844s] -- Detecting CXX compiler ABI info - done
+[1.854s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[1.854s] -- Detecting CXX compile features
+[1.855s] -- Detecting CXX compile features - done
+[1.860s] -- Found ament_cmake: 1.3.13 (/opt/ros/humble/share/ament_cmake/cmake)
+[2.103s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[2.214s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[2.393s] -- Configuring done
+[2.405s] -- Generating done
+[2.406s] [33mCMake Warning:
+[2.406s]   Manually-specified variables were not used by the project:
+[2.406s] 
+[2.406s]     CMAKE_EXPORT_COMPILE_COMMANDS
+[2.406s] 
+[2.406s] [0m
+[2.409s] -- Build files have been written to: /home/billy/git/Robotics-Studio-2/build/ur_onrobot_control
+[2.418s] Invoked command in '/home/billy/git/Robotics-Studio-2/build/ur_onrobot_control' returned '0': AMENT_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:${LD_LIBRARY_PATH} /usr/bin/cmake /home/billy/git/Robotics-Studio-2/src/ur_onrobot/ur_onrobot_control -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control
+[2.421s] Invoking command in '/home/billy/git/Robotics-Studio-2/build/ur_onrobot_control': AMENT_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --build /home/billy/git/Robotics-Studio-2/build/ur_onrobot_control -- -j16 -l16
+[2.491s] Invoked command in '/home/billy/git/Robotics-Studio-2/build/ur_onrobot_control' returned '0': AMENT_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --build /home/billy/git/Robotics-Studio-2/build/ur_onrobot_control -- -j16 -l16
+[2.495s] Invoking command in '/home/billy/git/Robotics-Studio-2/build/ur_onrobot_control': AMENT_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --install /home/billy/git/Robotics-Studio-2/build/ur_onrobot_control
+[2.508s] -- Install configuration: ""
+[2.509s] -- Execute custom install script
+[2.513s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/launch/start_robot.launch.py
+[2.531s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/config/ur_onrobot_controllers.yaml
+[2.549s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ament_index/resource_index/package_run_dependencies/ur_onrobot_control
+[2.567s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ament_index/resource_index/parent_prefix_path/ur_onrobot_control
+[2.586s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/environment/ament_prefix_path.sh
+[2.604s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/environment/ament_prefix_path.dsv
+[2.621s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/environment/path.sh
+[2.638s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/environment/path.dsv
+[2.656s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/local_setup.bash
+[2.673s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/local_setup.sh
+[2.692s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/local_setup.zsh
+[2.710s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/local_setup.dsv
+[2.728s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/package.dsv
+[2.747s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ament_index/resource_index/packages/ur_onrobot_control
+[2.764s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/cmake/ur_onrobot_controlConfig.cmake
+[2.783s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/cmake/ur_onrobot_controlConfig-version.cmake
+[2.802s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/package.xml
+[2.824s] Invoked command in '/home/billy/git/Robotics-Studio-2/build/ur_onrobot_control' returned '0': AMENT_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --install /home/billy/git/Robotics-Studio-2/build/ur_onrobot_control

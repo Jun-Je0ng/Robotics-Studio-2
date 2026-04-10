@@ -1,0 +1,79 @@
+[0.263s] Invoking command in '/home/billy/git/Robotics-Studio-2/build/ur_onrobot_moveit_config': AMENT_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:${LD_LIBRARY_PATH} /usr/bin/cmake /home/billy/git/Robotics-Studio-2/src/ur_onrobot/ur_onrobot_moveit_config -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config
+[0.465s] -- The C compiler identification is GNU 11.4.0
+[1.039s] -- The CXX compiler identification is GNU 11.4.0
+[1.420s] -- Detecting C compiler ABI info
+[1.668s] -- Detecting C compiler ABI info - done
+[1.678s] -- Check for working C compiler: /usr/bin/cc - skipped
+[1.678s] -- Detecting C compile features
+[1.679s] -- Detecting C compile features - done
+[1.683s] -- Detecting CXX compiler ABI info
+[1.966s] -- Detecting CXX compiler ABI info - done
+[1.976s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[1.977s] -- Detecting CXX compile features
+[1.978s] -- Detecting CXX compile features - done
+[1.985s] -- Found ament_cmake: 1.3.13 (/opt/ros/humble/share/ament_cmake/cmake)
+[2.254s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[2.381s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[2.708s] -- Configuring done
+[2.729s] -- Generating done
+[2.730s] [33mCMake Warning:
+[2.730s]   Manually-specified variables were not used by the project:
+[2.730s] 
+[2.731s]     CMAKE_EXPORT_COMPILE_COMMANDS
+[2.731s] 
+[2.731s] [0m
+[2.735s] -- Build files have been written to: /home/billy/git/Robotics-Studio-2/build/ur_onrobot_moveit_config
+[2.746s] Invoked command in '/home/billy/git/Robotics-Studio-2/build/ur_onrobot_moveit_config' returned '0': AMENT_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:${LD_LIBRARY_PATH} /usr/bin/cmake /home/billy/git/Robotics-Studio-2/src/ur_onrobot/ur_onrobot_moveit_config -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config
+[2.749s] Invoking command in '/home/billy/git/Robotics-Studio-2/build/ur_onrobot_moveit_config': AMENT_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --build /home/billy/git/Robotics-Studio-2/build/ur_onrobot_moveit_config -- -j16 -l16
+[2.872s] Built target ament_cmake_python_symlink_ur_onrobot_moveit_config
+[3.325s] running egg_info
+[3.326s] creating ur_onrobot_moveit_config.egg-info
+[3.328s] writing ur_onrobot_moveit_config.egg-info/PKG-INFO
+[3.329s] writing dependency_links to ur_onrobot_moveit_config.egg-info/dependency_links.txt
+[3.329s] writing top-level names to ur_onrobot_moveit_config.egg-info/top_level.txt
+[3.329s] writing manifest file 'ur_onrobot_moveit_config.egg-info/SOURCES.txt'
+[3.335s] reading manifest file 'ur_onrobot_moveit_config.egg-info/SOURCES.txt'
+[3.336s] writing manifest file 'ur_onrobot_moveit_config.egg-info/SOURCES.txt'
+[3.395s] Built target ament_cmake_python_build_ur_onrobot_moveit_config_egg
+[3.418s] Invoked command in '/home/billy/git/Robotics-Studio-2/build/ur_onrobot_moveit_config' returned '0': AMENT_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --build /home/billy/git/Robotics-Studio-2/build/ur_onrobot_moveit_config -- -j16 -l16
+[3.422s] Invoking command in '/home/billy/git/Robotics-Studio-2/build/ur_onrobot_moveit_config': AMENT_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --install /home/billy/git/Robotics-Studio-2/build/ur_onrobot_moveit_config
+[3.436s] -- Install configuration: ""
+[3.437s] -- Execute custom install script
+[3.441s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/config/controllers.yaml
+[3.463s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/config/joint_limits.yaml
+[3.482s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/config/kinematics.yaml
+[3.500s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/config/ompl_planning.yaml
+[3.519s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/config/ur_onrobot_servo.yaml
+[3.542s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/launch/ur_onrobot_moveit.launch.py
+[3.563s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/rviz/view_robot.rviz
+[3.584s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/srdf/ur_onrobot.srdf.xacro
+[3.603s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/srdf/ur_onrobot_macro.srdf.xacro
+[3.622s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/environment/pythonpath.sh
+[3.643s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/environment/pythonpath.dsv
+[3.668s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages/ur_onrobot_moveit_config-0.0.1-py3.10.egg-info/PKG-INFO
+[3.688s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages/ur_onrobot_moveit_config-0.0.1-py3.10.egg-info/SOURCES.txt
+[3.706s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages/ur_onrobot_moveit_config-0.0.1-py3.10.egg-info/dependency_links.txt
+[3.725s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages/ur_onrobot_moveit_config-0.0.1-py3.10.egg-info/top_level.txt
+[3.746s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages/ur_onrobot_moveit_config/__init__.py
+[3.764s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages/ur_onrobot_moveit_config/launch_common.py
+[3.785s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages/launch_common.py
+[3.806s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ament_index/resource_index/package_run_dependencies/ur_onrobot_moveit_config
+[3.830s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ament_index/resource_index/parent_prefix_path/ur_onrobot_moveit_config
+[3.850s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/environment/ament_prefix_path.sh
+[3.870s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/environment/ament_prefix_path.dsv
+[3.892s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/environment/path.sh
+[3.915s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/environment/path.dsv
+[3.935s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/local_setup.bash
+[3.955s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/local_setup.sh
+[3.980s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/local_setup.zsh
+[4.006s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/local_setup.dsv
+[4.031s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/package.dsv
+[4.050s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ament_index/resource_index/packages/ur_onrobot_moveit_config
+[4.080s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/cmake/ur_onrobot_moveit_configConfig.cmake
+[4.106s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/cmake/ur_onrobot_moveit_configConfig-version.cmake
+[4.136s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/share/ur_onrobot_moveit_config/package.xml
+[4.278s] Listing '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages/ur_onrobot_moveit_config'...
+[4.279s] Compiling '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages/ur_onrobot_moveit_config/__init__.py'...
+[4.279s] Compiling '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages/ur_onrobot_moveit_config/launch_common.py'...
+[4.352s] Compiling '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages/launch_common.py'...
+[4.367s] Invoked command in '/home/billy/git/Robotics-Studio-2/build/ur_onrobot_moveit_config' returned '0': AMENT_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --install /home/billy/git/Robotics-Studio-2/build/ur_onrobot_moveit_config

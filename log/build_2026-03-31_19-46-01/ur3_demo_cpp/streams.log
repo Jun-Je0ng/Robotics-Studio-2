@@ -1,0 +1,4 @@
+[0.043s] Invoking command in '/home/billy/git/Robotics-Studio-2/build/ur3_demo_cpp': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/billy/git/Robotics-Studio-2/build/ur3_demo_cpp -- -j16 -l16
+[0.163s] [ 50%] [32mBuilding CXX object CMakeFiles/panda_demo_node.dir/src/moveit_cpp_tutorial.cpp.o[0m
+[29.965s] [100%] [32m[1mLinking CXX executable panda_demo_node[0m
+[31.657s] [100%] Built target panda_demo_node

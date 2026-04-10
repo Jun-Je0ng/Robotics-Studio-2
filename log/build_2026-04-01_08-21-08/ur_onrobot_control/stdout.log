@@ -1,0 +1,19 @@
+-- Install configuration: ""
+-- Execute custom install script
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/launch/start_robot.launch.py
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/config/ur_onrobot_controllers.yaml
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ament_index/resource_index/package_run_dependencies/ur_onrobot_control
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ament_index/resource_index/parent_prefix_path/ur_onrobot_control
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/environment/ament_prefix_path.sh
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/environment/ament_prefix_path.dsv
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/environment/path.sh
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/environment/path.dsv
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/local_setup.bash
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/local_setup.sh
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/local_setup.zsh
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/local_setup.dsv
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/package.dsv
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ament_index/resource_index/packages/ur_onrobot_control
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/cmake/ur_onrobot_controlConfig.cmake
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/cmake/ur_onrobot_controlConfig-version.cmake
+-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_control/share/ur_onrobot_control/package.xml
