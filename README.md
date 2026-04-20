@@ -72,12 +72,19 @@ MODEL_PATH = "/your/path/to/best.pt"
 ```
 
 **Camera-to-robot calibration** — must be generated per setup.
-The calibration file is specific to your camera position and robot setup.
-See the Calibration section below to generate it.
-Once generated, open `obb_detector_node.py` and update this line:
+For initial testing you can use Rian's calibration file — note this is only
+valid if the camera and robot are in the exact same position as Rian's setup:
+> [Download camera_to_robot_calibration.json — Google Drive](https://drive.google.com/file/d/1WYGAGIuWkN1SfdV2ZPyGIjgIhSolGRTG/view?usp=sharing)
+
+Once downloaded, place it anywhere on your machine, then open
+`src/plastic_detection/plastic_detection/obb_detector_node.py`
+and update this line at the top to match where you saved it:
 ```python
 CALIBRATION_FILE = "/your/path/to/camera_to_robot_calibration.json"
 ```
+
+> **Important:** For real deployment you must generate your own calibration
+> file using `camera_calibration.py` — see the Calibration section below.
 
 ### Build the package
 ```bash
