@@ -26,6 +26,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+# my launch file
+
 import os
 
 from launch_ros.actions import Node
@@ -171,6 +173,15 @@ def launch_setup(context, *args, **kwargs):
         [FindPackageShare(moveit_config_package), "config", "kinematics.yaml"]
     )
 
+    # from ur_onrobot_moveit_config.launch_common import load_yaml
+
+    # robot_description_kinematics = {
+    #     "robot_description_kinematics": load_yaml(
+    #         str(moveit_config_package.perform(context)),
+    #         "config/kinematics.yaml"
+    #     )
+    # }
+
     robot_description_planning = {
         "robot_description_planning": load_yaml(
             str(moveit_config_package.perform(context)),
@@ -179,16 +190,46 @@ def launch_setup(context, *args, **kwargs):
     }
 
     # Planning Configuration
-    ompl_planning_pipeline_config = {
-        "move_group": {
+    # planning_pipeline_config = {
+    #     "move_group": {
+    #         "planning_plugin": "ompl_interface/OMPLPlanner",
+    #         "request_adapters": """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",
+    #         "start_state_max_bounds_error": 0.1,
+    #     }
+    # }
+    # # *** CHANGED: load ompl config from ur_onrobot_moveit_config ***
+    # ompl_planning_yaml = load_yaml("ur_onrobot_moveit_config", "config/ompl_planning.yaml")
+    # planning_pipeline_config["move_group"].update(ompl_planning_yaml)
+
+    # Double CHanged to use newer format
+    planning_pipeline_config = {
+        "planning_pipelines": ["ompl"],
+        "default_planning_pipeline": "ompl",
+        "ompl": {
             "planning_plugin": "ompl_interface/OMPLPlanner",
             "request_adapters": """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",
             "start_state_max_bounds_error": 0.1,
-        }
+        },
     }
-    # *** CHANGED: load ompl config from ur_onrobot_moveit_config ***
-    ompl_planning_yaml = load_yaml("ur_onrobot_moveit_config", "config/ompl_planning.yaml")
-    ompl_planning_pipeline_config["move_group"].update(ompl_planning_yaml)
+    ompl_yaml = load_yaml("ur_onrobot_moveit_config", "config/ompl_planning.yaml")
+    if ompl_yaml:
+        planning_pipeline_config["ompl"].update(ompl_yaml)
+
+
+    # tryign to add stomp
+    # planning_pipeline_config = {
+    #     "planning_pipelines": ["ompl", "stomp"],
+    #     "default_planning_pipeline": "stomp",  # was ompl before
+    #     "ompl": {
+    #         "planning_plugin": "ompl_interface/OMPLPlanner",
+    #         "request_adapters": """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",
+    #         "start_state_max_bounds_error": 0.1,
+    #     },
+    #     "stomp": load_yaml("ur_onrobot_moveit_config", "config/stomp_planning.yaml"),
+    # }
+    # ompl_yaml = load_yaml("ur_onrobot_moveit_config", "config/ompl_planning.yaml")
+    # if ompl_yaml:
+    #     planning_pipeline_config["ompl"].update(ompl_yaml)
 
     # Trajectory Execution Configuration
     # *** CHANGED: load controllers from ur_onrobot_moveit_config ***
@@ -235,7 +276,7 @@ def launch_setup(context, *args, **kwargs):
             publish_robot_description_semantic,
             robot_description_kinematics,
             robot_description_planning,
-            ompl_planning_pipeline_config,
+            planning_pipeline_config,
             trajectory_execution,
             moveit_controllers,
             planning_scene_monitor_parameters,
@@ -258,7 +299,7 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
             robot_description,
             robot_description_semantic,
-            ompl_planning_pipeline_config,
+            planning_pipeline_config,
             robot_description_kinematics,
             robot_description_planning,
             warehouse_ros_config,
@@ -279,6 +320,7 @@ def launch_setup(context, *args, **kwargs):
             servo_params,
             robot_description,
             robot_description_semantic,
+            robot_description_kinematics
         ],
         output="screen",
     )
@@ -299,7 +341,7 @@ def launch_setup(context, *args, **kwargs):
             robot_description_semantic,
             robot_description_kinematics,
             robot_description_planning,
-            ompl_planning_pipeline_config,
+            planning_pipeline_config,
             trajectory_execution,
             moveit_controllers,
             planning_scene_monitor_parameters,
@@ -320,7 +362,7 @@ def launch_setup(context, *args, **kwargs):
             robot_description_semantic,
             robot_description_kinematics,
             robot_description_planning,
-            ompl_planning_pipeline_config,
+            planning_pipeline_config,
             trajectory_execution,
             moveit_controllers,
             planning_scene_monitor_parameters,
@@ -328,13 +370,22 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    Perception_info_translator = Node(
+        package='ur_gripper_demo',
+        executable='plastic_detections_translator',
+        name='plastic_detections_translator',
+        output='screen',
+    )
+
     # nodes_to_start = [move_group_node, rviz_node, servo_node, demo_node]
     nodes_to_start = [
         move_group_node,
+        # MTC_executor_node,
         rviz_node,
         servo_node,
         demo_node,
         pick_place_node,
+        Perception_info_translator,
     ]
 
     return nodes_to_start

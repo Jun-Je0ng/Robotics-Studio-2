@@ -1,0 +1,537 @@
+[0.000000] (-) TimerEvent: {}
+[0.000700] (-) JobUnselected: {'identifier': 'motion_control_subsystem'}
+[0.000768] (-) JobUnselected: {'identifier': 'object_msgs'}
+[0.001236] (-) JobUnselected: {'identifier': 'onrobot_description'}
+[0.001288] (-) JobUnselected: {'identifier': 'onrobot_driver'}
+[0.001336] (-) JobUnselected: {'identifier': 'ur3_demo_cpp'}
+[0.001381] (-) JobUnselected: {'identifier': 'ur_description_local'}
+[0.001428] (-) JobUnselected: {'identifier': 'ur_onrobot_control'}
+[0.001634] (-) JobUnselected: {'identifier': 'ur_onrobot_description'}
+[0.001681] (-) JobUnselected: {'identifier': 'ur_onrobot_moveit_config'}
+[0.002128] (ur_gripper_demo) JobQueued: {'identifier': 'ur_gripper_demo', 'dependencies': OrderedDict([('object_msgs', '/home/billy/git/Robotics-Studio-2/install/object_msgs')])}
+[0.002286] (ur_gripper_demo) JobStarted: {'identifier': 'ur_gripper_demo'}
+[0.099497] (-) TimerEvent: {}
+[0.102379] (ur_gripper_demo) JobProgress: {'identifier': 'ur_gripper_demo', 'progress': 'cmake'}
+[0.106061] (ur_gripper_demo) JobProgress: {'identifier': 'ur_gripper_demo', 'progress': 'build'}
+[0.106877] (ur_gripper_demo) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo', '--', '-j16', '-l16'], 'cwd': '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'billy'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/billy/git/Robotics-Studio-2/install/object_msgs/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/lib:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools/lib:/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/billy'), ('OLDPWD', '/home/billy'), ('ROS_PYTHON_VERSION', '3'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'billy'), ('NAME', 'BillyZen'), ('WSL_INTEROP', '/run/WSL/3590_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/billy/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForLinux_2.6.3.0_x64__8wekyb3d8bbwe:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/STMicroelectronics/STM32 ST-LINK Utility/ST-LINK Utility:/mnt/c/Program Files/nodejs/:/mnt/c/Program Files/PostgreSQL/18/bin:/mnt/c/Program Files/MATLAB/R2025b/bin:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Python313/Scripts/:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Python313/:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/bilgu/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/bilgu/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/bilgu/AppData/Local/GitHubDesktop/bin:/mnt/c/Users/bilgu/AppData/Roaming/npm:/snap/bin'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GALLIUM_DRIVER', 'llvmpipe'), ('CMAKE_MODULE_PATH', '/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/share/moveit_task_constructor_core/cmake'), ('PWD', '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble'), ('WSLENV', '')]), 'shell': False}
+[0.199648] (-) TimerEvent: {}
+[0.300114] (-) TimerEvent: {}
+[0.400522] (-) TimerEvent: {}
+[0.429602] (ur_gripper_demo) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target gripper_pick_place\x1b[0m\n'}
+[0.442173] (ur_gripper_demo) StdoutLine: {'line': b'[  0%] Built target ament_cmake_python_symlink_ur_gripper_demo\n'}
+[0.462034] (ur_gripper_demo) StdoutLine: {'line': b'[ 50%] Built target gripper_demo_node\n'}
+[0.484450] (ur_gripper_demo) StdoutLine: {'line': b'[ 75%] \x1b[32mBuilding CXX object CMakeFiles/gripper_pick_place.dir/src/pick_n_place_try2_1.cpp.o\x1b[0m\n'}
+[0.500667] (-) TimerEvent: {}
+[0.601103] (-) TimerEvent: {}
+[0.701511] (-) TimerEvent: {}
+[0.755025] (ur_gripper_demo) StdoutLine: {'line': b'running egg_info\n'}
+[0.756064] (ur_gripper_demo) StdoutLine: {'line': b'writing ur_gripper_demo.egg-info/PKG-INFO\n'}
+[0.756524] (ur_gripper_demo) StdoutLine: {'line': b'writing dependency_links to ur_gripper_demo.egg-info/dependency_links.txt\n'}
+[0.756809] (ur_gripper_demo) StdoutLine: {'line': b'writing top-level names to ur_gripper_demo.egg-info/top_level.txt\n'}
+[0.764106] (ur_gripper_demo) StdoutLine: {'line': b"reading manifest file 'ur_gripper_demo.egg-info/SOURCES.txt'\n"}
+[0.765013] (ur_gripper_demo) StdoutLine: {'line': b"writing manifest file 'ur_gripper_demo.egg-info/SOURCES.txt'\n"}
+[0.801664] (-) TimerEvent: {}
+[0.810589] (ur_gripper_demo) StdoutLine: {'line': b'[ 75%] Built target ament_cmake_python_build_ur_gripper_demo_egg\n'}
+[0.901834] (-) TimerEvent: {}
+[1.002262] (-) TimerEvent: {}
+[1.102732] (-) TimerEvent: {}
+[1.203216] (-) TimerEvent: {}
+[1.303651] (-) TimerEvent: {}
+[1.404103] (-) TimerEvent: {}
+[1.504588] (-) TimerEvent: {}
+[1.605070] (-) TimerEvent: {}
+[1.705600] (-) TimerEvent: {}
+[1.806060] (-) TimerEvent: {}
+[1.906477] (-) TimerEvent: {}
+[2.006957] (-) TimerEvent: {}
+[2.107462] (-) TimerEvent: {}
+[2.207973] (-) TimerEvent: {}
+[2.308479] (-) TimerEvent: {}
+[2.408930] (-) TimerEvent: {}
+[2.509376] (-) TimerEvent: {}
+[2.609847] (-) TimerEvent: {}
+[2.710341] (-) TimerEvent: {}
+[2.810794] (-) TimerEvent: {}
+[2.911360] (-) TimerEvent: {}
+[3.011893] (-) TimerEvent: {}
+[3.112397] (-) TimerEvent: {}
+[3.212851] (-) TimerEvent: {}
+[3.313320] (-) TimerEvent: {}
+[3.413823] (-) TimerEvent: {}
+[3.514340] (-) TimerEvent: {}
+[3.614815] (-) TimerEvent: {}
+[3.715408] (-) TimerEvent: {}
+[3.815869] (-) TimerEvent: {}
+[3.916394] (-) TimerEvent: {}
+[4.016962] (-) TimerEvent: {}
+[4.117363] (-) TimerEvent: {}
+[4.217776] (-) TimerEvent: {}
+[4.318237] (-) TimerEvent: {}
+[4.418829] (-) TimerEvent: {}
+[4.519388] (-) TimerEvent: {}
+[4.619862] (-) TimerEvent: {}
+[4.720361] (-) TimerEvent: {}
+[4.820852] (-) TimerEvent: {}
+[4.921356] (-) TimerEvent: {}
+[5.021818] (-) TimerEvent: {}
+[5.122299] (-) TimerEvent: {}
+[5.222746] (-) TimerEvent: {}
+[5.323275] (-) TimerEvent: {}
+[5.423730] (-) TimerEvent: {}
+[5.524284] (-) TimerEvent: {}
+[5.624834] (-) TimerEvent: {}
+[5.725381] (-) TimerEvent: {}
+[5.825913] (-) TimerEvent: {}
+[5.927395] (-) TimerEvent: {}
+[6.028137] (-) TimerEvent: {}
+[6.128672] (-) TimerEvent: {}
+[6.229126] (-) TimerEvent: {}
+[6.329576] (-) TimerEvent: {}
+[6.430285] (-) TimerEvent: {}
+[6.530786] (-) TimerEvent: {}
+[6.631449] (-) TimerEvent: {}
+[6.731907] (-) TimerEvent: {}
+[6.832455] (-) TimerEvent: {}
+[6.932967] (-) TimerEvent: {}
+[7.033444] (-) TimerEvent: {}
+[7.133892] (-) TimerEvent: {}
+[7.234348] (-) TimerEvent: {}
+[7.334812] (-) TimerEvent: {}
+[7.435291] (-) TimerEvent: {}
+[7.535760] (-) TimerEvent: {}
+[7.636276] (-) TimerEvent: {}
+[7.736821] (-) TimerEvent: {}
+[7.837282] (-) TimerEvent: {}
+[7.937745] (-) TimerEvent: {}
+[8.038253] (-) TimerEvent: {}
+[8.138677] (-) TimerEvent: {}
+[8.239243] (-) TimerEvent: {}
+[8.339736] (-) TimerEvent: {}
+[8.440299] (-) TimerEvent: {}
+[8.540908] (-) TimerEvent: {}
+[8.641578] (-) TimerEvent: {}
+[8.742082] (-) TimerEvent: {}
+[8.842641] (-) TimerEvent: {}
+[8.943114] (-) TimerEvent: {}
+[9.043554] (-) TimerEvent: {}
+[9.144111] (-) TimerEvent: {}
+[9.244726] (-) TimerEvent: {}
+[9.345151] (-) TimerEvent: {}
+[9.445682] (-) TimerEvent: {}
+[9.546231] (-) TimerEvent: {}
+[9.646724] (-) TimerEvent: {}
+[9.747297] (-) TimerEvent: {}
+[9.847813] (-) TimerEvent: {}
+[9.948339] (-) TimerEvent: {}
+[10.048791] (-) TimerEvent: {}
+[10.149242] (-) TimerEvent: {}
+[10.249718] (-) TimerEvent: {}
+[10.350175] (-) TimerEvent: {}
+[10.450639] (-) TimerEvent: {}
+[10.551188] (-) TimerEvent: {}
+[10.651716] (-) TimerEvent: {}
+[10.752220] (-) TimerEvent: {}
+[10.852709] (-) TimerEvent: {}
+[10.953266] (-) TimerEvent: {}
+[11.053943] (-) TimerEvent: {}
+[11.154477] (-) TimerEvent: {}
+[11.254971] (-) TimerEvent: {}
+[11.355450] (-) TimerEvent: {}
+[11.455924] (-) TimerEvent: {}
+[11.556422] (-) TimerEvent: {}
+[11.656861] (-) TimerEvent: {}
+[11.757335] (-) TimerEvent: {}
+[11.858028] (-) TimerEvent: {}
+[11.958531] (-) TimerEvent: {}
+[12.059057] (-) TimerEvent: {}
+[12.159488] (-) TimerEvent: {}
+[12.259923] (-) TimerEvent: {}
+[12.360370] (-) TimerEvent: {}
+[12.460792] (-) TimerEvent: {}
+[12.561265] (-) TimerEvent: {}
+[12.661741] (-) TimerEvent: {}
+[12.762255] (-) TimerEvent: {}
+[12.862856] (-) TimerEvent: {}
+[12.963377] (-) TimerEvent: {}
+[13.063802] (-) TimerEvent: {}
+[13.164238] (-) TimerEvent: {}
+[13.264698] (-) TimerEvent: {}
+[13.365147] (-) TimerEvent: {}
+[13.465653] (-) TimerEvent: {}
+[13.566114] (-) TimerEvent: {}
+[13.666630] (-) TimerEvent: {}
+[13.767278] (-) TimerEvent: {}
+[13.867777] (-) TimerEvent: {}
+[13.968274] (-) TimerEvent: {}
+[14.068841] (-) TimerEvent: {}
+[14.169465] (-) TimerEvent: {}
+[14.269991] (-) TimerEvent: {}
+[14.370484] (-) TimerEvent: {}
+[14.471068] (-) TimerEvent: {}
+[14.571507] (-) TimerEvent: {}
+[14.672001] (-) TimerEvent: {}
+[14.772442] (-) TimerEvent: {}
+[14.873139] (-) TimerEvent: {}
+[14.973597] (-) TimerEvent: {}
+[15.074410] (-) TimerEvent: {}
+[15.175128] (-) TimerEvent: {}
+[15.275894] (-) TimerEvent: {}
+[15.376476] (-) TimerEvent: {}
+[15.476968] (-) TimerEvent: {}
+[15.577432] (-) TimerEvent: {}
+[15.677919] (-) TimerEvent: {}
+[15.778412] (-) TimerEvent: {}
+[15.878918] (-) TimerEvent: {}
+[15.979430] (-) TimerEvent: {}
+[16.079987] (-) TimerEvent: {}
+[16.180560] (-) TimerEvent: {}
+[16.281101] (-) TimerEvent: {}
+[16.381877] (-) TimerEvent: {}
+[16.482522] (-) TimerEvent: {}
+[16.583024] (-) TimerEvent: {}
+[16.683561] (-) TimerEvent: {}
+[16.784025] (-) TimerEvent: {}
+[16.884526] (-) TimerEvent: {}
+[16.985014] (-) TimerEvent: {}
+[17.085491] (-) TimerEvent: {}
+[17.185991] (-) TimerEvent: {}
+[17.286489] (-) TimerEvent: {}
+[17.387014] (-) TimerEvent: {}
+[17.487467] (-) TimerEvent: {}
+[17.587934] (-) TimerEvent: {}
+[17.688487] (-) TimerEvent: {}
+[17.788942] (-) TimerEvent: {}
+[17.889394] (-) TimerEvent: {}
+[17.989867] (-) TimerEvent: {}
+[18.090343] (-) TimerEvent: {}
+[18.190928] (-) TimerEvent: {}
+[18.291455] (-) TimerEvent: {}
+[18.391943] (-) TimerEvent: {}
+[18.492497] (-) TimerEvent: {}
+[18.593006] (-) TimerEvent: {}
+[18.693492] (-) TimerEvent: {}
+[18.793996] (-) TimerEvent: {}
+[18.894498] (-) TimerEvent: {}
+[18.994984] (-) TimerEvent: {}
+[19.095457] (-) TimerEvent: {}
+[19.195910] (-) TimerEvent: {}
+[19.296465] (-) TimerEvent: {}
+[19.396879] (-) TimerEvent: {}
+[19.497375] (-) TimerEvent: {}
+[19.597846] (-) TimerEvent: {}
+[19.698423] (-) TimerEvent: {}
+[19.799008] (-) TimerEvent: {}
+[19.899579] (-) TimerEvent: {}
+[20.000121] (-) TimerEvent: {}
+[20.100699] (-) TimerEvent: {}
+[20.201134] (-) TimerEvent: {}
+[20.301572] (-) TimerEvent: {}
+[20.402094] (-) TimerEvent: {}
+[20.502654] (-) TimerEvent: {}
+[20.603160] (-) TimerEvent: {}
+[20.703667] (-) TimerEvent: {}
+[20.804372] (-) TimerEvent: {}
+[20.904823] (-) TimerEvent: {}
+[21.005340] (-) TimerEvent: {}
+[21.105775] (-) TimerEvent: {}
+[21.206275] (-) TimerEvent: {}
+[21.306725] (-) TimerEvent: {}
+[21.407198] (-) TimerEvent: {}
+[21.507695] (-) TimerEvent: {}
+[21.608202] (-) TimerEvent: {}
+[21.708990] (-) TimerEvent: {}
+[21.809607] (-) TimerEvent: {}
+[21.910164] (-) TimerEvent: {}
+[22.010624] (-) TimerEvent: {}
+[22.111131] (-) TimerEvent: {}
+[22.211644] (-) TimerEvent: {}
+[22.312112] (-) TimerEvent: {}
+[22.412730] (-) TimerEvent: {}
+[22.513195] (-) TimerEvent: {}
+[22.613650] (-) TimerEvent: {}
+[22.714129] (-) TimerEvent: {}
+[22.814638] (-) TimerEvent: {}
+[22.915220] (-) TimerEvent: {}
+[23.015716] (-) TimerEvent: {}
+[23.116250] (-) TimerEvent: {}
+[23.216769] (-) TimerEvent: {}
+[23.317230] (-) TimerEvent: {}
+[23.417687] (-) TimerEvent: {}
+[23.518170] (-) TimerEvent: {}
+[23.618753] (-) TimerEvent: {}
+[23.719253] (-) TimerEvent: {}
+[23.819770] (-) TimerEvent: {}
+[23.920363] (-) TimerEvent: {}
+[24.021077] (-) TimerEvent: {}
+[24.121565] (-) TimerEvent: {}
+[24.222022] (-) TimerEvent: {}
+[24.322567] (-) TimerEvent: {}
+[24.423021] (-) TimerEvent: {}
+[24.523495] (-) TimerEvent: {}
+[24.624020] (-) TimerEvent: {}
+[24.724672] (-) TimerEvent: {}
+[24.825317] (-) TimerEvent: {}
+[24.925996] (-) TimerEvent: {}
+[25.026556] (-) TimerEvent: {}
+[25.127035] (-) TimerEvent: {}
+[25.227592] (-) TimerEvent: {}
+[25.328181] (-) TimerEvent: {}
+[25.428704] (-) TimerEvent: {}
+[25.529211] (-) TimerEvent: {}
+[25.629662] (-) TimerEvent: {}
+[25.730124] (-) TimerEvent: {}
+[25.830669] (-) TimerEvent: {}
+[25.931231] (-) TimerEvent: {}
+[26.031695] (-) TimerEvent: {}
+[26.132170] (-) TimerEvent: {}
+[26.232603] (-) TimerEvent: {}
+[26.333075] (-) TimerEvent: {}
+[26.433535] (-) TimerEvent: {}
+[26.534018] (-) TimerEvent: {}
+[26.634586] (-) TimerEvent: {}
+[26.735028] (-) TimerEvent: {}
+[26.835469] (-) TimerEvent: {}
+[26.935892] (-) TimerEvent: {}
+[27.036386] (-) TimerEvent: {}
+[27.136851] (-) TimerEvent: {}
+[27.237307] (-) TimerEvent: {}
+[27.337756] (-) TimerEvent: {}
+[27.438227] (-) TimerEvent: {}
+[27.538693] (-) TimerEvent: {}
+[27.639125] (-) TimerEvent: {}
+[27.739604] (-) TimerEvent: {}
+[27.840027] (-) TimerEvent: {}
+[27.940464] (-) TimerEvent: {}
+[28.040875] (-) TimerEvent: {}
+[28.141369] (-) TimerEvent: {}
+[28.241867] (-) TimerEvent: {}
+[28.342353] (-) TimerEvent: {}
+[28.442777] (-) TimerEvent: {}
+[28.543241] (-) TimerEvent: {}
+[28.643697] (-) TimerEvent: {}
+[28.744178] (-) TimerEvent: {}
+[28.844624] (-) TimerEvent: {}
+[28.945140] (-) TimerEvent: {}
+[29.045650] (-) TimerEvent: {}
+[29.146097] (-) TimerEvent: {}
+[29.246634] (-) TimerEvent: {}
+[29.347193] (-) TimerEvent: {}
+[29.447652] (-) TimerEvent: {}
+[29.548120] (-) TimerEvent: {}
+[29.648586] (-) TimerEvent: {}
+[29.749055] (-) TimerEvent: {}
+[29.849491] (-) TimerEvent: {}
+[29.949893] (-) TimerEvent: {}
+[30.050428] (-) TimerEvent: {}
+[30.150867] (-) TimerEvent: {}
+[30.251380] (-) TimerEvent: {}
+[30.351824] (-) TimerEvent: {}
+[30.452374] (-) TimerEvent: {}
+[30.553115] (-) TimerEvent: {}
+[30.653624] (-) TimerEvent: {}
+[30.754093] (-) TimerEvent: {}
+[30.854655] (-) TimerEvent: {}
+[30.955402] (-) TimerEvent: {}
+[31.055842] (-) TimerEvent: {}
+[31.156292] (-) TimerEvent: {}
+[31.256864] (-) TimerEvent: {}
+[31.357468] (-) TimerEvent: {}
+[31.457983] (-) TimerEvent: {}
+[31.558646] (-) TimerEvent: {}
+[31.659159] (-) TimerEvent: {}
+[31.759627] (-) TimerEvent: {}
+[31.860125] (-) TimerEvent: {}
+[31.960602] (-) TimerEvent: {}
+[32.061156] (-) TimerEvent: {}
+[32.161673] (-) TimerEvent: {}
+[32.262183] (-) TimerEvent: {}
+[32.362763] (-) TimerEvent: {}
+[32.463335] (-) TimerEvent: {}
+[32.563783] (-) TimerEvent: {}
+[32.664249] (-) TimerEvent: {}
+[32.764657] (-) TimerEvent: {}
+[32.865109] (-) TimerEvent: {}
+[32.965670] (-) TimerEvent: {}
+[33.066146] (-) TimerEvent: {}
+[33.167097] (-) TimerEvent: {}
+[33.267602] (-) TimerEvent: {}
+[33.368243] (-) TimerEvent: {}
+[33.468889] (-) TimerEvent: {}
+[33.569522] (-) TimerEvent: {}
+[33.670166] (-) TimerEvent: {}
+[33.770847] (-) TimerEvent: {}
+[33.871668] (-) TimerEvent: {}
+[33.972362] (-) TimerEvent: {}
+[34.073153] (-) TimerEvent: {}
+[34.173810] (-) TimerEvent: {}
+[34.274582] (-) TimerEvent: {}
+[34.375377] (-) TimerEvent: {}
+[34.476209] (-) TimerEvent: {}
+[34.576987] (-) TimerEvent: {}
+[34.677736] (-) TimerEvent: {}
+[34.778275] (-) TimerEvent: {}
+[34.878753] (-) TimerEvent: {}
+[34.979439] (-) TimerEvent: {}
+[35.080101] (-) TimerEvent: {}
+[35.180725] (-) TimerEvent: {}
+[35.281370] (-) TimerEvent: {}
+[35.382226] (-) TimerEvent: {}
+[35.483115] (-) TimerEvent: {}
+[35.583719] (-) TimerEvent: {}
+[35.684359] (-) TimerEvent: {}
+[35.785056] (-) TimerEvent: {}
+[35.885754] (-) TimerEvent: {}
+[35.986466] (-) TimerEvent: {}
+[36.087291] (-) TimerEvent: {}
+[36.187902] (-) TimerEvent: {}
+[36.288458] (-) TimerEvent: {}
+[36.389159] (-) TimerEvent: {}
+[36.489853] (-) TimerEvent: {}
+[36.590349] (-) TimerEvent: {}
+[36.691039] (-) TimerEvent: {}
+[36.791698] (-) TimerEvent: {}
+[36.892348] (-) TimerEvent: {}
+[36.992843] (-) TimerEvent: {}
+[37.093366] (-) TimerEvent: {}
+[37.193796] (-) TimerEvent: {}
+[37.294317] (-) TimerEvent: {}
+[37.394960] (-) TimerEvent: {}
+[37.495571] (-) TimerEvent: {}
+[37.596315] (-) TimerEvent: {}
+[37.696986] (-) TimerEvent: {}
+[37.797460] (-) TimerEvent: {}
+[37.898039] (-) TimerEvent: {}
+[37.998519] (-) TimerEvent: {}
+[38.099061] (-) TimerEvent: {}
+[38.199525] (-) TimerEvent: {}
+[38.300039] (-) TimerEvent: {}
+[38.400659] (-) TimerEvent: {}
+[38.408177] (ur_gripper_demo) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking CXX executable gripper_pick_place\x1b[0m\n'}
+[38.500893] (-) TimerEvent: {}
+[38.601527] (-) TimerEvent: {}
+[38.701957] (-) TimerEvent: {}
+[38.802414] (-) TimerEvent: {}
+[38.902957] (-) TimerEvent: {}
+[39.003463] (-) TimerEvent: {}
+[39.103941] (-) TimerEvent: {}
+[39.204401] (-) TimerEvent: {}
+[39.304852] (-) TimerEvent: {}
+[39.405389] (-) TimerEvent: {}
+[39.505886] (-) TimerEvent: {}
+[39.606436] (-) TimerEvent: {}
+[39.706995] (-) TimerEvent: {}
+[39.807443] (-) TimerEvent: {}
+[39.908010] (-) TimerEvent: {}
+[40.008525] (-) TimerEvent: {}
+[40.109010] (-) TimerEvent: {}
+[40.209484] (-) TimerEvent: {}
+[40.310609] (-) TimerEvent: {}
+[40.411304] (-) TimerEvent: {}
+[40.511780] (-) TimerEvent: {}
+[40.612377] (-) TimerEvent: {}
+[40.712857] (-) TimerEvent: {}
+[40.813438] (-) TimerEvent: {}
+[40.914162] (-) TimerEvent: {}
+[41.027476] (-) TimerEvent: {}
+[41.127952] (-) TimerEvent: {}
+[41.228456] (-) TimerEvent: {}
+[41.325482] (ur_gripper_demo) StdoutLine: {'line': b'[100%] Built target gripper_pick_place\n'}
+[41.328549] (-) TimerEvent: {}
+[41.364748] (ur_gripper_demo) CommandEnded: {'returncode': 0}
+[41.366183] (ur_gripper_demo) JobProgress: {'identifier': 'ur_gripper_demo', 'progress': 'install'}
+[41.379262] (ur_gripper_demo) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo'], 'cwd': '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'billy'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/billy/git/Robotics-Studio-2/install/object_msgs/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/lib:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools/lib:/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/billy'), ('OLDPWD', '/home/billy'), ('ROS_PYTHON_VERSION', '3'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'billy'), ('NAME', 'BillyZen'), ('WSL_INTEROP', '/run/WSL/3590_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/billy/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForLinux_2.6.3.0_x64__8wekyb3d8bbwe:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/STMicroelectronics/STM32 ST-LINK Utility/ST-LINK Utility:/mnt/c/Program Files/nodejs/:/mnt/c/Program Files/PostgreSQL/18/bin:/mnt/c/Program Files/MATLAB/R2025b/bin:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Python313/Scripts/:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Python313/:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/bilgu/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/bilgu/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/bilgu/AppData/Local/GitHubDesktop/bin:/mnt/c/Users/bilgu/AppData/Roaming/npm:/snap/bin'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GALLIUM_DRIVER', 'llvmpipe'), ('CMAKE_MODULE_PATH', '/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/share/moveit_task_constructor_core/cmake'), ('PWD', '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble'), ('WSLENV', '')]), 'shell': False}
+[41.392859] (ur_gripper_demo) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[41.394247] (ur_gripper_demo) StdoutLine: {'line': b'-- Execute custom install script\n'}
+[41.395013] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/environment/pythonpath.sh\n'}
+[41.395386] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/environment/pythonpath.dsv\n'}
+[41.396915] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo-0.0.0-py3.10.egg-info/PKG-INFO\n'}
+[41.397188] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo-0.0.0-py3.10.egg-info/SOURCES.txt\n'}
+[41.397547] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo-0.0.0-py3.10.egg-info/dependency_links.txt\n'}
+[41.397826] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo-0.0.0-py3.10.egg-info/top_level.txt\n'}
+[41.400396] (ur_gripper_demo) StderrLine: {'line': b'\x1b[33mCMake Warning (dev) at ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:67 (file):\n'}
+[41.400509] (ur_gripper_demo) StderrLine: {'line': b'  Policy CMP0009 is not set: FILE GLOB_RECURSE calls should not follow\n'}
+[41.400559] (ur_gripper_demo) StderrLine: {'line': b'  symlinks by default.  Run "cmake --help-policy CMP0009" for policy details.\n'}
+[41.400601] (ur_gripper_demo) StderrLine: {'line': b'  Use the cmake_policy command to set the policy and suppress this warning.\n'}
+[41.400639] (ur_gripper_demo) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[41.400679] (ur_gripper_demo) StderrLine: {'line': b'  ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:328 (ament_cmake_symlink_install_directory)\n'}
+[41.400724] (ur_gripper_demo) StderrLine: {'line': b'  cmake_install.cmake:46 (include)\n'}
+[41.400769] (ur_gripper_demo) StderrLine: {'line': b'This warning is for project developers.  Use -Wno-dev to suppress it.\n'}
+[41.400809] (ur_gripper_demo) StderrLine: {'line': b'\x1b[0m\n'}
+[41.401044] (ur_gripper_demo) StderrLine: {'line': b'\x1b[33mCMake Warning (dev) at ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:78 (file):\n'}
+[41.401209] (ur_gripper_demo) StderrLine: {'line': b'  Policy CMP0009 is not set: FILE GLOB_RECURSE calls should not follow\n'}
+[41.401263] (ur_gripper_demo) StderrLine: {'line': b'  symlinks by default.  Run "cmake --help-policy CMP0009" for policy details.\n'}
+[41.401307] (ur_gripper_demo) StderrLine: {'line': b'  Use the cmake_policy command to set the policy and suppress this warning.\n'}
+[41.401346] (ur_gripper_demo) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[41.401385] (ur_gripper_demo) StderrLine: {'line': b'  ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:328 (ament_cmake_symlink_install_directory)\n'}
+[41.401822] (ur_gripper_demo) StderrLine: {'line': b'  cmake_install.cmake:46 (include)\n'}
+[41.401889] (ur_gripper_demo) StderrLine: {'line': b'This warning is for project developers.  Use -Wno-dev to suppress it.\n'}
+[41.401980] (ur_gripper_demo) StderrLine: {'line': b'\x1b[0m\n'}
+[41.402069] (ur_gripper_demo) StderrLine: {'line': b'\x1b[33mCMake Warning (dev) at ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:78 (file):\n'}
+[41.402162] (ur_gripper_demo) StderrLine: {'line': b'  Policy CMP0009 is not set: FILE GLOB_RECURSE calls should not follow\n'}
+[41.402217] (ur_gripper_demo) StderrLine: {'line': b'  symlinks by default.  Run "cmake --help-policy CMP0009" for policy details.\n'}
+[41.402260] (ur_gripper_demo) StderrLine: {'line': b'  Use the cmake_policy command to set the policy and suppress this warning.\n'}
+[41.402301] (ur_gripper_demo) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[41.402340] (ur_gripper_demo) StderrLine: {'line': b'  ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:328 (ament_cmake_symlink_install_directory)\n'}
+[41.402379] (ur_gripper_demo) StderrLine: {'line': b'  cmake_install.cmake:46 (include)\n'}
+[41.402418] (ur_gripper_demo) StderrLine: {'line': b'This warning is for project developers.  Use -Wno-dev to suppress it.\n'}
+[41.402455] (ur_gripper_demo) StderrLine: {'line': b'\x1b[0m\n'}
+[41.402653] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/__init__.py\n'}
+[41.402721] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/build/.built_by\n'}
+[41.402835] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/build/COLCON_IGNORE\n'}
+[41.403208] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/.colcon_install_layout\n'}
+[41.403531] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/COLCON_IGNORE\n'}
+[41.403957] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/_local_setup_util_ps1.py\n'}
+[41.404272] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/_local_setup_util_sh.py\n'}
+[41.404577] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/local_setup.bash\n'}
+[41.404886] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/local_setup.ps1\n'}
+[41.405435] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/local_setup.sh\n'}
+[41.405758] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/local_setup.zsh\n'}
+[41.406122] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/setup.bash\n'}
+[41.406387] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/setup.ps1\n'}
+[41.406595] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/setup.sh\n'}
+[41.406812] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/setup.zsh\n'}
+[41.407172] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/COLCON_IGNORE\n'}
+[41.407417] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-24-55/events.log\n'}
+[41.407755] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-24-55/logger_all.log\n'}
+[41.408155] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-24-57/events.log\n'}
+[41.408474] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-24-57/logger_all.log\n'}
+[41.408781] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-25-55/events.log\n'}
+[41.409017] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-25-55/logger_all.log\n'}
+[41.409250] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/latest/events.log\n'}
+[41.409498] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/latest/logger_all.log\n'}
+[41.410076] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/latest_build/events.log\n'}
+[41.410384] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/latest_build/logger_all.log\n'}
+[41.410655] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/lib/ur_gripper_demo/test_helper.py\n'}
+[41.411493] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/meshes/UR3eTrolley_decimated.dae\n'}
+[41.411921] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/lib/ur_gripper_demo/gripper_demo_node\n'}
+[41.412187] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/lib/ur_gripper_demo/gripper_pick_place\n'}
+[41.412595] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/launch/ur_moveit.launch.py\n'}
+[41.412846] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ament_index/resource_index/package_run_dependencies/ur_gripper_demo\n'}
+[41.413116] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ament_index/resource_index/parent_prefix_path/ur_gripper_demo\n'}
+[41.413377] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/environment/ament_prefix_path.sh\n'}
+[41.413710] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/environment/ament_prefix_path.dsv\n'}
+[41.413982] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/environment/path.sh\n'}
+[41.414237] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/environment/path.dsv\n'}
+[41.414496] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/local_setup.bash\n'}
+[41.414796] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/local_setup.sh\n'}
+[41.415284] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/local_setup.zsh\n'}
+[41.415555] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/local_setup.dsv\n'}
+[41.415714] (ur_gripper_demo) StdoutLine: {'line': b'-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/package.dsv\n'}
+[41.428755] (-) TimerEvent: {}
+[41.431899] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ament_index/resource_index/packages/ur_gripper_demo\n'}
+[41.432298] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/cmake/ur_gripper_demoConfig.cmake\n'}
+[41.432567] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/cmake/ur_gripper_demoConfig-version.cmake\n'}
+[41.432834] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/package.xml\n'}
+[41.478354] (ur_gripper_demo) StdoutLine: {'line': b"Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo'...\n"}
+[41.478671] (ur_gripper_demo) StdoutLine: {'line': b"Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/build'...\n"}
+[41.478852] (ur_gripper_demo) StdoutLine: {'line': b"Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install'...\n"}
+[41.479003] (ur_gripper_demo) StdoutLine: {'line': b"Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log'...\n"}
+[41.479123] (ur_gripper_demo) StdoutLine: {'line': b"Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-24-55'...\n"}
+[41.479248] (ur_gripper_demo) StdoutLine: {'line': b"Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-24-57'...\n"}
+[41.479298] (ur_gripper_demo) StdoutLine: {'line': b"Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-25-55'...\n"}
+[41.479339] (ur_gripper_demo) StdoutLine: {'line': b"Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/latest'...\n"}
+[41.479379] (ur_gripper_demo) StdoutLine: {'line': b"Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/latest_build'...\n"}
+[41.484054] (ur_gripper_demo) StdoutLine: {'line': b'-- Up-to-date: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/lib/ur_gripper_demo/plastic_detections_translator\n'}
+[41.489144] (ur_gripper_demo) CommandEnded: {'returncode': 0}
+[41.517144] (ur_gripper_demo) JobEnded: {'identifier': 'ur_gripper_demo', 'rc': 0}
+[41.518827] (-) EventReactorShutdown: {}

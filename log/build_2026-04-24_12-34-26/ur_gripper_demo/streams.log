@@ -1,0 +1,107 @@
+[0.164s] Invoking command in '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo': CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/object_msgs/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/lib:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools/lib:/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib /usr/bin/cmake --build /home/billy/git/Robotics-Studio-2/build/ur_gripper_demo -- -j16 -l16
+[0.331s] [35m[1mConsolidate compiler generated dependencies of target gripper_pick_place[0m
+[0.337s] [  0%] Built target ament_cmake_python_symlink_ur_gripper_demo
+[0.365s] [ 50%] Built target gripper_demo_node
+[0.397s] [ 75%] [32mBuilding CXX object CMakeFiles/gripper_pick_place.dir/src/pick_n_place_try2_1.cpp.o[0m
+[0.681s] running egg_info
+[0.683s] writing ur_gripper_demo.egg-info/PKG-INFO
+[0.683s] writing dependency_links to ur_gripper_demo.egg-info/dependency_links.txt
+[0.683s] writing top-level names to ur_gripper_demo.egg-info/top_level.txt
+[0.691s] reading manifest file 'ur_gripper_demo.egg-info/SOURCES.txt'
+[0.693s] writing manifest file 'ur_gripper_demo.egg-info/SOURCES.txt'
+[0.737s] [ 75%] Built target ament_cmake_python_build_ur_gripper_demo_egg
+[31.633s] [100%] [32m[1mLinking CXX executable gripper_pick_place[0m
+[33.971s] [100%] Built target gripper_pick_place
+[33.991s] Invoked command in '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo' returned '0': CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/object_msgs/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/lib:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools/lib:/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib /usr/bin/cmake --build /home/billy/git/Robotics-Studio-2/build/ur_gripper_demo -- -j16 -l16
+[34.007s] Invoking command in '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo': CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/object_msgs/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/lib:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools/lib:/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib /usr/bin/cmake --install /home/billy/git/Robotics-Studio-2/build/ur_gripper_demo
+[34.020s] -- Install configuration: ""
+[34.021s] -- Execute custom install script
+[34.022s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/environment/pythonpath.sh
+[34.023s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/environment/pythonpath.dsv
+[34.024s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo-0.0.0-py3.10.egg-info/PKG-INFO
+[34.025s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo-0.0.0-py3.10.egg-info/SOURCES.txt
+[34.025s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo-0.0.0-py3.10.egg-info/dependency_links.txt
+[34.025s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo-0.0.0-py3.10.egg-info/top_level.txt
+[34.026s] [33mCMake Warning (dev) at ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:67 (file):
+[34.026s]   Policy CMP0009 is not set: FILE GLOB_RECURSE calls should not follow
+[34.026s]   symlinks by default.  Run "cmake --help-policy CMP0009" for policy details.
+[34.026s]   Use the cmake_policy command to set the policy and suppress this warning.
+[34.026s] Call Stack (most recent call first):
+[34.026s]   ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:328 (ament_cmake_symlink_install_directory)
+[34.026s]   cmake_install.cmake:46 (include)
+[34.026s] This warning is for project developers.  Use -Wno-dev to suppress it.
+[34.027s] [0m
+[34.027s] [33mCMake Warning (dev) at ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:78 (file):
+[34.027s]   Policy CMP0009 is not set: FILE GLOB_RECURSE calls should not follow
+[34.027s]   symlinks by default.  Run "cmake --help-policy CMP0009" for policy details.
+[34.027s]   Use the cmake_policy command to set the policy and suppress this warning.
+[34.027s] Call Stack (most recent call first):
+[34.027s]   ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:328 (ament_cmake_symlink_install_directory)
+[34.027s]   cmake_install.cmake:46 (include)
+[34.027s] This warning is for project developers.  Use -Wno-dev to suppress it.
+[34.028s] [0m
+[34.028s] [33mCMake Warning (dev) at ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:78 (file):
+[34.028s]   Policy CMP0009 is not set: FILE GLOB_RECURSE calls should not follow
+[34.028s]   symlinks by default.  Run "cmake --help-policy CMP0009" for policy details.
+[34.028s]   Use the cmake_policy command to set the policy and suppress this warning.
+[34.028s] Call Stack (most recent call first):
+[34.028s]   ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:328 (ament_cmake_symlink_install_directory)
+[34.028s]   cmake_install.cmake:46 (include)
+[34.028s] This warning is for project developers.  Use -Wno-dev to suppress it.
+[34.029s] [0m
+[34.029s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/__init__.py
+[34.029s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/build/.built_by
+[34.029s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/build/COLCON_IGNORE
+[34.029s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/.colcon_install_layout
+[34.029s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/COLCON_IGNORE
+[34.029s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/_local_setup_util_ps1.py
+[34.029s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/_local_setup_util_sh.py
+[34.030s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/local_setup.bash
+[34.030s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/local_setup.ps1
+[34.030s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/local_setup.sh
+[34.030s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/local_setup.zsh
+[34.030s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/setup.bash
+[34.030s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/setup.ps1
+[34.030s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/setup.sh
+[34.030s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install/setup.zsh
+[34.030s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/COLCON_IGNORE
+[34.030s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-24-55/events.log
+[34.030s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-24-55/logger_all.log
+[34.031s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-24-57/events.log
+[34.031s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-24-57/logger_all.log
+[34.031s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-25-55/events.log
+[34.031s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-25-55/logger_all.log
+[34.032s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/latest/events.log
+[34.032s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/latest/logger_all.log
+[34.032s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/latest_build/events.log
+[34.032s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/latest_build/logger_all.log
+[34.033s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/lib/ur_gripper_demo/test_helper.py
+[34.033s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/meshes/UR3eTrolley_decimated.dae
+[34.034s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/lib/ur_gripper_demo/gripper_demo_node
+[34.034s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/lib/ur_gripper_demo/gripper_pick_place
+[34.034s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/launch/ur_moveit.launch.py
+[34.034s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ament_index/resource_index/package_run_dependencies/ur_gripper_demo
+[34.035s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ament_index/resource_index/parent_prefix_path/ur_gripper_demo
+[34.035s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/environment/ament_prefix_path.sh
+[34.035s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/environment/ament_prefix_path.dsv
+[34.035s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/environment/path.sh
+[34.036s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/environment/path.dsv
+[34.036s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/local_setup.bash
+[34.036s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/local_setup.sh
+[34.036s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/local_setup.zsh
+[34.036s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/local_setup.dsv
+[34.036s] -- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/package.dsv
+[34.050s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ament_index/resource_index/packages/ur_gripper_demo
+[34.050s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/cmake/ur_gripper_demoConfig.cmake
+[34.050s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/cmake/ur_gripper_demoConfig-version.cmake
+[34.050s] -- Up-to-date symlink: /home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/share/ur_gripper_demo/package.xml
+[34.084s] Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo'...
+[34.084s] Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/build'...
+[34.084s] Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/install'...
+[34.084s] Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log'...
+[34.085s] Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-24-55'...
+[34.085s] Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-24-57'...
+[34.085s] Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/build_2026-03-31_14-25-55'...
+[34.085s] Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/latest'...
+[34.085s] Listing '/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages/ur_gripper_demo/log/latest_build'...
+[34.093s] Invoked command in '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo' returned '0': CMAKE_PREFIX_PATH=/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/billy/git/Robotics-Studio-2/install/object_msgs/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/lib:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools/lib:/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib /usr/bin/cmake --install /home/billy/git/Robotics-Studio-2/build/ur_gripper_demo

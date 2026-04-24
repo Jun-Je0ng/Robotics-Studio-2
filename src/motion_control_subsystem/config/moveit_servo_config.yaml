@@ -1,0 +1,7 @@
+check_collisions: true
+self_collision_proximity_threshold: 0.01  # meters - starts slowing here
+scene_collision_proximity_threshold: 0.02 # meters - starts slowing here
+
+
+lower_singularity_threshold: 17.0  # starts slowing
+hard_stop_singularity_threshold: 30.0  # halts

@@ -1,0 +1,141 @@
+[0.000000] (-) TimerEvent: {}
+[0.000747] (-) JobUnselected: {'identifier': 'motion_control_subsystem'}
+[0.000983] (-) JobUnselected: {'identifier': 'object_msgs'}
+[0.001238] (-) JobUnselected: {'identifier': 'onrobot_description'}
+[0.001381] (-) JobUnselected: {'identifier': 'onrobot_driver'}
+[0.001487] (-) JobUnselected: {'identifier': 'ur3_demo_cpp'}
+[0.001587] (-) JobUnselected: {'identifier': 'ur_description_local'}
+[0.001727] (-) JobUnselected: {'identifier': 'ur_onrobot_control'}
+[0.001794] (-) JobUnselected: {'identifier': 'ur_onrobot_description'}
+[0.001831] (-) JobUnselected: {'identifier': 'ur_onrobot_moveit_config'}
+[0.001856] (ur_gripper_demo) JobQueued: {'identifier': 'ur_gripper_demo', 'dependencies': OrderedDict([('object_msgs', '/home/billy/git/Robotics-Studio-2/install/object_msgs')])}
+[0.001903] (ur_gripper_demo) JobStarted: {'identifier': 'ur_gripper_demo'}
+[0.058361] (ur_gripper_demo) JobProgress: {'identifier': 'ur_gripper_demo', 'progress': 'cmake'}
+[0.059421] (ur_gripper_demo) JobProgress: {'identifier': 'ur_gripper_demo', 'progress': 'build'}
+[0.060225] (ur_gripper_demo) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo', '--', '-j16', '-l16'], 'cwd': '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'billy'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/billy/git/Robotics-Studio-2/install/object_msgs/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/lib:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools/lib:/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/billy'), ('OLDPWD', '/home/billy'), ('ROS_PYTHON_VERSION', '3'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'billy'), ('NAME', 'BillyZen'), ('WSL_INTEROP', '/run/WSL/3590_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/billy/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForLinux_2.6.3.0_x64__8wekyb3d8bbwe:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/STMicroelectronics/STM32 ST-LINK Utility/ST-LINK Utility:/mnt/c/Program Files/nodejs/:/mnt/c/Program Files/PostgreSQL/18/bin:/mnt/c/Program Files/MATLAB/R2025b/bin:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Python313/Scripts/:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Python313/:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/bilgu/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/bilgu/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/bilgu/AppData/Local/GitHubDesktop/bin:/mnt/c/Users/bilgu/AppData/Roaming/npm:/snap/bin'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GALLIUM_DRIVER', 'llvmpipe'), ('CMAKE_MODULE_PATH', '/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/share/moveit_task_constructor_core/cmake'), ('PWD', '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble'), ('WSLENV', '')]), 'shell': False}
+[0.098657] (ur_gripper_demo) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.13 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.099402] (-) TimerEvent: {}
+[0.199810] (-) TimerEvent: {}
+[0.218972] (ur_gripper_demo) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.225220] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rclcpp: 16.0.18 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.302684] (-) TimerEvent: {}
+[0.314934] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.8 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.316922] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.8 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.321167] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.8 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.328230] (ur_gripper_demo) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.336928] (ur_gripper_demo) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.359252] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[0.360413] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.10 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[0.405011] (-) TimerEvent: {}
+[0.510681] (-) TimerEvent: {}
+[0.616435] (-) TimerEvent: {}
+[0.717163] (-) TimerEvent: {}
+[0.822731] (-) TimerEvent: {}
+[0.928301] (-) TimerEvent: {}
+[1.033874] (-) TimerEvent: {}
+[1.139482] (-) TimerEvent: {}
+[1.245044] (-) TimerEvent: {}
+[1.350608] (-) TimerEvent: {}
+[1.456186] (-) TimerEvent: {}
+[1.561749] (-) TimerEvent: {}
+[1.663296] (-) TimerEvent: {}
+[1.763776] (-) TimerEvent: {}
+[1.869349] (-) TimerEvent: {}
+[1.970769] (-) TimerEvent: {}
+[2.074589] (-) TimerEvent: {}
+[2.180173] (-) TimerEvent: {}
+[2.285756] (-) TimerEvent: {}
+[2.391381] (-) TimerEvent: {}
+[2.496886] (-) TimerEvent: {}
+[2.602706] (-) TimerEvent: {}
+[2.703829] (-) TimerEvent: {}
+[2.804523] (-) TimerEvent: {}
+[2.910116] (-) TimerEvent: {}
+[3.010577] (-) TimerEvent: {}
+[3.111107] (-) TimerEvent: {}
+[3.211557] (-) TimerEvent: {}
+[3.312146] (-) TimerEvent: {}
+[3.412803] (-) TimerEvent: {}
+[3.469125] (ur_gripper_demo) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[3.506349] (ur_gripper_demo) StdoutLine: {'line': b'-- Found geometry_msgs: 4.9.1 (/opt/ros/humble/share/geometry_msgs/cmake)\n'}
+[3.512987] (-) TimerEvent: {}
+[3.516629] (ur_gripper_demo) StdoutLine: {'line': b'-- Found moveit_core: 2.5.9 (/opt/ros/humble/share/moveit_core/cmake)\n'}
+[3.530264] (ur_gripper_demo) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: chrono date_time filesystem iostreams program_options regex serialization system thread \n'}
+[3.613401] (-) TimerEvent: {}
+[3.714188] (-) TimerEvent: {}
+[3.814651] (-) TimerEvent: {}
+[3.915132] (-) TimerEvent: {}
+[4.015709] (-) TimerEvent: {}
+[4.068906] (ur_gripper_demo) StdoutLine: {'line': b'-- Found parameter_traits: 0.6.0 (/opt/ros/humble/share/parameter_traits/cmake)\n'}
+[4.073702] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rclcpp_lifecycle: 16.0.18 (/opt/ros/humble/share/rclcpp_lifecycle/cmake)\n'}
+[4.089896] (ur_gripper_demo) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: filesystem \n'}
+[4.116119] (-) TimerEvent: {}
+[4.216839] (-) TimerEvent: {}
+[4.317536] (-) TimerEvent: {}
+[4.418328] (-) TimerEvent: {}
+[4.519540] (-) TimerEvent: {}
+[4.620150] (-) TimerEvent: {}
+[4.720992] (-) TimerEvent: {}
+[4.821701] (-) TimerEvent: {}
+[4.922568] (-) TimerEvent: {}
+[4.956963] (ur_gripper_demo) StdoutLine: {'line': b'-- library: /usr/lib/x86_64-linux-gnu/libcurl.so\n'}
+[4.999157] (ur_gripper_demo) StdoutLine: {'line': b'-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target\n'}
+[5.022760] (-) TimerEvent: {}
+[5.123336] (-) TimerEvent: {}
+[5.223898] (-) TimerEvent: {}
+[5.324505] (-) TimerEvent: {}
+[5.425141] (-) TimerEvent: {}
+[5.525924] (-) TimerEvent: {}
+[5.627105] (-) TimerEvent: {}
+[5.727742] (-) TimerEvent: {}
+[5.828685] (-) TimerEvent: {}
+[5.924195] (ur_gripper_demo) StdoutLine: {'line': b'-- Found moveit_ros_planning: 2.5.9 (/opt/ros/humble/share/moveit_ros_planning/cmake)\n'}
+[5.928075] (ur_gripper_demo) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread chrono \n'}
+[5.928815] (-) TimerEvent: {}
+[5.944548] (ur_gripper_demo) StdoutLine: {'line': b'-- Found moveit_ros_planning_interface: 2.5.9 (/opt/ros/humble/share/moveit_ros_planning_interface/cmake)\n'}
+[5.949009] (ur_gripper_demo) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: date_time filesystem program_options system thread \n'}
+[5.959128] (ur_gripper_demo) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: thread system filesystem regex date_time program_options \n'}
+[5.973047] (ur_gripper_demo) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread \n'}
+[5.992520] (ur_gripper_demo) StdoutLine: {'line': b'-- Found moveit_visual_tools: 4.1.2 (/opt/ros/humble/share/moveit_visual_tools/cmake)\n'}
+[6.029077] (-) TimerEvent: {}
+[6.070470] (ur_gripper_demo) StdoutLine: {'line': b"-- Setting assimp_DIR to: '/opt/ros/humble/share/rviz_assimp_vendor/cmake/../../../opt/rviz_assimp_vendor/lib/cmake/assimp-4.1'\n"}
+[6.075479] (ur_gripper_demo) StdoutLine: {'line': b"-- Setting OGRE_DIR to: '/opt/ros/humble/share/rviz_ogre_vendor/cmake/../../../opt/rviz_ogre_vendor/lib/OGRE/cmake'\n"}
+[6.076659] (ur_gripper_demo) StdoutLine: {'line': b'-- Found OGRE\n'}
+[6.076900] (ur_gripper_demo) StdoutLine: {'line': b'--   static     : OFF\n'}
+[6.077033] (ur_gripper_demo) StdoutLine: {'line': b'--   components : HLMS;MeshLodGenerator;Overlay;Paging;Property;RTShaderSystem;Terrain;Volume\n'}
+[6.077292] (ur_gripper_demo) StdoutLine: {'line': b'--   plugins    : Plugin_BSPSceneManager;Plugin_OctreeSceneManager;Plugin_PCZSceneManager;Plugin_ParticleFX;RenderSystem_GL;RenderSystem_GL3Plus;Codec_STBI\n'}
+[6.077347] (ur_gripper_demo) StdoutLine: {'line': b'--   media      : /opt/ros/humble/opt/rviz_ogre_vendor/share/OGRE/Media\n'}
+[6.077392] (ur_gripper_demo) StdoutLine: {'line': b'-- OGRE_LIBRARIES: OgreHLMS;OgreMeshLodGenerator;OgreOverlay;OgrePaging;OgreProperty;OgreRTShaderSystem;OgreTerrain;OgreVolume;OgreMain\n'}
+[6.077433] (ur_gripper_demo) StdoutLine: {'line': b'-- OGRE_LIBRARY_DIRS: /opt/ros/humble/opt/rviz_ogre_vendor/lib\n'}
+[6.077469] (ur_gripper_demo) StdoutLine: {'line': b'-- OGRE_PLUGINS: Plugin_BSPSceneManager;Plugin_OctreeSceneManager;Plugin_PCZSceneManager;Plugin_ParticleFX;RenderSystem_GL;RenderSystem_GL3Plus;Codec_STBI\n'}
+[6.077504] (ur_gripper_demo) StdoutLine: {'line': b'-- OGRE_PLUGIN_DIR: /opt/ros/humble/opt/rviz_ogre_vendor/lib/OGRE\n'}
+[6.077539] (ur_gripper_demo) StdoutLine: {'line': b'-- rviz_ogre_vendor::OgreOverlay for IMPORTED_LOCATION_RELEASE: /opt/ros/humble/opt/rviz_ogre_vendor/lib/libOgreOverlay.so\n'}
+[6.077577] (ur_gripper_demo) StdoutLine: {'line': b'-- rviz_ogre_vendor::OgreOverlay for IMPORTED_LOCATION_DEBUG: /opt/ros/humble/opt/rviz_ogre_vendor/lib/libOgreOverlay.so\n'}
+[6.077612] (ur_gripper_demo) StdoutLine: {'line': b'-- rviz_ogre_vendor::OgreMain for IMPORTED_LOCATION_RELEASE: /opt/ros/humble/opt/rviz_ogre_vendor/lib/libOgreMain.so\n'}
+[6.077664] (ur_gripper_demo) StdoutLine: {'line': b'-- rviz_ogre_vendor::OgreMain for IMPORTED_LOCATION_DEBUG: /opt/ros/humble/opt/rviz_ogre_vendor/lib/libOgreMain.so\n'}
+[6.129540] (-) TimerEvent: {}
+[6.231520] (-) TimerEvent: {}
+[6.332075] (-) TimerEvent: {}
+[6.433800] (-) TimerEvent: {}
+[6.534369] (-) TimerEvent: {}
+[6.634843] (-) TimerEvent: {}
+[6.735391] (-) TimerEvent: {}
+[6.836052] (-) TimerEvent: {}
+[6.936640] (-) TimerEvent: {}
+[7.037173] (-) TimerEvent: {}
+[7.137662] (-) TimerEvent: {}
+[7.173774] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rclpy: 3.3.20 (/opt/ros/humble/share/rclpy/cmake)\n'}
+[7.174267] (ur_gripper_demo) StdoutLine: {'line': b'-- Found object_msgs: 0.0.1 (/home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake)\n'}
+[7.238330] (-) TimerEvent: {}
+[7.251448] (ur_gripper_demo) StderrLine: {'line': b'\x1b[31mCMake Error at CMakeLists.txt:40 (file):\n'}
+[7.251716] (ur_gripper_demo) StderrLine: {'line': b'  file does not exist:\n'}
+[7.251781] (ur_gripper_demo) StderrLine: {'line': b'\n'}
+[7.251825] (ur_gripper_demo) StderrLine: {'line': b'    scripts/plastic_detections_translator.py\n'}
+[7.251860] (ur_gripper_demo) StderrLine: {'line': b'\n'}
+[7.251893] (ur_gripper_demo) StderrLine: {'line': b'\x1b[0m\n'}
+[7.251928] (ur_gripper_demo) StdoutLine: {'line': b'-- Configuring incomplete, errors occurred!\n'}
+[7.252043] (ur_gripper_demo) StdoutLine: {'line': b'See also "/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo/CMakeFiles/CMakeOutput.log".\n'}
+[7.273893] (ur_gripper_demo) StderrLine: {'line': b'gmake: *** [Makefile:336: cmake_check_build_system] Error 1\n'}
+[7.277124] (ur_gripper_demo) CommandEnded: {'returncode': 2}
+[7.286967] (ur_gripper_demo) JobEnded: {'identifier': 'ur_gripper_demo', 'rc': 2}
+[7.298188] (-) EventReactorShutdown: {}

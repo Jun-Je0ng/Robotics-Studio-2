@@ -17,9 +17,6 @@ find_package(nlohmann_json REQUIRED)
 
 
 
-
-
-
 find_package(ament_cmake_python REQUIRED)   # Python support
 find_package(rclpy REQUIRED)                # Python ROS2 client
 find_package(object_msgs REQUIRED)          # your custom messages
@@ -30,6 +27,24 @@ install(PROGRAMS                            # installs Python script as executab
   src/test_helper.py
   DESTINATION lib/${PROJECT_NAME}
 )
+
+install(
+  DIRECTORY meshes/
+  DESTINATION share/${PROJECT_NAME}/meshes
+)
+
+file(CHMOD ${CMAKE_CURRENT_SOURCE_DIR}/scripts/plastic_detections_translator.py 
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+
+install(PROGRAMS
+    scripts/plastic_detections_translator.py
+    RENAME plastic_detections_translator
+    DESTINATION lib/${PROJECT_NAME}
+)
+
+
+
 
 
 # add_executable(ur3_demo_node src/ur3_demo.cpp)
@@ -51,7 +66,9 @@ install(PROGRAMS                            # installs Python script as executab
 
 # add_executable(gripper_demo_node src/moveit_cpp_tutorial.cpp)
 add_executable(gripper_demo_node src/gripper_demo_clean.cpp)
-add_executable(gripper_pick_place src/unit_test_pick_n_place.cpp)
+# add_executable(gripper_pick_place src/unit_test_pick_n_place.cpp)
+# add_executable(gripper_pick_place src/pick_n_place_try2.cpp)
+add_executable(gripper_pick_place src/pick_n_place_try2_1.cpp)
 
 
 target_include_directories(gripper_demo_node PUBLIC

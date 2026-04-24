@@ -1,2 +1,1 @@
-source;share/ur_description_local/environment/ament_prefix_path.sh
-source;share/ur_description_local/environment/path.sh
+/home/billy/git/Robotics-Studio-2/build/ur_description_local/ament_cmake_environment_hooks/local_setup.dsv
