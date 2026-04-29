@@ -35,7 +35,7 @@ import threading
 # ──────────────────────────────────────────────────────────────────────────────
 
 MODEL_PATH       = "/home/rian/ml_project/runs/obb/train/weights/best.pt"
-CALIBRATION_FILE = "/home/rian/ml_project/camera_to_robot_calibration.json"
+CALIBRATION_FILE = "/home/rian/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/camera_to_robot_calibration.json"
 
 DEPTH_KERNEL_SIZE    = 11
 SMOOTHING_WINDOW     = 5

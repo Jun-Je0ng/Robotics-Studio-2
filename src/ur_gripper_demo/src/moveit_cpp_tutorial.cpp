@@ -21,8 +21,6 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <atomic>
-#include <mutex>
 
 namespace rvt = rviz_visual_tools;
 
@@ -31,8 +29,6 @@ static const rclcpp::Logger LOGGER = rclcpp::get_logger("ur3e_demo_node");
 // *** CHANGED: updated planning group name to match ur_onrobot SRDF ***
 static const std::string PLANNING_GROUP = "ur_onrobot_manipulator";
 static const std::string GRIPPER_PLANNING_GROUP = "ur_onrobot_gripper";
-static std::atomic<bool> estop_requested{false};
-static std::atomic<bool> estop_latched{false};
 
 void printMenu()
 {
@@ -47,8 +43,6 @@ void printMenu()
             << "  b  Add box obstacle\n"
             << "  t  Toggle Gripper Open/Close\n"
             << "  q  Quit\n"
-            << "  e  Emergency Stop\n"
-            << "  r  Reset Emergency Stop\n"
             << ">> ";
   std::cout.flush();
 }
@@ -379,7 +373,7 @@ void placeGround(
   ground_pose.orientation.w = 1.0;
   ground_pose.position.x    = 0.0;
   ground_pose.position.y    = 0.0;
-  ground_pose.position.z    = -0.1;
+  ground_pose.position.z    = -0.05;
 
   ground.primitives.push_back(primitive);
   ground.primitive_poses.push_back(ground_pose);
@@ -387,76 +381,6 @@ void placeGround(
 
   planning_scene_interface.addCollisionObjects({ ground });
 }
-
-void triggerEmergencyStop(
-    rclcpp::Node::SharedPtr node,
-    moveit::planning_interface::MoveGroupInterface& ur_move_group,
-    moveit::planning_interface::MoveGroupInterface& gripper_move_group,
-    moveit_visual_tools::MoveItVisualTools& visual_tools,
-    const Eigen::Isometry3d& text_pose)
-{
-  estop_requested.store(true);
-  estop_latched.store(true);
-
-  RCLCPP_ERROR(LOGGER, "EMERGENCY STOP TRIGGERED");
-
-  // Stop MoveIt execution immediately
-  ur_move_group.stop();
-  gripper_move_group.stop();
-
-  // Optional: call a UR service if you have one available
-  // If your stack exposes a real stop / halt service, call it here.
-  // Example placeholder:
-  // callTriggerService(node, "/some_stop_service");
-
-  visual_tools.publishText(text_pose, "EMERGENCY STOP", rvt::RED, rvt::XLARGE);
-  visual_tools.trigger();
-}
-
-
-void resetEmergencyStop(
-    moveit_visual_tools::MoveItVisualTools& visual_tools,
-    const Eigen::Isometry3d& text_pose)
-{
-  estop_requested.store(false);
-  estop_latched.store(false);
-
-  RCLCPP_INFO(LOGGER, "Emergency stop reset");
-  visual_tools.publishText(text_pose, "E-STOP RESET", rvt::GREEN, rvt::XLARGE);
-  visual_tools.trigger();
-  
-}
-
-void emergencyStopMonitor(
-    rclcpp::Node::SharedPtr node,
-    moveit::planning_interface::MoveGroupInterface* ur_move_group,
-    moveit::planning_interface::MoveGroupInterface* gripper_move_group,
-    moveit_visual_tools::MoveItVisualTools* visual_tools,
-    Eigen::Isometry3d text_pose,
-    std::atomic<bool>* monitor_running)
-{
-  rclcpp::WallRate rate(50.0);  // 50 Hz
-
-  while (rclcpp::ok() && monitor_running->load()) {
-    if (estop_requested.load()) {
-      ur_move_group->stop();
-      gripper_move_group->stop();
-
-      visual_tools->publishText(text_pose, "EMERGENCY STOP", rvt::RED, rvt::XLARGE);
-      visual_tools->trigger();
-
-      estop_requested.store(false);  // one-shot trigger, latched state remains
-    }
-    rate.sleep();
-  }
-}
-
-
-
-
-
-
-
 
 //  main
 int main(int argc, char** argv)
@@ -534,7 +458,7 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  placeGround(ur_move_group, planning_scene_interface, visual_tools);
+  //placeGround(ur_move_group, planning_scene_interface, visual_tools);
 
   bool running = true;
   while (running && rclcpp::ok())
@@ -555,86 +479,40 @@ int main(int argc, char** argv)
     switch (cmd)
     {
       case 'f':
-        if (estop_latched.load()) {
-            RCLCPP_WARN(LOGGER, "System is E-stopped. Reset before continuing.");
-            break;
-        }
         handleEnableFreedrive(node, visual_tools, text_pose);
         break;
       case 'd':
-              if (estop_latched.load()) {
-          RCLCPP_WARN(LOGGER, "System is E-stopped. Reset before continuing.");
-          break;
-        }
         handleDisableFreedrive(node, visual_tools, text_pose);
         break;
       case 's':
-              if (estop_latched.load()) {
-          RCLCPP_WARN(LOGGER, "System is E-stopped. Reset before continuing.");
-          break;
-        }
         // *** CHANGED FROM DEMO: pass both move groups and separate joint value vectors ***
         handleSavePose(ur_move_group, gripper_move_group, visual_tools, text_pose,
           saved_poses, ur_joint_values, gripper_joint_values);
         break;
       case 'g':
-              if (estop_latched.load()) {
-          RCLCPP_WARN(LOGGER, "System is E-stopped. Reset before continuing.");
-          break;
-        }
         // *** CHANGED: pass both move groups and separate joint value vectors ***
        handleExecuteSequence(ur_move_group, gripper_move_group, gripper_pub, visual_tools, text_pose,
           saved_poses, ur_joint_values, gripper_joint_values, use_cartesian);
         break;
       case 'c':
-              if (estop_latched.load()) {
-          RCLCPP_WARN(LOGGER, "System is E-stopped. Reset before continuing.");
-          break;
-        }
         handleTogglePlanningMode(visual_tools, text_pose, use_cartesian);
         break;
       case 'o':
-              if (estop_latched.load()) {
-          RCLCPP_WARN(LOGGER, "System is E-stopped. Reset before continuing.");
-          break;
-        }
         moveGripperOpen(gripper_pub, visual_tools, text_pose);
         break;
       case 'p':
-              if (estop_latched.load()) {
-          RCLCPP_WARN(LOGGER, "System is E-stopped. Reset before continuing.");
-          break;
-        }
         moveGripperClose(gripper_pub, visual_tools, text_pose);
         break;
       case 'b':
-          if (estop_latched.load()) {
-      RCLCPP_WARN(LOGGER, "System is E-stopped. Reset before continuing.");
-      break;
-      }
         handleAddBox(ur_move_group, planning_scene_interface, visual_tools, text_pose, box_count);
         break;
       case 'q':
-            if (estop_latched.load()) {
-        RCLCPP_WARN(LOGGER, "System is E-stopped. Reset before continuing.");
-        break;
-      }
         RCLCPP_INFO(LOGGER, "Quitting demo.");
         running = false;
         break;
       // case 't':
       //   toggleGripper(gripper_move_group, visual_tools, gripper_is_open);
       //   break;
-
-      case 'e':
-        triggerEmergencyStop(node, ur_move_group, gripper_move_group, visual_tools, text_pose);
-        break;
-      case 'r':
-        resetEmergencyStop(visual_tools, text_pose);
-
-        break;
-
-
       default:
         std::cout << "Unknown command '" << cmd << "' - try again.\n";
         break;
@@ -643,23 +521,6 @@ int main(int argc, char** argv)
 
   visual_tools.deleteAllMarkers();
   visual_tools.trigger();
-
-  std::atomic<bool> estop_monitor_running{true};
-
-  std::thread estop_thread(
-      emergencyStopMonitor,
-      node,
-      &ur_move_group,
-      &gripper_move_group,
-      &visual_tools,
-      text_pose,
-      &estop_monitor_running);
-
-  estop_monitor_running.store(false);
-  if (estop_thread.joinable()) {
-    estop_thread.join();
-  }
-
   rclcpp::shutdown();
   return 0;
 }

@@ -26,6 +26,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+# my launch file
+
 import os
 
 from launch_ros.actions import Node
@@ -43,7 +45,7 @@ from launch.substitutions import (
     LaunchConfiguration,
     PathJoinSubstitution,
 )
-
+from launch.substitutions import PythonExpression
 
 def launch_setup(context, *args, **kwargs):
 
@@ -68,6 +70,10 @@ def launch_setup(context, *args, **kwargs):
     use_sim_time = LaunchConfiguration("use_sim_time")
     launch_rviz = LaunchConfiguration("launch_rviz")
     launch_servo = LaunchConfiguration("launch_servo")
+
+
+    # *** Changed: Load which node to run
+    demo_type = LaunchConfiguration("demo_type")
 
     # *** CHANGED: use ur_description_package for UR-specific config params ***
     joint_limit_params = PathJoinSubstitution(
@@ -167,6 +173,15 @@ def launch_setup(context, *args, **kwargs):
         [FindPackageShare(moveit_config_package), "config", "kinematics.yaml"]
     )
 
+    # from ur_onrobot_moveit_config.launch_common import load_yaml
+
+    # robot_description_kinematics = {
+    #     "robot_description_kinematics": load_yaml(
+    #         str(moveit_config_package.perform(context)),
+    #         "config/kinematics.yaml"
+    #     )
+    # }
+
     robot_description_planning = {
         "robot_description_planning": load_yaml(
             str(moveit_config_package.perform(context)),
@@ -175,16 +190,46 @@ def launch_setup(context, *args, **kwargs):
     }
 
     # Planning Configuration
-    ompl_planning_pipeline_config = {
-        "move_group": {
+    # planning_pipeline_config = {
+    #     "move_group": {
+    #         "planning_plugin": "ompl_interface/OMPLPlanner",
+    #         "request_adapters": """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",
+    #         "start_state_max_bounds_error": 0.1,
+    #     }
+    # }
+    # # *** CHANGED: load ompl config from ur_onrobot_moveit_config ***
+    # ompl_planning_yaml = load_yaml("ur_onrobot_moveit_config", "config/ompl_planning.yaml")
+    # planning_pipeline_config["move_group"].update(ompl_planning_yaml)
+
+    # Double CHanged to use newer format
+    planning_pipeline_config = {
+        "planning_pipelines": ["ompl"],
+        "default_planning_pipeline": "ompl",
+        "ompl": {
             "planning_plugin": "ompl_interface/OMPLPlanner",
             "request_adapters": """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",
             "start_state_max_bounds_error": 0.1,
-        }
+        },
     }
-    # *** CHANGED: load ompl config from ur_onrobot_moveit_config ***
-    ompl_planning_yaml = load_yaml("ur_onrobot_moveit_config", "config/ompl_planning.yaml")
-    ompl_planning_pipeline_config["move_group"].update(ompl_planning_yaml)
+    ompl_yaml = load_yaml("ur_onrobot_moveit_config", "config/ompl_planning.yaml")
+    if ompl_yaml:
+        planning_pipeline_config["ompl"].update(ompl_yaml)
+
+
+    # tryign to add stomp
+    # planning_pipeline_config = {
+    #     "planning_pipelines": ["ompl", "stomp"],
+    #     "default_planning_pipeline": "stomp",  # was ompl before
+    #     "ompl": {
+    #         "planning_plugin": "ompl_interface/OMPLPlanner",
+    #         "request_adapters": """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",
+    #         "start_state_max_bounds_error": 0.1,
+    #     },
+    #     "stomp": load_yaml("ur_onrobot_moveit_config", "config/stomp_planning.yaml"),
+    # }
+    # ompl_yaml = load_yaml("ur_onrobot_moveit_config", "config/ompl_planning.yaml")
+    # if ompl_yaml:
+    #     planning_pipeline_config["ompl"].update(ompl_yaml)
 
     # Trajectory Execution Configuration
     # *** CHANGED: load controllers from ur_onrobot_moveit_config ***
@@ -224,13 +269,14 @@ def launch_setup(context, *args, **kwargs):
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
+        arguments=["--ros-args", "--log-level", "warn"],  # silence
         parameters=[
             robot_description,
             robot_description_semantic,
             publish_robot_description_semantic,
             robot_description_kinematics,
             robot_description_planning,
-            ompl_planning_pipeline_config,
+            planning_pipeline_config,
             trajectory_execution,
             moveit_controllers,
             planning_scene_monitor_parameters,
@@ -249,11 +295,11 @@ def launch_setup(context, *args, **kwargs):
         executable="rviz2",
         name="rviz2_moveit",
         output="log",
-        arguments=["-d", rviz_config_file],
+        arguments=["-d", rviz_config_file, "--ros-args", "--log-level", "error"],  # silence
         parameters=[
             robot_description,
             robot_description_semantic,
-            ompl_planning_pipeline_config,
+            planning_pipeline_config,
             robot_description_kinematics,
             robot_description_planning,
             warehouse_ros_config,
@@ -269,26 +315,33 @@ def launch_setup(context, *args, **kwargs):
         package="moveit_servo",
         condition=IfCondition(launch_servo),
         executable="servo_node_main",
+        arguments=["--ros-args", "--log-level", "warn"], # silence
         parameters=[
             servo_params,
             robot_description,
             robot_description_semantic,
+            robot_description_kinematics
         ],
         output="screen",
     )
 
     # Your custom demo node (kept from your original launch file)
     demo_node = Node(
+        
         package="ur_gripper_demo",
         executable="gripper_demo_node",
         name="ur3e_moveit_cpp",
         output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", demo_type, "' == 'demo'"])
+        ),
+        # arguments=["--ros-args", "--log-level", "info"], # silence
         parameters=[
             robot_description,
             robot_description_semantic,
             robot_description_kinematics,
             robot_description_planning,
-            ompl_planning_pipeline_config,
+            planning_pipeline_config,
             trajectory_execution,
             moveit_controllers,
             planning_scene_monitor_parameters,
@@ -296,7 +349,44 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
-    nodes_to_start = [move_group_node, rviz_node, servo_node, demo_node]
+    pick_place_node = Node(
+        package="ur_gripper_demo",
+        executable="gripper_pick_place",
+        name="ur_pick_place",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", demo_type, "' == 'pick_place'"])
+        ),
+        parameters=[
+            robot_description,
+            robot_description_semantic,
+            robot_description_kinematics,
+            robot_description_planning,
+            planning_pipeline_config,
+            trajectory_execution,
+            moveit_controllers,
+            planning_scene_monitor_parameters,
+            {"use_sim_time": use_sim_time},
+        ],
+    )
+
+    Perception_info_translator = Node(
+        package='ur_gripper_demo',
+        executable='plastic_detections_translator',
+        name='plastic_detections_translator',
+        output='screen',
+    )
+
+    # nodes_to_start = [move_group_node, rviz_node, servo_node, demo_node]
+    nodes_to_start = [
+        move_group_node,
+        # MTC_executor_node,
+        rviz_node,
+        servo_node,
+        demo_node,
+        pick_place_node,
+        Perception_info_translator,
+    ]
 
     return nodes_to_start
 
@@ -417,6 +507,17 @@ def generate_launch_description():
     )
     declared_arguments.append(
         DeclareLaunchArgument("launch_servo", default_value="true", description="Launch Servo?")
+    )
+
+
+
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "demo_type",
+            default_value="demo",
+            description="Which demo node to run",
+            choices=["demo", "pick_place", "none"],
+        )
     )
 
     return LaunchDescription(declared_arguments + [OpaqueFunction(function=launch_setup)])
