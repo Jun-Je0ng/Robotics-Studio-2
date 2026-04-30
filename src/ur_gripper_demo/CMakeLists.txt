@@ -23,9 +23,13 @@ find_package(object_msgs REQUIRED)          # your custom messages
 
 ament_python_install_package(${PROJECT_NAME})  # makes the package importable
 
-install(PROGRAMS                            # installs Python script as executable
-  src/test_helper.py
-  DESTINATION lib/${PROJECT_NAME}
+file(CHMOD ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_helper.py
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+install(PROGRAMS
+    scripts/test_helper.py
+    RENAME test_helper
+    DESTINATION lib/${PROJECT_NAME}
 )
 
 install(

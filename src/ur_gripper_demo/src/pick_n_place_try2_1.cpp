@@ -301,7 +301,7 @@ void placeGround(
     //   std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
 
-    // will also add little slotted raised level 
+    // will also add little slotted raised level
 
     moveit_msgs::msg::CollisionObject platform;
     platform.header.frame_id = arm.getPlanningFrame();
@@ -832,22 +832,64 @@ bool moveCartesian(
         RCLCPP_ERROR(LOGGER, "Cartesian path only %.0f%% complete", fraction * 100.0);
         return false;
     }
-    
+
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     plan.trajectory_ = traj;
     return arm.execute(plan) == moveit::core::MoveItErrorCode::SUCCESS;
 }
 
+// Sum of absolute joint angle changes across a trajectory.
+// Lower = fewer/smaller joint movements = more efficient motion.
+double computePlanCost(const moveit::planning_interface::MoveGroupInterface::Plan& plan)
+{
+    const auto& pts = plan.trajectory_.joint_trajectory.points;
+    if (pts.size() < 2) return 0.0;
+
+    double total = 0.0;
+    for (size_t i = 1; i < pts.size(); ++i)
+        for (size_t j = 0; j < pts[i].positions.size(); ++j)
+            total += std::abs(pts[i].positions[j] - pts[i - 1].positions[j]);
+
+    return total;
+}
+
+// Plan to a Cartesian pose, but try multiple times and execute the plan with
+// the lowest total joint movement.  This prevents the robot from choosing a
+// 270° shoulder rotation when a 90° one reaches the same Cartesian target.
 bool moveToPose(
     moveit::planning_interface::MoveGroupInterface& arm,
-    const geometry_msgs::msg::Pose& pose){
+    const geometry_msgs::msg::Pose& pose,
+    int num_attempts = 8)
+{
     arm.setPoseTarget(pose);
-    moveit::planning_interface::MoveGroupInterface::Plan plan;
-    if (arm.plan(plan) != moveit::core::MoveItErrorCode::SUCCESS){
-        RCLCPP_ERROR(LOGGER, "Joint-space planning failed");
+
+    moveit::planning_interface::MoveGroupInterface::Plan best_plan;
+    double best_cost = std::numeric_limits<double>::infinity();
+
+    for (int i = 0; i < num_attempts; ++i)
+    {
+        moveit::planning_interface::MoveGroupInterface::Plan plan;
+        if (arm.plan(plan) == moveit::core::MoveItErrorCode::SUCCESS)
+        {
+            double cost = computePlanCost(plan);
+            RCLCPP_DEBUG(LOGGER, "Plan attempt %d: cost=%.3f", i + 1, cost);
+            if (cost < best_cost)
+            {
+                best_cost = cost;
+                best_plan = plan;
+            }
+        }
+    }
+
+    if (best_cost == std::numeric_limits<double>::infinity())
+    {
+        RCLCPP_ERROR(LOGGER, "All %d planning attempts failed", num_attempts);
         return false;
     }
-    return arm.execute(plan) == moveit::core::MoveItErrorCode::SUCCESS;
+
+    RCLCPP_INFO(LOGGER, "Executing lowest-cost plan (cost=%.3f) out of %d attempts",
+                best_cost, num_attempts);
+    return arm.execute(best_plan) == moveit::core::MoveItErrorCode::SUCCESS;
 }
 
 
@@ -1329,10 +1371,13 @@ int main(int argc, char** argv)
     moveit::planning_interface::MoveGroupInterface arm(node, ARM_GROUP);
     moveit::planning_interface::PlanningSceneInterface psi;
 
-    // arm.setPlannerId("RRTstarkConfigDefault");
+    // BiTRRT explores from both start AND goal simultaneously — much better at
+    // avoiding the "long way around" than plain RRT, and faster than RRTstar.
+    // Each moveToPose() call tries 8 independent plans and picks the shortest.
+    arm.setPlannerId("BiTRRTkConfigDefault");
     arm.setMaxVelocityScalingFactor(0.3);
     arm.setMaxAccelerationScalingFactor(0.3);
-    arm.setPlanningTime(15.0);
+    arm.setPlanningTime(3.0);   // per attempt; 8 attempts = 24s max, usually much less
     arm.setGoalJointTolerance(0.01);
     arm.setGoalOrientationTolerance(0.01);
     arm.setGoalPositionTolerance(0.005);
