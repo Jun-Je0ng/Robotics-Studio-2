@@ -772,9 +772,9 @@ from object_msgs.msg import Object, ObjectArray
 # ==============================================================================
 
 UR3E_WORKSPACE = {
-    'x': (0.25, 0.45),
-    'y': (-0.15, 0.15),
-    'z': (0.02, 0.05)
+    'x': (0.20, -0.20),
+    'y': (0.25, 0.50),
+    'z': (0.10, 0.15)
 }
 
 MAX_OBJECT_SIZE = 0.12
@@ -823,15 +823,15 @@ DETERMINISTIC_OBJECTS = [
         # Object 2 — UNCOMFORTABLE
         # Tall narrow object standing upright, thin axis is x,
         # height exceeds top-down wrist clearance limit
-        # 'classification': 'fabric',
-        # 'x': -0.10, 'y': 0.40, 'z': 0.10,
-        # 'yaw': math.radians(80),
-        # 'dims': [0.03, 0.055, 0.10],  # thin axis = x, height=0.10 > 0.08 → SIDE
-
         'classification': 'fabric',
-        'x': -0.10, 'y': 0.60, 'z': 0.10,
-        'yaw': math.radians(45),
-        'dims': [0.03, 0.055, 0.10],  # thin axis = x, height=0.10 > 0.08 → SIDE
+        'x': -0.10, 'y': 0.40, 'z': 0.10,
+        'yaw': math.radians(80),
+        'dims': [0.03, 0.055, 0.07],  # thin axis = x, height=0.10 > 0.08 → SIDE
+
+        # 'classification': 'fabric',
+        # 'x': -0.10, 'y': 0.60, 'z': 0.10,
+        # 'yaw': math.radians(45),
+        # 'dims': [0.03, 0.055, 0.10],  # thin axis = x, height=0.10 > 0.08 → SIDE
     },
 ]
 

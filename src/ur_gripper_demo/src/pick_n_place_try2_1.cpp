@@ -404,11 +404,11 @@ void spawnCameraAssembly(
         0.0, M_PI / 2.0, CAM_ARM_YAW));
 
     // Camera head — box
-    objects.push_back(makeBox(
-        "cam_head",
-        CAM_HEAD_X, CAM_HEAD_Y, CAM_HEAD_Z,
-        CAM_HEAD_DX, CAM_HEAD_DY, CAM_HEAD_DZ,
-        0.0));
+    // objects.push_back(makeBox(
+    //     "cam_head",
+    //     CAM_HEAD_X, CAM_HEAD_Y, CAM_HEAD_Z,
+    //     CAM_HEAD_DX, CAM_HEAD_DY, CAM_HEAD_DZ,
+    //     0.0));
 
     psi.addCollisionObjects(objects);
 
@@ -1165,6 +1165,7 @@ void MainLoop(
         } else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL){
             RCLCPP_INFO(LOGGER, "Skipping '%s' (SIDE_VERTICAL strategy not implemented yet)", r.id.c_str());
             // side grasp here
+            continue;
             if (!executeSideHorizontalGrasp(arm, gripper_pub, r))
             {
                 continue;
@@ -1198,6 +1199,8 @@ void MainLoop(
     }
     RCLCPP_INFO(LOGGER, "All objects processed. Returning home.");
     returnHome(arm, gripper_pub);
+
+    
 }
 
 void handleCommand(
@@ -1239,6 +1242,8 @@ void handleCommand(
     }
 }
 
+// void sendToGUI(const std::string& msg){
+
 
 // ============================================================
 // Main
@@ -1257,18 +1262,31 @@ int main(int argc, char** argv)
     object_msgs::msg::ObjectArray::SharedPtr latest_objects;
     geometry_msgs::msg::PoseArray::SharedPtr latest_goals;
     std::atomic<bool> sequence_requested{false};
+    std::atomic<bool> objects_fresh{false};  // for objectss
 
     std::string file =
         std::string(getenv("HOME")) +
         "/git/Robotics-Studio-2/src/ur_gripper_demo/bin_poses.json";
     
 
+    // auto object_sub = node->create_subscription<object_msgs::msg::ObjectArray>(
+    //     "perception/objects", 10,
+    //     [&](const object_msgs::msg::ObjectArray::SharedPtr msg) {
+    //     std::lock_guard<std::mutex> lock(data_mutex);
+    //     latest_objects = msg;
+    //     RCLCPP_INFO(LOGGER, "Received %zu objects", msg->objects.size());
+    //     });
+        
     auto object_sub = node->create_subscription<object_msgs::msg::ObjectArray>(
         "perception/objects", 10,
         [&](const object_msgs::msg::ObjectArray::SharedPtr msg) {
-        std::lock_guard<std::mutex> lock(data_mutex);
-        latest_objects = msg;
-        RCLCPP_INFO(LOGGER, "Received %zu objects", msg->objects.size());
+            std::lock_guard<std::mutex> lock(data_mutex);
+            if (!objects_fresh) {  // only accept if we've consumed the last one
+                latest_objects = msg;
+                objects_fresh = true;
+                RCLCPP_INFO(LOGGER, "Received %zu objects (snapshot taken)", msg->objects.size());
+            }
+            // silently drop repeated messages
         });
 
     auto goal_sub = node->create_subscription<geometry_msgs::msg::PoseArray>(
@@ -1296,6 +1314,9 @@ int main(int argc, char** argv)
 
     auto gripper_pub = node->create_publisher<std_msgs::msg::Float64MultiArray>(
         "/finger_width_controller/commands", 10);
+
+    auto status_pub = node->create_publisher<std_msgs::msg::String>(
+        "motion_system/status", 10);
 
     
 
@@ -1396,6 +1417,11 @@ int main(int argc, char** argv)
 
         // executePickPlace(arm, gripper_pub, psi, objects_copy, goals_copy);
         MainLoop(arm, gripper_pub, psi, objects_copy, goals_copy);
+
+        objects_copy = *latest_objects;
+        objects_fresh = false;  // ← add this line, right after copying
+        if (latest_goals)
+            goals_copy = *latest_goals;
     }
 
     rclcpp::shutdown();

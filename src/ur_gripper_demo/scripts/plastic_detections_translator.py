@@ -11,7 +11,6 @@ Classification mapping: 'pet_bottle'/'hdpe_bottle' → 'plastic'
 
 Run standalone:
     ros2 run <your_pkg> plastic_detections_translator
-Or include in your launch file alongside pick_place_demo.
 """
 
 import rclpy
