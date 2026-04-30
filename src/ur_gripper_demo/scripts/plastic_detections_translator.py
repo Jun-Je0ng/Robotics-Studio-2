@@ -81,11 +81,10 @@ class PlasticDetectionsTranslator(Node):
             obj_array.objects.append(obj)
 
         if not obj_array.objects:
-            self.get_logger().warn('No valid objects after translation — not publishing')
             return
 
         self.pub.publish(obj_array)
-        self.get_logger().info(
+        self.get_logger().debug(
             f'Published {len(obj_array.objects)} object(s) on /perception/objects'
         )
 
@@ -110,9 +109,9 @@ class PlasticDetectionsTranslator(Node):
         ori = det['pose']['orientation']
 
         pose = Pose()
-        pose.position.x = mm_to_m(pos['x'])
-        pose.position.y = mm_to_m(pos['y'])
-        pose.position.z = mm_to_m(pos['z'])
+        pose.position.x =  mm_to_m(pos['x'])
+        pose.position.y = -mm_to_m(pos['y'])
+        pose.position.z = -mm_to_m(pos['z'])
         pose.orientation.x = ori['qx']
         pose.orientation.y = ori['qy']
         pose.orientation.z = ori['qz']
