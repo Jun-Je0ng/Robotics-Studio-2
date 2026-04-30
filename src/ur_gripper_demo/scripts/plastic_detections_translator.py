@@ -29,6 +29,13 @@ MIN_CONFIDENCE = 0.50
 
 MM_TO_M = 1e-3
 
+# Distance from tool0 / onrobot_base_link to gripper_tcp along the gripper Z axis.
+# Source: rg2_macro.xacro  <origin xyz="0 0 0.218"/>  on tcp_joint.
+# The calibration was performed with the pendant reporting the tool0 frame,
+# so perceived z values are offset by this amount relative to the gripper fingertip.
+# Adding it here converts to a frame where z=0 is the trolley work surface.
+GRIPPER_TCP_OFFSET_M = 0.218
+
 
 def mm_to_m(v: float) -> float:
     return v * MM_TO_M
@@ -110,8 +117,8 @@ class PlasticDetectionsTranslator(Node):
 
         pose = Pose()
         pose.position.x =  mm_to_m(pos['x'])
-        pose.position.y = -mm_to_m(pos['y'])
-        pose.position.z = -mm_to_m(pos['z'])
+        pose.position.y = -mm_to_m(pos['y'])                      # UR pendant Y is opposite to URDF base_link Y
+        pose.position.z =  mm_to_m(pos['z']) + GRIPPER_TCP_OFFSET_M  # shift from tool0 frame → trolley surface frame
         pose.orientation.x = ori['qx']
         pose.orientation.y = ori['qy']
         pose.orientation.z = ori['qz']

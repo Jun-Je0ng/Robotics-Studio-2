@@ -760,9 +760,11 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseArray, Pose, Point, Quaternion
+from std_msgs.msg import String
 from std_srvs.srv import Trigger
 import random
 import math
+import json
 
 from object_msgs.msg import Object, ObjectArray
 
@@ -1014,13 +1016,121 @@ class ObjectClassificationHelper(Node):
 
 
 # ==============================================================================
+# Coordinate Inject Node
+# Publishes a single detection with KNOWN teach-pendant coordinates onto
+# /plastic_detections (raw JSON) so it flows through the translator unchanged.
+# Use this to verify the translator fix: the object should appear at the
+# correct physical location in RViz after spawning.
+#
+# Trigger:
+#   ros2 service call /inject_detection std_srvs/srv/Trigger {}
+#
+# Edit INJECT_COORDS below to match what your teach pendant showed.
+# ==============================================================================
+
+# ── Paste your teach-pendant reading here (mm) ───────────────────────────────
+INJECT_COORDS = {
+    'x_mm':  18.0,     # teach-pendant X
+    'y_mm': -292.0,    # teach-pendant Y
+    'z_mm': -133.0,    # teach-pendant Z
+}
+
+INJECT_DIMS = {
+    'dx_mm': 80.0,   # rough bottle width  — adjust if you know it
+    'dy_mm': 80.0,
+    'dz_mm': 60.0,   # depth / diameter
+}
+
+INJECT_CLASS      = 'metal'
+INJECT_CONFIDENCE = 0.95
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class CoordinateInjectNode(Node):
+    """
+    Publishes a single detection with exact known coordinates onto
+    /plastic_detections so the translator (and the full pipeline) processes it.
+
+    After calling the service, look in RViz: the spawned collision object
+    should appear at the physical location matching the teach pendant reading.
+    """
+
+    def __init__(self):
+        super().__init__('coordinate_inject_node')
+
+        self.pub = self.create_publisher(String, 'plastic_detections', 10)
+        self.srv = self.create_service(Trigger, 'inject_detection', self.callback)
+
+        self.get_logger().info(
+            f'CoordinateInjectNode ready.\n'
+            f'  Inject coords (mm): x={INJECT_COORDS["x_mm"]}, '
+            f'y={INJECT_COORDS["y_mm"]}, z={INJECT_COORDS["z_mm"]}\n'
+            f'  Class: {INJECT_CLASS}\n'
+            f'  Trigger: ros2 service call /inject_detection std_srvs/srv/Trigger {{}}'
+        )
+
+    def callback(self, request, response):
+        detection = [
+            {
+                'pose': {
+                    'position': {
+                        'x': INJECT_COORDS['x_mm'],
+                        'y': INJECT_COORDS['y_mm'],
+                        'z': INJECT_COORDS['z_mm'],
+                    },
+                    'orientation': {'qx': 0.0, 'qy': 0.0, 'qz': 0.0, 'qw': 1.0},
+                },
+                'dimensions': {
+                    'dx_mm': INJECT_DIMS['dx_mm'],
+                    'dy_mm': INJECT_DIMS['dy_mm'],
+                    'dz_mm': INJECT_DIMS['dz_mm'],
+                },
+                'classification': {
+                    'class':      INJECT_CLASS,
+                    'confidence': INJECT_CONFIDENCE,
+                },
+                'debug': {
+                    'z_table_mm':    INJECT_COORDS['z_mm'],
+                    'z_approach_mm': INJECT_COORDS['z_mm'] + 150.0,
+                    'angle_deg':     0.0,
+                    'angle_rad':     0.0,
+                    'depth_m':       abs(INJECT_COORDS['z_mm']) / 1000.0,
+                    'dz_source':     'depth',
+                },
+            }
+        ]
+
+        msg = String()
+        msg.data = json.dumps(detection)
+        self.pub.publish(msg)
+
+        GRIPPER_TCP_OFFSET_M = 0.218
+        self.get_logger().info(
+            f'Injected detection: ({INJECT_COORDS["x_mm"]}, '
+            f'{INJECT_COORDS["y_mm"]}, {INJECT_COORDS["z_mm"]}) mm  →  '
+            f'expect object at ('
+            f'{INJECT_COORDS["x_mm"]/1000:.3f}, '
+            f'{-INJECT_COORDS["y_mm"]/1000:.3f}, '        # translator flips Y
+            f'{INJECT_COORDS["z_mm"]/1000 + GRIPPER_TCP_OFFSET_M:.3f}'  # translator adds gripper offset
+            f') m in base_link'
+        )
+
+        response.success = True
+        response.message = 'Detection injected on /plastic_detections'
+        return response
+
+
+# ==============================================================================
 # Main
 # ==============================================================================
 
 def main(args=None):
     rclpy.init(args=args)
-    node = ObjectClassificationHelper(num_objects=3)
+    # ── Swap node here ──────────────────────────────────────────────────────
+    node = CoordinateInjectNode()         # ← full-pipeline coordinate test
+    # node = ObjectClassificationHelper(num_objects=3)
     # node = PickPlaceTestHelper()
+    # ────────────────────────────────────────────────────────────────────────
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
