@@ -6,7 +6,6 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/pose_array.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
-#include <std_msgs/msg/string.hpp>
 #include <std_srvs/srv/trigger.hpp>
 
 #include <object_msgs/msg/object_array.hpp>
@@ -49,20 +48,6 @@ const double TOP_DOWN_MAX_SPAN  = RG2_MAX_SPAN - 0.02;  // 0.090m
 // const double TOP_DOWN_MAX_HEIGHT = 0.120;  // metres
 const double TOP_DOWN_MAX_HEIGHT = 0.080;  // metres
 std::map<std::string, geometry_msgs::msg::Pose> bin_map;
-
-using StringPub = rclcpp::Publisher<std_msgs::msg::String>::SharedPtr;
-StringPub g_status_pub;
-StringPub g_robot_state_pub;
-StringPub g_event_log_pub;
-StringPub g_mot_status_pub;
-StringPub g_cur_obj_pub;
-
-static void pubStr(const StringPub& pub, const std::string& text) {
-    if (!pub) return;
-    std_msgs::msg::String msg;
-    msg.data = text;
-    pub->publish(msg);
-}
 
 // camera + tripod location
 // can be done via primitaves
@@ -121,9 +106,11 @@ int attempts = 3;
 // Structs
 // ============================================================
 const std::map<std::string, int> BIN_MAP = {
-    {"metal",   0},
-    {"plastic", 1},
-    {"fabric",  2},
+    {"metal",        0},
+    {"plastic",      1},
+    {"fabric",       2},
+    {"hdpe_bottle",  1},
+    {"pet_bottle",   1},
 };
 
 // Drop-off poses for each bin — position only, orientation is always top-down
@@ -419,11 +406,11 @@ void spawnCameraAssembly(
         0.0, M_PI / 2.0, CAM_ARM_YAW));
 
     // Camera head — box
-    objects.push_back(makeBox(
-        "cam_head",
-        CAM_HEAD_X, CAM_HEAD_Y, CAM_HEAD_Z,
-        CAM_HEAD_DX, CAM_HEAD_DY, CAM_HEAD_DZ,
-        0.0));
+    // objects.push_back(makeBox(
+    //     "cam_head",
+    //     CAM_HEAD_X, CAM_HEAD_Y, CAM_HEAD_Z,
+    //     CAM_HEAD_DX, CAM_HEAD_DY, CAM_HEAD_DZ,
+    //     0.0));
 
     psi.addCollisionObjects(objects);
 
@@ -1156,9 +1143,6 @@ void MainLoop(
     if (object_array.objects.empty())  { RCLCPP_WARN(LOGGER, "No objects."); return; }
     // if (goal_poses.poses.empty())      { RCLCPP_WARN(LOGGER, "No goal poses."); return; }
 
-    pubStr(g_status_pub,     "Running");
-    pubStr(g_mot_status_pub, "Processing");
-
     auto resolved = resolveObjects(object_array);
 
     // sort by bin
@@ -1170,42 +1154,41 @@ void MainLoop(
 
     // go to pregrasp:
     for (const auto& r : resolved){
+        if (!executeTopDownGrasp(arm, gripper_pub, r))
+            {
+                continue;
+            }
 
-        pubStr(g_cur_obj_pub,     r.obj.classification);
-        pubStr(g_robot_state_pub, "Picking");
-        pubStr(g_event_log_pub,   "Picking " + r.id + " (" + r.obj.classification + ")");
-
-        if (r.grasp.strategy == GraspStrategy::SIDE_VERTICAL){
-            RCLCPP_INFO(LOGGER, "Skipping '%s' (SIDE_VERTICAL strategy not implemented yet)", r.id.c_str());
-            // side grasp here 
-            continue;
-            if (!executeSideVerticalGrasp(arm, gripper_pub, psi, r))
-            {
-                continue;
-            }
-            continue;
-        } else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL){
-            RCLCPP_INFO(LOGGER, "Skipping '%s' (SIDE_VERTICAL strategy not implemented yet)", r.id.c_str());
-            // side grasp here
-            if (!executeSideHorizontalGrasp(arm, gripper_pub, r))
-            {
-                continue;
-            }
-        } else if (r.grasp.strategy == GraspStrategy::TOP_DOWN){
-            RCLCPP_INFO(LOGGER, "Skipping '%s' (SIDE_VERTICAL strategy not implemented yet)", r.id.c_str());
-            // side grasp here
-            if (!executeTopDownGrasp(arm, gripper_pub, r))
-            {
-                continue;
-            }
-        } else {
-            RCLCPP_INFO(LOGGER, "Skipping unknown strategy '%s'", toString(r.grasp.strategy));
-            continue;
-        }
+        // if (r.grasp.strategy == GraspStrategy::SIDE_VERTICAL){
+        //     RCLCPP_INFO(LOGGER, "Skipping '%s' (SIDE_VERTICAL strategy not implemented yet)", r.id.c_str());
+        //     // side grasp here 
+        //     continue;
+        //     if (!executeSideVerticalGrasp(arm, gripper_pub, psi, r))
+        //     {
+        //         continue;
+        //     }
+        //     continue;
+        // } else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL){
+        //     RCLCPP_INFO(LOGGER, "Skipping '%s' (SIDE_VERTICAL strategy not implemented yet)", r.id.c_str());
+        //     // side grasp here
+        //     continue;
+        //     if (!executeSideHorizontalGrasp(arm, gripper_pub, r))
+        //     {
+        //         continue;
+        //     }
+        // } else if (r.grasp.strategy == GraspStrategy::TOP_DOWN){
+        //     RCLCPP_INFO(LOGGER, "Skipping '%s' (SIDE_VERTICAL strategy not implemented yet)", r.id.c_str());
+        //     // side grasp here
+        //     if (!executeTopDownGrasp(arm, gripper_pub, r))
+        //     {
+        //         continue;
+        //     }
+        // } else {
+        //     RCLCPP_INFO(LOGGER, "Skipping unknown strategy '%s'", toString(r.grasp.strategy));
+        //     continue;
+        // }
         
         // go to bin
-        pubStr(g_robot_state_pub, "Placing");
-        pubStr(g_event_log_pub,   "Moving to bin for " + r.id);
         geometry_msgs::msg::Pose bin_pose = getDropOffPose(r.obj.classification);
 
         moveToPose(arm, bin_pose);
@@ -1216,87 +1199,56 @@ void MainLoop(
         detachObject(arm, r.id);
         std::this_thread::sleep_for(std::chrono::seconds(1));
         removeObject(psi, r.id);
-        pubStr(g_event_log_pub,   "Placed " + r.id + " (" + r.obj.classification + ")");
 
 
         // go to home or request updated objects data
     }
     RCLCPP_INFO(LOGGER, "All objects processed. Returning home.");
-    pubStr(g_status_pub,      "Stopped");
-    pubStr(g_robot_state_pub, "Idle");
-    pubStr(g_mot_status_pub,  "Complete");
-    pubStr(g_cur_obj_pub,     "\xe2\x80\x94");  // em dash
-    pubStr(g_event_log_pub,   "All objects processed.");
     returnHome(arm, gripper_pub);
+
+    
 }
 
 void handleCommand(
     const std::string& cmd,
     moveit::planning_interface::MoveGroupInterface& arm,
     const rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr& gripper_pub){
-    if (cmd == "HOME" || cmd == "home")
+    if (cmd == "HOME")
     {
-        pubStr(g_robot_state_pub, "Homing");
-        pubStr(g_event_log_pub,   "Returning home.");
         returnHome(arm, gripper_pub);
-        pubStr(g_robot_state_pub, "Idle");
         RCLCPP_INFO(LOGGER, "CMD: HOME");
     }
     else if (cmd == "LOAD_BINS")
     {
         loadBinPoses();
-        pubStr(g_event_log_pub, "Bin poses loaded.");
         RCLCPP_INFO(LOGGER, "CMD: LOAD_BINS");
     }
     else if (cmd.rfind("SAVE_BIN:", 0) == 0)
     {
         std::string label = cmd.substr(9);
+
         geometry_msgs::msg::Pose p = arm.getCurrentPose().pose;
         saveBinPose(label, p, "bin_poses");
-        pubStr(g_event_log_pub, "Saved bin pose: " + label);
+
         RCLCPP_INFO(LOGGER, "CMD: SAVED %s", label.c_str());
     }
-    else if (cmd == "START" || cmd == "start")
+    else if (cmd == "START")
     {
         sequence_requested = true;
-        pubStr(g_status_pub,    "Running");
-        pubStr(g_mot_status_pub, "Started");
-        pubStr(g_event_log_pub, "Sequence started.");
         RCLCPP_INFO(LOGGER, "CMD: START");
     }
-    else if (cmd == "STOP" || cmd == "stop")
+    else if (cmd == "STOP")
     {
         sequence_requested = false;
-        pubStr(g_status_pub,      "Stopped");
-        pubStr(g_robot_state_pub, "Idle");
-        pubStr(g_mot_status_pub,  "Stopped");
-        pubStr(g_event_log_pub,   "Sequence stopped.");
         RCLCPP_WARN(LOGGER, "CMD: STOP");
-    }
-    else if (cmd == "estop")
-    {
-        sequence_requested = false;
-        pubStr(g_status_pub,      "Failed");
-        pubStr(g_robot_state_pub, "Idle");
-        pubStr(g_mot_status_pub,  "Stopped");
-        pubStr(g_event_log_pub,   "E-STOP triggered.");
-        RCLCPP_ERROR(LOGGER, "CMD: ESTOP");
-    }
-    else if (cmd == "open_gripper")
-    {
-        sendGripper(gripper_pub, GRIPPER_OPEN);
-        pubStr(g_event_log_pub, "Gripper opened.");
-    }
-    else if (cmd == "close_gripper")
-    {
-        sendGripper(gripper_pub, GRIPPER_CLOSED);
-        pubStr(g_event_log_pub, "Gripper closed.");
     }
     else
     {
         RCLCPP_WARN(LOGGER, "Unknown command: %s", cmd.c_str());
     }
 }
+
+// void sendToGUI(const std::string& msg){
 
 
 // ============================================================
@@ -1312,28 +1264,35 @@ int main(int argc, char** argv)
     executor.add_node(node);
     std::thread spinner([&executor]() { executor.spin(); });
 
-    g_status_pub      = node->create_publisher<std_msgs::msg::String>("/system_status",              10);
-    g_robot_state_pub = node->create_publisher<std_msgs::msg::String>("/robot_state",                10);
-    g_event_log_pub   = node->create_publisher<std_msgs::msg::String>("/event_log",                  10);
-    g_mot_status_pub  = node->create_publisher<std_msgs::msg::String>("/motion_system/status",       10);
-    g_cur_obj_pub     = node->create_publisher<std_msgs::msg::String>("/motion_system/current_object", 10);
-
     std::mutex data_mutex;
     object_msgs::msg::ObjectArray::SharedPtr latest_objects;
     geometry_msgs::msg::PoseArray::SharedPtr latest_goals;
     std::atomic<bool> sequence_requested{false};
+    std::atomic<bool> objects_fresh{false};  // for objectss
 
     std::string file =
         std::string(getenv("HOME")) +
         "/git/Robotics-Studio-2/src/ur_gripper_demo/bin_poses.json";
     
 
+    // auto object_sub = node->create_subscription<object_msgs::msg::ObjectArray>(
+    //     "perception/objects", 10,
+    //     [&](const object_msgs::msg::ObjectArray::SharedPtr msg) {
+    //     std::lock_guard<std::mutex> lock(data_mutex);
+    //     latest_objects = msg;
+    //     RCLCPP_INFO(LOGGER, "Received %zu objects", msg->objects.size());
+    //     });
+        
     auto object_sub = node->create_subscription<object_msgs::msg::ObjectArray>(
         "perception/objects", 10,
         [&](const object_msgs::msg::ObjectArray::SharedPtr msg) {
-        std::lock_guard<std::mutex> lock(data_mutex);
-        latest_objects = msg;
-        RCLCPP_INFO(LOGGER, "Received %zu objects", msg->objects.size());
+            std::lock_guard<std::mutex> lock(data_mutex);
+            if (!objects_fresh) {  // only accept if we've consumed the last one
+                latest_objects = msg;
+                objects_fresh = true;
+                RCLCPP_INFO(LOGGER, "Received %zu objects (snapshot taken)", msg->objects.size());
+            }
+            // silently drop repeated messages
         });
 
     auto goal_sub = node->create_subscription<geometry_msgs::msg::PoseArray>(
@@ -1361,6 +1320,9 @@ int main(int argc, char** argv)
 
     auto gripper_pub = node->create_publisher<std_msgs::msg::Float64MultiArray>(
         "/finger_width_controller/commands", 10);
+
+    auto status_pub = node->create_publisher<std_msgs::msg::String>(
+        "motion_system/status", 10);
 
     
 
@@ -1461,6 +1423,11 @@ int main(int argc, char** argv)
 
         // executePickPlace(arm, gripper_pub, psi, objects_copy, goals_copy);
         MainLoop(arm, gripper_pub, psi, objects_copy, goals_copy);
+
+        objects_copy = *latest_objects;
+        objects_fresh = false;  // ← add this line, right after copying
+        if (latest_goals)
+            goals_copy = *latest_goals;
     }
 
     rclcpp::shutdown();
