@@ -34,7 +34,7 @@ MM_TO_M = 1e-3
 # The calibration was performed with the pendant reporting the tool0 frame,
 # so perceived z values are offset by this amount relative to the gripper fingertip.
 # Adding it here converts to a frame where z=0 is the trolley work surface.
-GRIPPER_TCP_OFFSET_M = 0.218
+GRIPPER_TCP_OFFSET_M = 0.180
 
 
 def mm_to_m(v: float) -> float:
@@ -116,13 +116,15 @@ class PlasticDetectionsTranslator(Node):
         ori = det['pose']['orientation']
 
         pose = Pose()
-        pose.position.x =  mm_to_m(pos['x'])
+        pose.position.x = -mm_to_m(pos['x'])                      # camera X is mirrored relative to robot base_link X
         pose.position.y = -mm_to_m(pos['y'])                      # UR pendant Y is opposite to URDF base_link Y
         pose.position.z =  mm_to_m(pos['z']) + GRIPPER_TCP_OFFSET_M  # shift from tool0 frame → trolley surface frame
-        pose.orientation.x = ori['qx']
-        pose.orientation.y = ori['qy']
-        pose.orientation.z = ori['qz']
-        pose.orientation.w = ori['qw']
+        # Negating x and y positions is a 180° Z rotation; apply the same to orientation.
+        # q_new = Rz(π) * q_original  →  (-qy, qx, qw, -qz)
+        pose.orientation.x = -ori['qy']
+        pose.orientation.y =  ori['qx']
+        pose.orientation.z =  ori['qw']
+        pose.orientation.w = -ori['qz']
 
         # ── Dimensions (mm → m) ───────────────────────────────────────────────
         dims = det['dimensions']

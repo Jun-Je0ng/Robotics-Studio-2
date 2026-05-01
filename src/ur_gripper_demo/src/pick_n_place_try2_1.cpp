@@ -531,17 +531,8 @@ GraspGeometry computeGraspGeometry(const object_msgs::msg::Object& obj)
     double xy_max = std::max(d[0], d[1]);
     double height = d[2];
 
-    // Strategy selection
-    bool fits_topdown = (xy_min < TOP_DOWN_MAX_SPAN) && (height <= TOP_DOWN_MAX_HEIGHT);
-    bool is_tall      = height > TOP_DOWN_MAX_HEIGHT;          // taller than TOP_DOWN_MAX_HEIGHT → likely upright bottle
-    bool is_thin      = xy_min < 0.03;          // thin profile → slide-under more reliable
-    
-    if (fits_topdown)
-        g.strategy = GraspStrategy::TOP_DOWN;
-    else if (is_tall && !is_thin)
-        g.strategy = GraspStrategy::SIDE_HORIZONTAL;  // upright bottle, grip from sides
-    else
-        g.strategy = GraspStrategy::SIDE_VERTICAL;    // wide flat object, slide under
+    // Bottles always lay on their side — top-down grasp only
+    g.strategy = GraspStrategy::TOP_DOWN;
     
 
     // Grip width
