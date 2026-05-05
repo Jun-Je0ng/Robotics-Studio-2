@@ -130,8 +130,9 @@ class PlasticDetectionsTranslator(Node):
         dims = det['dimensions']
         dx = mm_to_m(dims['dx_mm'])
         dy = mm_to_m(dims['dy_mm'])
-        # dz_mm is optional — fall back to dy (long axis) if depth failed
-        dz = mm_to_m(dims['dz_mm']) if 'dz_mm' in dims else dy
+        # dz_mm is 0.0 when measurement failed — fall back to min(dx, dy) (diameter)
+        dz_raw = dims.get('dz_mm', 0.0)
+        dz = mm_to_m(dz_raw) if dz_raw > 5.0 else min(dx, dy)
 
         # ── Build message ─────────────────────────────────────────────────────
         obj = Object()

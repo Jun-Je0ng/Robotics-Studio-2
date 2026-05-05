@@ -21,6 +21,8 @@
 #include <mutex>
 #include <atomic>
 #include <algorithm>
+#include <cctype>
+#include <set>
 #include <nlohmann/json.hpp>
 
 namespace rvt = rviz_visual_tools;
@@ -290,7 +292,7 @@ void placeGround(
 
     geometry_msgs::msg::Pose pose;
     pose.orientation.w = 1.0;
-    pose.position.z    = -0.055;
+    pose.position.z    = -0.165;
 
     ground.primitives.push_back(primitive);
     ground.primitive_poses.push_back(pose);
@@ -489,6 +491,10 @@ void returnHome(
   sendGripper(gripper_pub, GRIPPER_OPEN);
 }
 
+static const std::set<std::string> CYLINDER_CLASSES = {
+    "hdpe_bottle", "pet_bottle"
+};
+
 void spawnCollisionObject(
     moveit::planning_interface::PlanningSceneInterface & psi,
     const object_msgs::msg::Object & obj,
@@ -499,19 +505,62 @@ void spawnCollisionObject(
     co.header.frame_id = frame_id;
     co.operation       = moveit_msgs::msg::CollisionObject::ADD;
 
-    shape_msgs::msg::SolidPrimitive box;
-    box.type       = shape_msgs::msg::SolidPrimitive::BOX;
-    box.dimensions = {obj.dimensions[0] - RG2_FINGER_MARGIN, obj.dimensions[1] - RG2_FINGER_MARGIN, obj.dimensions[2] - RG2_FINGER_MARGIN};
+    bool is_cylinder = CYLINDER_CLASSES.count(obj.classification) > 0;
+    const char* shape_str;
 
-    co.primitives.push_back(box);
-    co.primitive_poses.push_back(obj.pose);
+    geometry_msgs::msg::Pose spawn_pose = obj.pose;
 
+    if (is_cylinder)
+    {
+        double dx     = obj.dimensions[0];
+        double dy     = obj.dimensions[1];
+        double length = std::max(dx, dy);       // bottle body length
+        double radius = std::min(dx, dy) / 2.0; // bottle radius
+
+        // Extract the yaw from the object orientation (OBB rotation in XY plane).
+        // dx is the OBB "width" axis (along yaw), dy is perpendicular (along yaw+90°).
+        tf2::Quaternion q_obj;
+        tf2::fromMsg(obj.pose.orientation, q_obj);
+        double r_obj, p_obj, yaw_obj;
+        tf2::Matrix3x3(q_obj).getRPY(r_obj, p_obj, yaw_obj);
+
+        // Long-axis angle: dx direction if dx>=dy, else rotate 90°
+        double long_axis_yaw = (dx >= dy) ? yaw_obj : (yaw_obj + M_PI / 2.0);
+
+        // Lay the cylinder horizontal: pitch 90° then yaw to align with long axis.
+        // setRPY(0, π/2, long_axis_yaw) → local Z points along the long axis in XY plane.
+        tf2::Quaternion q_cyl;
+        q_cyl.setRPY(0.0, M_PI / 2.0, long_axis_yaw);
+        q_cyl.normalize();
+        spawn_pose.orientation = tf2::toMsg(q_cyl);
+
+        shape_msgs::msg::SolidPrimitive cyl;
+        cyl.type       = shape_msgs::msg::SolidPrimitive::CYLINDER;
+        cyl.dimensions = {length, radius};  // height=length, radius=radius
+
+        co.primitives.push_back(cyl);
+        shape_str = "CYLINDER";
+    }
+    else
+    {
+        shape_msgs::msg::SolidPrimitive box;
+        box.type       = shape_msgs::msg::SolidPrimitive::BOX;
+        box.dimensions = {
+            obj.dimensions[0] - RG2_FINGER_MARGIN,
+            obj.dimensions[1] - RG2_FINGER_MARGIN,
+            obj.dimensions[2] - RG2_FINGER_MARGIN
+        };
+        co.primitives.push_back(box);
+        shape_str = "BOX";
+    }
+
+    co.primitive_poses.push_back(spawn_pose);
     psi.addCollisionObjects({co});
 
-    RCLCPP_INFO(LOGGER, "Spawned '%s'  [%.3f x %.3f x %.3f]  class=%s",
+    RCLCPP_INFO(LOGGER, "Spawned '%s'  [%.3f x %.3f x %.3f]  class=%s  shape=%s",
         id.c_str(),
         obj.dimensions[0], obj.dimensions[1], obj.dimensions[2],
-        obj.classification.c_str());
+        obj.classification.c_str(), shape_str);
 }
 
 
@@ -537,7 +586,7 @@ GraspGeometry computeGraspGeometry(const object_msgs::msg::Object& obj)
 
     // Grip width
     if (g.strategy == GraspStrategy::TOP_DOWN) {
-        g.grip_width = std::clamp(xy_min - 0.005, 0.0, RG2_MAX_SPAN);
+        g.grip_width = std::clamp(xy_min - 0.020, 0.0, RG2_MAX_SPAN);
     }
     else if (g.strategy == GraspStrategy::SIDE_HORIZONTAL) {
         // Use XY diameter (important!)
@@ -1224,7 +1273,15 @@ void MainLoop(
         // go to bin
         geometry_msgs::msg::Pose bin_pose = getDropOffPose(r.obj.classification);
 
-        moveToPose(arm, bin_pose);
+        if (!moveToPose(arm, bin_pose))
+        {
+            RCLCPP_WARN(LOGGER, "Direct path to bin failed — trying via home");
+            arm.setNamedTarget("home");
+            moveit::planning_interface::MoveGroupInterface::Plan home_plan;
+            if (arm.plan(home_plan) == moveit::core::MoveItErrorCode::SUCCESS)
+                arm.execute(home_plan);
+            moveToPose(arm, bin_pose);
+        }
         // returnHome(arm, gripper_pub);
 
         // Detach and leave it back in the scene
@@ -1243,13 +1300,53 @@ void MainLoop(
 }
 
 void handleCommand(
-    const std::string& cmd,
+    const std::string& raw_cmd,
     moveit::planning_interface::MoveGroupInterface& arm,
-    const rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr& gripper_pub){
+    const rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr& gripper_pub,
+    std::atomic<bool>& sequence_requested)
+{
+    // Normalise to uppercase so GUI (lowercase) and keyboard (uppercase) both work
+    std::string cmd = raw_cmd;
+    std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper);
+
     if (cmd == "HOME")
     {
         returnHome(arm, gripper_pub);
         RCLCPP_INFO(LOGGER, "CMD: HOME");
+    }
+    else if (cmd == "START")
+    {
+        sequence_requested.store(true);
+        RCLCPP_INFO(LOGGER, "CMD: START");
+    }
+    else if (cmd == "STOP")
+    {
+        sequence_requested.store(false);
+        arm.stop();
+        RCLCPP_WARN(LOGGER, "CMD: STOP");
+    }
+    else if (cmd == "ESTOP")
+    {
+        sequence_requested.store(false);
+        arm.stop();
+        RCLCPP_ERROR(LOGGER, "E-STOP triggered — terminating process");
+        rclcpp::shutdown();
+        exit(1);
+    }
+    else if (cmd == "RESET")
+    {
+        sequence_requested.store(false);
+        RCLCPP_INFO(LOGGER, "CMD: RESET");
+    }
+    else if (cmd == "OPEN_GRIPPER")
+    {
+        sendGripper(gripper_pub, GRIPPER_OPEN);
+        RCLCPP_INFO(LOGGER, "CMD: OPEN_GRIPPER");
+    }
+    else if (cmd == "CLOSE_GRIPPER")
+    {
+        sendGripper(gripper_pub, GRIPPER_CLOSED);
+        RCLCPP_INFO(LOGGER, "CMD: CLOSE_GRIPPER");
     }
     else if (cmd == "LOAD_BINS")
     {
@@ -1259,25 +1356,13 @@ void handleCommand(
     else if (cmd.rfind("SAVE_BIN:", 0) == 0)
     {
         std::string label = cmd.substr(9);
-
         geometry_msgs::msg::Pose p = arm.getCurrentPose().pose;
         saveBinPose(label, p, "bin_poses");
-
         RCLCPP_INFO(LOGGER, "CMD: SAVED %s", label.c_str());
-    }
-    else if (cmd == "START")
-    {
-        sequence_requested = true;
-        RCLCPP_INFO(LOGGER, "CMD: START");
-    }
-    else if (cmd == "STOP")
-    {
-        sequence_requested = false;
-        RCLCPP_WARN(LOGGER, "CMD: STOP");
     }
     else
     {
-        RCLCPP_WARN(LOGGER, "Unknown command: %s", cmd.c_str());
+        RCLCPP_WARN(LOGGER, "Unknown command: %s", raw_cmd.c_str());
     }
 }
 
@@ -1305,7 +1390,7 @@ int main(int argc, char** argv)
 
     std::string file =
         std::string(getenv("HOME")) +
-        "/git/Robotics-Studio-2/src/ur_gripper_demo/bin_poses.json";
+        "/git/Robotics-Studio-2/src/ur_gripper_demo/config/bin_poses.json";
     
 
     // auto object_sub = node->create_subscription<object_msgs::msg::ObjectArray>(
@@ -1396,11 +1481,11 @@ int main(int argc, char** argv)
     }
 
 
-    // Command interface:
+    // Command interface — handles both GUI (lowercase) and keyboard topics
     auto cmd_sub = node->create_subscription<std_msgs::msg::String>(
         "/motion_system/command", 10,
         [&](const std_msgs::msg::String::SharedPtr msg){
-        handleCommand(msg->data, arm, gripper_pub);
+        handleCommand(msg->data, arm, gripper_pub, sequence_requested);
     });
 
 
@@ -1409,32 +1494,37 @@ int main(int argc, char** argv)
     // addTrolleyMesh(arm,psi);
     returnHome(arm, gripper_pub);
 
-    std::ifstream tty("/dev/tty");
-    RCLCPP_INFO(LOGGER, "Ready. Press ENTER to start, 'q' to quit.");
+    // Keyboard input runs in a background thread so the GUI can also trigger
+    // the sequence without the user needing to press ENTER.
+    std::atomic<bool> quit_requested{false};
+    std::thread kbd_thread([&]() {
+        std::ifstream tty("/dev/tty");
+        RCLCPP_INFO(LOGGER, "Ready. Press ENTER to start, 'q' to quit, 'pose <name>' to save.");
+        while (rclcpp::ok() && !quit_requested.load()) {
+            std::cout << "\n[kbd] ENTER=start  q=quit  pose <name>=save\n>> " << std::flush;
+            std::string line;
+            if (!std::getline(tty, line)) break;
+            if (line == "q") { quit_requested.store(true); rclcpp::shutdown(); break; }
+            if (line.rfind("pose ", 0) == 0) {
+                std::string name = line.substr(5);
+                geometry_msgs::msg::Pose p = arm.getCurrentPose().pose;
+                saveBinPose(name, p, file);
+                RCLCPP_INFO(LOGGER, "Saved pose '%s'", name.c_str());
+                continue;
+            }
+            // ENTER (empty line) → trigger sequence
+            sequence_requested.store(true);
+        }
+    });
 
-    while (rclcpp::ok())
+    // Main polling loop — wakes up when GUI or keyboard sets sequence_requested
+    while (rclcpp::ok() && !quit_requested.load())
     {
-        std::cout << "\nPress ENTER to start, 'q' to quit.\n>> ";
-        std::string line;
-        std::getline(tty, line);
-        char cmd = line.empty() ? '\n' : line[0];
-        if (cmd == 'q') break;
-
-        // debug COMMAND: SAVE POSE
-        if (line.rfind("pose ", 0) == 0)
+        if (!sequence_requested.exchange(false))
         {
-            std::string name = line.substr(5);
-
-            geometry_msgs::msg::Pose current_pose = arm.getCurrentPose().pose;
-
-            saveBinPose(name, current_pose, file);
-
-            RCLCPP_INFO(LOGGER, "Saved pose for '%s'", name.c_str());
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
             continue;
         }
-
-        bool go = (cmd == '\n') || sequence_requested.exchange(false);
-        if (!go) continue;
 
         object_msgs::msg::ObjectArray objects_copy;
         geometry_msgs::msg::PoseArray  goals_copy;
@@ -1466,7 +1556,9 @@ int main(int argc, char** argv)
             goals_copy = *latest_goals;
     }
 
+    quit_requested.store(true);
     rclcpp::shutdown();
+    kbd_thread.detach();
     spinner.join();
     return 0;
 }

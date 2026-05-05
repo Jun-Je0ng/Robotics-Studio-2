@@ -34,8 +34,8 @@ import threading
 # CONFIG
 # ──────────────────────────────────────────────────────────────────────────────
 
-MODEL_PATH       = "/home/rian/ml_project/runs/obb/train/weights/best.pt"
-CALIBRATION_FILE = "/home/rian/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/camera_to_robot_calibration.json"
+MODEL_PATH       = "/home/jun/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/best.pt"
+CALIBRATION_FILE = "/home/jun/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/camera_to_robot_calibration.json"
 
 DEPTH_KERNEL_SIZE    = 11
 SMOOTHING_WINDOW     = 5
@@ -80,7 +80,8 @@ def camera_to_robot(T, cam_xyz):
 
 def angle_to_quaternion(angle_rad):
     """Convert 2D OBB rotation angle to 3D quaternion (rotation around Z axis)."""
-    r = Rotation.from_euler('z', angle_rad)
+    # Negate: image Y (downward) maps to robot -Y, so image angles are mirrored
+    r = Rotation.from_euler('z', -angle_rad)
     q = r.as_quat()  # [x, y, z, w]
     return {
         "qx": round(float(q[0]), 6),
@@ -93,33 +94,46 @@ def pixels_to_mm(pixels, depth_m, focal_length):
     """Convert pixel dimension to mm using depth and focal length."""
     return (pixels / focal_length) * depth_m * 1000.0
 
-def compute_dz(depth_frame, intrinsics, cx, cy, half_width_px, depth_m):
+def compute_height_from_depth(depth_frame, cx, cy, w_px, h_px, depth_object):
     """
-    Compute bottle dz (diameter) from depth data.
-    Returns (dz_mm, 'depth') if successful, or (None, 'failed') if unreliable.
+    Measure object height by comparing depth at the object top surface vs the
+    table surface just outside the bounding box.
+    Works for any orientation (standing or lying) from a top-down camera.
+    Returns (height_mm, source_str) or (None, 'failed').
     """
     try:
-        edge_x = int(cx + half_width_px)
-        edge_x = max(0, min(depth_frame.get_width() - 1, edge_x))
+        img_w = depth_frame.get_width()
+        img_h = depth_frame.get_height()
 
-        depth_centre = get_median_depth(depth_frame, cx, cy, k=5)
-        depth_edge   = get_median_depth(depth_frame, edge_x, cy, k=5)
+        # Sample table in four directions just outside the OBB footprint
+        margin = 1.1  # 10% beyond the half-extents
+        candidates = [
+            (int(cx + w_px * margin), cy),
+            (int(cx - w_px * margin), cy),
+            (cx, int(cy + h_px * margin)),
+            (cx, int(cy - h_px * margin)),
+        ]
 
-        if depth_centre is None or depth_edge is None:
+        table_depths = []
+        for tx, ty in candidates:
+            tx = max(0, min(img_w - 1, tx))
+            ty = max(0, min(img_h - 1, ty))
+            d = get_median_depth(depth_frame, tx, ty, k=7)
+            if d is not None:
+                table_depths.append(d)
+
+        if not table_depths or depth_object is None:
             return None, "failed"
 
-        pt_centre = rs.rs2_deproject_pixel_to_point(
-            intrinsics, [cx, cy], depth_centre)
-        pt_edge   = rs.rs2_deproject_pixel_to_point(
-            intrinsics, [edge_x, cy], depth_edge)
+        depth_table = float(np.median(table_depths))
 
-        dist = np.linalg.norm(np.array(pt_centre) - np.array(pt_edge))
-        dz   = dist * 2 * 1000  # metres → mm
+        # Table is further from camera → larger depth value
+        height_m  = depth_table - depth_object
+        height_mm = height_m * 1000.0
 
-        if 20.0 <= dz <= 200.0:
-            return round(dz, 1), "depth"
-        else:
-            return None, "failed"
+        if 5.0 <= height_mm <= 400.0:
+            return round(height_mm, 1), "depth_diff"
+        return None, "failed"
 
     except Exception:
         return None, "failed"
@@ -268,10 +282,9 @@ class OBBDetectorNode(Node):
                 dx_mm = pixels_to_mm(w_px, depth_m, fx)
                 dy_mm = pixels_to_mm(h_px, depth_m, fx)
 
-                # Compute dz from depth
-                dz_mm, dz_source = compute_dz(
-                    depth_frame, self.intrinsics,
-                    cx, cy, w_px / 2, depth_m
+                # Compute dz: vertical height from object top to table surface
+                dz_mm, dz_source = compute_height_from_depth(
+                    depth_frame, cx, cy, w_px / 2, h_px / 2, depth_m
                 )
 
                 # Quaternion
@@ -297,13 +310,12 @@ class OBBDetectorNode(Node):
                                 (cx - 80, cy - 12),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, colour, 2)
 
-                # Build dimensions — only include dz if measurement succeeded
+                # Build dimensions — always include dz (0.0 if measurement failed)
                 dimensions = {
                     "dx_mm": round(dx_mm, 1),
                     "dy_mm": round(dy_mm, 1),
+                    "dz_mm": round(dz_mm, 1) if dz_mm is not None else 0.0,
                 }
-                if dz_mm is not None:
-                    dimensions["dz_mm"] = dz_mm
 
                 seen_this_frame.add(cls_name)
                 current_detections[cls_name] = {

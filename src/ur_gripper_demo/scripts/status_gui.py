@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import subprocess
 import threading
 import time
 from datetime import datetime
@@ -123,8 +124,12 @@ class StatusGui(Node):
         row.pack(fill=tk.X, pady=(0, 4))
         self._btn(row, "▶  START", "start",
                   bg=C['green'], fg=C['bg'], width=12).pack(side=tk.LEFT, padx=(0, 6))
-        self._btn(row, "■  STOP", "stop",
-                  bg=C['red'], fg='white', width=12).pack(side=tk.LEFT)
+        tk.Button(row, text="⚠  E-STOP", command=self._do_estop,
+                  bg=C['red'], fg='white',
+                  font=("Helvetica", 10, "bold"), width=12, height=1,
+                  relief="flat", cursor="hand2", borderwidth=0,
+                  activebackground='#c0392b', activeforeground='white'
+                  ).pack(side=tk.LEFT)
 
         self._btn(p, "⌂  Home", "home",
                   bg=C['card'], fg=C['text'], width=28).pack(fill=tk.X, pady=(4, 0))
@@ -328,14 +333,15 @@ class StatusGui(Node):
         bar.pack(fill=tk.X, side=tk.BOTTOM)
         bar.pack_propagate(False)
 
-        tk.Button(bar, text="  ⚠  E-STOP  ",
-                  command=lambda: self.send_command("estop"),
-                  bg=C['red'], fg='white',
-                  font=("Helvetica", 13, "bold"),
-                  relief="flat", cursor="hand2",
-                  activebackground='#c0392b', activeforeground='white',
-                  borderwidth=0, height=2
-                  ).pack(side=tk.LEFT, padx=16, pady=10)
+        self._estop_btn = tk.Button(
+            bar, text="  ⚠  E-STOP  ",
+            command=self._do_estop,
+            bg=C['red'], fg='white',
+            font=("Helvetica", 13, "bold"),
+            relief="flat", cursor="hand2",
+            activebackground='#c0392b', activeforeground='white',
+            borderwidth=0, height=2)
+        self._estop_btn.pack(side=tk.LEFT, padx=16, pady=10)
 
         tk.Button(bar, text="↺  Reset",
                   command=lambda: self.send_command("reset"),
@@ -346,9 +352,33 @@ class StatusGui(Node):
                   borderwidth=0, width=10, height=2
                   ).pack(side=tk.LEFT, padx=4, pady=10)
 
-        tk.Label(bar, text="Emergency stop halts all motion immediately.",
-                 font=("Helvetica", 9), bg=C['surface'], fg=C['muted']
-                 ).pack(side=tk.LEFT, padx=14)
+        self._estop_status = tk.Label(
+            bar, text="Emergency stop kills the pick-place node immediately.",
+            font=("Helvetica", 9), bg=C['surface'], fg=C['muted'])
+        self._estop_status.pack(side=tk.LEFT, padx=14)
+
+    def _do_estop(self):
+        # 1. Send ROS command so the node can stop the arm before dying
+        self.send_command("estop")
+
+        # 2. Directly kill the process at OS level — does not rely on ROS comms
+        result = subprocess.run(
+            ['pkill', '-9', '-f', 'gripper_pick_place'],
+            capture_output=True)
+        killed = result.returncode == 0
+
+        # 3. Lock the button so it cannot be pressed twice
+        self._estop_btn.config(
+            text="  ✕  E-STOPPED  ",
+            bg='#6e1010',
+            state="disabled",
+            cursor="arrow")
+
+        status_text = "E-STOP sent — process killed." if killed \
+            else "E-STOP sent — process not found (already stopped?)."
+        self._estop_status.config(text=status_text, fg=C['red'])
+        self._sys_card.config(text="E-STOPPED", fg=C['red'])
+        self._log("E-STOP triggered — gripper_pick_place killed", "err")
 
     # ══════════════════════════════════════════════════════════════════════════
     # Widget helpers
