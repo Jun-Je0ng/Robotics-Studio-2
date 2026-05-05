@@ -2,6 +2,18 @@
 build/
 install/
 log/
+
+# ignore Python cache and virtual environment
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# ignore large ML model weights
+*.pt
+*.pth
+*.onnx
+
 # ignore .env file
 .env
 
