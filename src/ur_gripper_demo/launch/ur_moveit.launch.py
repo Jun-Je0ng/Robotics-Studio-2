@@ -74,6 +74,7 @@ def launch_setup(context, *args, **kwargs):
 
     # *** Changed: Load which node to run
     demo_type = LaunchConfiguration("demo_type")
+    sim = LaunchConfiguration("sim")
 
     # *** CHANGED: use ur_description_package for UR-specific config params ***
     joint_limit_params = PathJoinSubstitution(
@@ -370,6 +371,28 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    unit_test_node = Node(
+        package="ur_gripper_demo",
+        executable="motion_controller",
+        name="motion_controller_test",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", demo_type, "' == 'motion_controller_test'"])
+        ),
+        parameters=[
+            robot_description,
+            robot_description_semantic,
+            robot_description_kinematics,
+            robot_description_planning,
+            planning_pipeline_config,
+            trajectory_execution,
+            moveit_controllers,
+            planning_scene_monitor_parameters,
+            {"use_sim_time": use_sim_time},
+            {"sim": sim},
+        ],
+    )
+
     Perception_info_translator = Node(
         package='ur_gripper_demo',
         executable='plastic_detections_translator',
@@ -385,6 +408,7 @@ def launch_setup(context, *args, **kwargs):
         servo_node,
         demo_node,
         pick_place_node,
+        unit_test_node,
         Perception_info_translator,
     ]
 
@@ -516,7 +540,15 @@ def generate_launch_description():
             "demo_type",
             default_value="demo",
             description="Which demo node to run",
-            choices=["demo", "pick_place", "none"],
+            choices=["demo", "pick_place", "none", "motion_controller_test"],
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "sim",
+            default_value="false",
+            description="Set to true when running in simulation: disables gripper stall detection "
+                        "and always reports a successful grasp.",
         )
     )
 
