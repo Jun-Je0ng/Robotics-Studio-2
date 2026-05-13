@@ -11,6 +11,9 @@ find_package(moveit_ros_planning REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
 find_package(moveit_visual_tools REQUIRED)
 find_package(std_srvs REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(control_msgs REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
 
@@ -81,6 +84,7 @@ add_executable(gripper_demo_node src/gripper_demo_clean.cpp)
 # add_executable(gripper_pick_place src/unit_test_pick_n_place.cpp)
 # add_executable(gripper_pick_place src/pick_n_place_try2.cpp)
 add_executable(gripper_pick_place src/pick_n_place_try2_1.cpp)
+add_executable(motion_controller src/motion_controller.cpp)
 
 
 target_include_directories(gripper_demo_node PUBLIC
@@ -105,7 +109,7 @@ target_link_libraries(gripper_demo_node
   nlohmann_json::nlohmann_json
 )
 
-ament_target_dependencies(gripper_pick_place 
+ament_target_dependencies(gripper_pick_place
   rclcpp
   geometry_msgs
   moveit_core
@@ -122,15 +126,41 @@ target_link_libraries(gripper_pick_place
   nlohmann_json::nlohmann_json
 )
 
+ament_target_dependencies(motion_controller
+  rclcpp
+  rclcpp_action
+  control_msgs
+  ament_index_cpp
+  geometry_msgs
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  moveit_visual_tools
+  std_srvs
+  graph_msgs
+  object_msgs
+)
+
+target_link_libraries(motion_controller
+  moveit_visual_tools::moveit_visual_tools
+  nlohmann_json::nlohmann_json
+)
+
 install(TARGETS
   # ur3_demo_node
   gripper_demo_node
   gripper_pick_place
+  motion_controller
   DESTINATION lib/${PROJECT_NAME}
 )
 
 install(
   DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY config
   DESTINATION share/${PROJECT_NAME}
 )
 

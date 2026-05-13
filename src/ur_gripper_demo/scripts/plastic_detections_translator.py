@@ -26,7 +26,7 @@ import json
 
 # Minimum confidence to pass through — detections below this are dropped
 MIN_CONFIDENCE = 0.50
-
+ROBOT_FRAME = 'base'
 MM_TO_M = 1e-3
 
 # Distance from tool0 / onrobot_base_link to gripper_tcp along the gripper Z axis.
@@ -72,7 +72,8 @@ class PlasticDetectionsTranslator(Node):
 
         stamp     = self.get_clock().now().to_msg()
         obj_array = ObjectArray()
-        obj_array.header.frame_id = 'base_link'
+        # obj_array.header.frame_id = 'base_link'
+        obj_array.header.frame_id = ROBOT_FRAME
         obj_array.header.stamp    = stamp
 
         for i, det in enumerate(detections):
@@ -116,15 +117,22 @@ class PlasticDetectionsTranslator(Node):
         ori = det['pose']['orientation']
 
         pose = Pose()
-        pose.position.x = -mm_to_m(pos['x'])                      # camera X is mirrored relative to robot base_link X
-        pose.position.y = -mm_to_m(pos['y'])                      # UR pendant Y is opposite to URDF base_link Y
+        pose.position.x = mm_to_m(pos['x'])                      # camera X is mirrored relative to robot base_link X
+        pose.position.y = mm_to_m(pos['y'])                      # UR pendant Y is opposite to URDF base_link Y
         pose.position.z =  mm_to_m(pos['z']) + GRIPPER_TCP_OFFSET_M  # shift from tool0 frame → trolley surface frame
         # Negating x and y positions is a 180° Z rotation; apply the same to orientation.
         # q_new = Rz(π) * q_original  →  (-qy, qx, qw, -qz)
-        pose.orientation.x = -ori['qy']
-        pose.orientation.y =  ori['qx']
-        pose.orientation.z =  ori['qw']
-        pose.orientation.w = -ori['qz']
+        # pose.orientation.x = -ori['qy']
+        # pose.orientation.y =  ori['qx']
+        # pose.orientation.z =  ori['qw']
+        # pose.orientation.w = -ori['qz']
+
+
+        # axes mismatch
+        pose.orientation.x = -ori['qx']   # negate for Y reflection
+        pose.orientation.y =  ori['qy']   # unchanged
+        pose.orientation.z = -ori['qz']   # negate for Y reflection
+        pose.orientation.w =  ori['qw']   # unchanged
 
         # ── Dimensions (mm → m) ───────────────────────────────────────────────
         dims = det['dimensions']
@@ -135,7 +143,7 @@ class PlasticDetectionsTranslator(Node):
 
         # ── Build message ─────────────────────────────────────────────────────
         obj = Object()
-        obj.header.frame_id  = 'base_link'
+        obj.header.frame_id  = ROBOT_FRAME
         obj.header.stamp     = stamp
         obj.pose             = pose
         obj.classification   = ml_class
