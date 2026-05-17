@@ -1132,7 +1132,8 @@ class CoordinateInjectNode(Node):
             INJECT_TALL_CLASS, INJECT_TALL_CONFIDENCE)
 
         msg = String()
-        msg.data = json.dumps([flat, tall])
+        # msg.data = json.dumps([flat, tall])
+        msg.data = json.dumps([flat])
         self.pub.publish(msg)
 
         # Log expected positions after translator transform (Y flip + Z offset)

@@ -890,8 +890,8 @@ def launch_setup(context, *args, **kwargs):
         "force_torque_sensor_broadcaster",
         "tcp_pose_broadcaster",
         "ur_configuration_controller",
-        "gripper_action_controller",
-        # "finger_width_controller",
+        # "gripper_action_controller",
+        "finger_width_controller",
     ]
     controllers_inactive = [
         "scaled_joint_trajectory_controller",
@@ -901,7 +901,7 @@ def launch_setup(context, *args, **kwargs):
         "force_mode_controller",
         "passthrough_trajectory_controller",
         "freedrive_mode_controller",
-        "finger_width_controller",
+        "gripper_action_controller",
     ]
     if activate_joint_controller.perform(context) == "true":
         controllers_active.append(initial_joint_controller.perform(context))

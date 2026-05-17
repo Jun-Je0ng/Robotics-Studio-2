@@ -578,28 +578,74 @@ void returnHome(
     openGripper(gripper_client, 0.088);
 }
 
+// void spawnCollisionObject(
+//     moveit::planning_interface::PlanningSceneInterface & psi,
+//     const object_msgs::msg::Object & obj,
+//     const std::string & id,
+//     const std::string & frame_id = "base"){
+//     moveit_msgs::msg::CollisionObject co;
+//     co.id              = id;
+//     co.header.frame_id = frame_id;
+//     co.operation       = moveit_msgs::msg::CollisionObject::ADD;
+
+//     shape_msgs::msg::SolidPrimitive box;
+//     box.type       = shape_msgs::msg::SolidPrimitive::BOX;
+//     box.dimensions = {obj.dimensions[0] - RG2_FINGER_MARGIN, obj.dimensions[1] - RG2_FINGER_MARGIN, obj.dimensions[2] - RG2_FINGER_MARGIN};
+
+//     co.primitives.push_back(box);
+//     co.primitive_poses.push_back(obj.pose);
+
+//     psi.addCollisionObjects({co});
+
+//     RCLCPP_INFO(LOGGER, "Spawned '%s'  [%.3f x %.3f x %.3f]  class=%s",
+//         id.c_str(),
+//         obj.dimensions[0] - 0.02, obj.dimensions[1] - 0.02, obj.dimensions[2],
+//         obj.classification.c_str());
+// }
+
 void spawnCollisionObject(
     moveit::planning_interface::PlanningSceneInterface & psi,
     const object_msgs::msg::Object & obj,
     const std::string & id,
-    const std::string & frame_id = "base"){
+    const std::string & frame_id = "base")
+{
     moveit_msgs::msg::CollisionObject co;
     co.id              = id;
     co.header.frame_id = frame_id;
     co.operation       = moveit_msgs::msg::CollisionObject::ADD;
 
-    shape_msgs::msg::SolidPrimitive box;
-    box.type       = shape_msgs::msg::SolidPrimitive::BOX;
-    box.dimensions = {obj.dimensions[0] - RG2_FINGER_MARGIN, obj.dimensions[1] - RG2_FINGER_MARGIN, obj.dimensions[2] - RG2_FINGER_MARGIN};
+    shape_msgs::msg::SolidPrimitive cylinder;
+    cylinder.type = shape_msgs::msg::SolidPrimitive::CYLINDER;
 
-    co.primitives.push_back(box);
-    co.primitive_poses.push_back(obj.pose);
+    double x = obj.dimensions[0];
+    double y = obj.dimensions[1];
+    double z = obj.dimensions[2];
+
+    double radius = 0.5 * std::min(x, y) - RG2_FINGER_MARGIN;
+    double height = z - RG2_FINGER_MARGIN;
+
+    cylinder.dimensions.resize(2);
+    cylinder.dimensions[shape_msgs::msg::SolidPrimitive::CYLINDER_HEIGHT] = height;
+    cylinder.dimensions[shape_msgs::msg::SolidPrimitive::CYLINDER_RADIUS] = radius;
+
+    // --- FIX: use corrected pose ---
+    geometry_msgs::msg::Pose cyl_pose = obj.pose;
+
+    // OPTIONAL: lay cylinder on its side (X-axis alignment)
+    tf2::Quaternion q;
+    q.setRPY(M_PI / 2.0, 0.0, 0.0);   // rotate cylinder from Z → X
+    cyl_pose.orientation = tf2::toMsg(q);
+
+    co.primitives.push_back(cylinder);
+    co.primitive_poses.push_back(cyl_pose);  // ✅ use corrected pose
 
     psi.addCollisionObjects({co});
 
-    RCLCPP_INFO(LOGGER, "Spawned '%s'  [%.3f x %.3f x %.3f]  class=%s",
+    RCLCPP_INFO(LOGGER,
+        "Spawned CYLINDER '%s' [h=%.3f, r=%.3f] class=%s",
         id.c_str(),
-        obj.dimensions[0], obj.dimensions[1], obj.dimensions[2],
+        height,
+        radius,
         obj.classification.c_str());
 }
 
@@ -1382,7 +1428,7 @@ bool MainLoop(
         DropMonitor drop_monitor;
         if (!g_sim_mode) drop_monitor.start(gripper_client);
 
-        moveToPose(arm, bin_pose);
+        // moveToPose(arm, bin_pose);
 
         drop_monitor.stop();   // joins thread; no-op if sim (thread never started)
 

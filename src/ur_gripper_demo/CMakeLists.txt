@@ -58,6 +58,17 @@ install(PROGRAMS
     DESTINATION lib/${PROJECT_NAME}
 )
 
+# Gripper bridge — real-robot only: translates GripperCommand actions into
+# finger_width_controller commands and detects stall via joint_states effort field.
+file(CHMOD ${CMAKE_CURRENT_SOURCE_DIR}/scripts/gripper_bridge.py
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+install(PROGRAMS
+    scripts/gripper_bridge.py
+    RENAME gripper_bridge
+    DESTINATION lib/${PROJECT_NAME}
+)
+
 
 
 
