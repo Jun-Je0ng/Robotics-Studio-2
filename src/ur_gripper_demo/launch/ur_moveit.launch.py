@@ -400,6 +400,24 @@ def launch_setup(context, *args, **kwargs):
         output='screen',
     )
 
+    # Gripper bridge — real robot only.
+    # On the real robot the gripper_action_controller is not configured by the
+    # OnRobot RG driver, so this bridge presents the standard GripperCommand
+    # action interface and detects stall/grip via the effort field of the
+    # finger_width joint in /joint_states (set by the hardware interface from
+    # the RG status register grip-detected bit).
+    # Not started in simulation because the gripper_action_controller works
+    # there and two servers on the same action topic would conflict.
+    gripper_bridge_node = Node(
+        package='ur_gripper_demo',
+        executable='gripper_bridge',
+        name='gripper_bridge',
+        output='screen',
+        condition=IfCondition(
+            PythonExpression(["'", sim, "' == 'false'"])
+        ),
+    )
+
     # nodes_to_start = [move_group_node, rviz_node, servo_node, demo_node]
     nodes_to_start = [
         move_group_node,
@@ -410,6 +428,7 @@ def launch_setup(context, *args, **kwargs):
         pick_place_node,
         unit_test_node,
         Perception_info_translator,
+        gripper_bridge_node,
     ]
 
     return nodes_to_start

@@ -34,7 +34,7 @@ MM_TO_M = 1e-3
 # The calibration was performed with the pendant reporting the tool0 frame,
 # so perceived z values are offset by this amount relative to the gripper fingertip.
 # Adding it here converts to a frame where z=0 is the trolley work surface.
-GRIPPER_TCP_OFFSET_M = 0.180
+GRIPPER_TCP_OFFSET_M = 0.185
 
 
 def mm_to_m(v: float) -> float:
@@ -139,7 +139,7 @@ class PlasticDetectionsTranslator(Node):
         dx = mm_to_m(dims['dx_mm'])
         dy = mm_to_m(dims['dy_mm'])
         # dz_mm is optional — fall back to dy (long axis) if depth failed
-        dz = mm_to_m(dims['dz_mm']) if 'dz_mm' in dims else dy
+        dz = mm_to_m(dims['dz_mm']/2) if 'dz_mm' in dims else dy
 
         # ── Build message ─────────────────────────────────────────────────────
         obj = Object()
