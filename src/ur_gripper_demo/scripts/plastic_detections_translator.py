@@ -88,13 +88,17 @@ class PlasticDetectionsTranslator(Node):
 
             obj_array.objects.append(obj)
 
-        if not obj_array.objects:
-            return
-
+        # Always publish — including empty arrays.
+        # The motion controller uses consecutive empty messages to detect a clear
+        # platform and terminate the pick loop.  Suppressing empty arrays here
+        # would break that termination signal.
         self.pub.publish(obj_array)
-        self.get_logger().debug(
-            f'Published {len(obj_array.objects)} object(s) on /perception/objects'
-        )
+        if obj_array.objects:
+            self.get_logger().debug(
+                f'Published {len(obj_array.objects)} object(s) on /perception/objects'
+            )
+        else:
+            self.get_logger().debug('Published empty ObjectArray (platform clear)')
 
     def _convert(self, det: dict, stamp) -> Object | None:
         """
@@ -136,8 +140,8 @@ class PlasticDetectionsTranslator(Node):
 
         # ── Dimensions (mm → m) ───────────────────────────────────────────────
         dims = det['dimensions']
-        dx = mm_to_m(dims['dx_mm'])
-        dy = mm_to_m(dims['dy_mm'])
+        dx = mm_to_m(dims['dx_mm']/2)
+        dy = mm_to_m(dims['dy_mm']/2)
         # dz_mm is optional — fall back to dy (long axis) if depth failed
         dz = mm_to_m(dims['dz_mm']/2) if 'dz_mm' in dims else dy
 

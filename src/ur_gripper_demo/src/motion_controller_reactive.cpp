@@ -144,6 +144,13 @@ enum class GraspStrategy {
     SIDE_HORIZONTAL  // new bottle-style grasp
 };
 
+enum class PickResult {
+    SUCCESS,      // object grasped and placed
+    GRASP_FAILED, // arm reached object but fingers found nothing — retry with fresh perception
+    SKIPPED,      // unknown classification, no bin defined
+    DROPPED,      // grasped but object fell during transport
+};
+
 struct GraspGeometry
 {
   GraspStrategy strategy;
@@ -1001,19 +1008,17 @@ bool executeTopDownGrasp(
         if (!grasped)
         {
             RCLCPP_WARN(LOGGER, "No object detected (gripper not stalled) on attempt %d — releasing", attempt);
-            detachObject(arm, r.id);
             openGripper(gripper_client);
+            detachObject(arm, r.id);
             continue;
         }
 
         // Raise
         geometry_msgs::msg::Pose raise_pose = grasp_pose;
-        // raise_pose.position.z = r.obj.pose.position.z
-        //                       + (r.obj.dimensions[2] / 2.0)
-        //                       + PREGRASP_HEIGHT
-        //                       - fingerExtension(r.grasp.grip_width);
-
-        raise_pose.position.z = 0.30;  // fixed lift height (simpler than computing exact pregrasp height)
+        raise_pose.position.z = r.obj.pose.position.z
+                              + (r.obj.dimensions[2] / 2.0)
+                              + PREGRASP_HEIGHT
+                              - fingerExtension(r.grasp.grip_width);
 
         if (!moveCartesian(arm, raise_pose))
         {
@@ -1372,91 +1377,94 @@ private:
 };
 
 // ============================================================
-// MainLoop — dispatches to the correct grasp executor based on
-// the strategy selected by computeGraspGeometry().
-// Returns true  = all objects processed normally.
-// Returns false = object dropped during transport; caller should
-//                 discard the current perception snapshot and
-//                 wait for a fresh one before retrying.
+// processOneObject — picks ONE object and drops it in its bin.
+//
+// The caller (reactive main loop) is responsible for:
+//   • selecting which object to process from the latest perception frame
+//   • returning the arm home between calls so the camera has a clear view
+//   • retrying or skipping based on the returned PickResult
+//
+// object_counter is a monotonically increasing ID so collision-object
+// names never collide across iterations of the outer loop.
 // ============================================================
-bool MainLoop(
+PickResult processOneObject(
     moveit::planning_interface::MoveGroupInterface& arm,
     const GripperActionClient::SharedPtr& gripper_client,
     moveit::planning_interface::PlanningSceneInterface& psi,
-    const object_msgs::msg::ObjectArray& object_array,
-    const geometry_msgs::msg::PoseArray& goal_poses,
-    rclcpp::Node::SharedPtr node){
-
-    if (object_array.objects.empty()) { RCLCPP_WARN(LOGGER, "No objects."); return true; }
-
-    auto resolved = resolveObjects(object_array);
-
-    // Sort by bin so objects going to the same bin are batched together
-    std::sort(resolved.begin(), resolved.end(),
-        [](const ResolvedObject& a, const ResolvedObject& b)
+    const object_msgs::msg::Object& obj,
+    int object_counter,
+    rclcpp::Node::SharedPtr node)
+{
+    if (BIN_MAP.find(obj.classification) == BIN_MAP.end())
     {
-        return a.bin_index < b.bin_index;
-    });
-
-    for (const auto& r : resolved)
-    {
-        openGripper(gripper_client);
-        RCLCPP_INFO(LOGGER, "Processing '%s' — strategy: %s",
-                    r.id.c_str(), toString(r.grasp.strategy));
-
-        bool grasped = false;
-
-        if (BIN_MAP.find(r.obj.classification) == BIN_MAP.end())
-        {
-            RCLCPP_WARN(LOGGER, "No bin found for class '%s' — skipping", r.obj.classification.c_str());
-            continue;
-        }
-
-        if (r.grasp.strategy == GraspStrategy::TOP_DOWN)
-            grasped = executeTopDownGrasp(arm, gripper_client, r, node);
-        else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL)
-            grasped = executeSideHorizontalGrasp(arm, gripper_client, r, node);
-        else if (r.grasp.strategy == GraspStrategy::SIDE_VERTICAL)
-            grasped = executeSideVerticalGrasp(arm, gripper_client, psi, r, node);
-        else
-            RCLCPP_WARN(LOGGER, "Unknown strategy for '%s' — skipping", r.id.c_str());
-
-        if (!grasped)
-        {
-            RCLCPP_ERROR(LOGGER, "Grasp failed for '%s' — skipping to next object", r.id.c_str());
-            continue;
-        }
-
-        // ── Transport to drop-off bin with drop monitoring ────────────────────
-        geometry_msgs::msg::Pose bin_pose = getDropOffPose(r.obj.classification);
-
-        DropMonitor drop_monitor;
-        if (!g_sim_mode) drop_monitor.start(gripper_client);
-
-        // moveToPose(arm, bin_pose);
-
-        drop_monitor.stop();   // joins thread; no-op if sim (thread never started)
-
-        if (drop_monitor.object_dropped.load())
-        {
-            RCLCPP_WARN(LOGGER,
-                "Object '%s' dropped during transport — discarding perception snapshot",
-                r.id.c_str());
-            detachObject(arm, r.id);
-            removeObject(psi, r.id);
-            return false;   // caller (main) should wait for fresh perception and retry
-        }
-
-        // Normal release at bin
-        openGripper(gripper_client);
-        detachObject(arm, r.id);
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        removeObject(psi, r.id);
+        RCLCPP_WARN(LOGGER, "No bin for class '%s' — skipping", obj.classification.c_str());
+        return PickResult::SKIPPED;
     }
 
-    RCLCPP_INFO(LOGGER, "All objects processed. Returning home.");
-    returnHome(arm, gripper_client);
-    return true;
+    ResolvedObject r;
+    r.obj       = obj;
+    r.bin_index = BIN_MAP.at(obj.classification);
+    r.grasp     = computeGraspGeometry(obj);
+    r.id        = "object_" + std::to_string(object_counter);
+
+    RCLCPP_INFO(LOGGER, "Processing '%s' (class=%s, strategy=%s)",
+        r.id.c_str(), obj.classification.c_str(), toString(r.grasp.strategy));
+
+    openGripper(gripper_client);
+
+    // Spawn collision object immediately before grasping — pose is the freshest possible.
+    spawnCollisionObject(psi, obj, r.id);
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+    bool grasped = false;
+    if (r.grasp.strategy == GraspStrategy::TOP_DOWN)
+        grasped = executeTopDownGrasp(arm, gripper_client, r, node);
+    else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL)
+        grasped = executeSideHorizontalGrasp(arm, gripper_client, r, node);
+    else if (r.grasp.strategy == GraspStrategy::SIDE_VERTICAL)
+        grasped = executeSideVerticalGrasp(arm, gripper_client, psi, r, node);
+    else
+    {
+        RCLCPP_WARN(LOGGER, "Unknown strategy — skipping '%s'", r.id.c_str());
+        removeObject(psi, r.id);
+        return PickResult::SKIPPED;
+    }
+
+    if (!grasped)
+    {
+        RCLCPP_WARN(LOGGER, "Grasp failed for '%s'", r.id.c_str());
+        removeObject(psi, r.id);
+        return PickResult::GRASP_FAILED;
+    }
+
+    // ── Transport to bin with drop monitoring ─────────────────────────────────
+    geometry_msgs::msg::Pose bin_pose = getDropOffPose(obj.classification);
+
+    DropMonitor drop_monitor;
+    if (!g_sim_mode) drop_monitor.start(gripper_client);
+
+    moveToPose(arm, bin_pose);
+
+    drop_monitor.stop();
+
+    if (drop_monitor.object_dropped.load())
+    {
+        RCLCPP_WARN(LOGGER, "Object '%s' dropped during transport", r.id.c_str());
+        detachObject(arm, r.id);
+        removeObject(psi, r.id);
+        // The dropped object will appear in the next perception frame
+        // and be picked up naturally in the next loop iteration.
+        return PickResult::DROPPED;
+    }
+
+    // ── Normal release ────────────────────────────────────────────────────────
+    openGripper(gripper_client);
+    detachObject(arm, r.id);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    removeObject(psi, r.id);
+
+    RCLCPP_INFO(LOGGER, "Object '%s' placed successfully", r.id.c_str());
+    return PickResult::SUCCESS;
 }
 
 void handleCommand(
@@ -1557,6 +1565,9 @@ int main(int argc, char** argv)
     geometry_msgs::msg::PoseArray::SharedPtr latest_goals;
     std::atomic<bool> sequence_requested{false};
     std::atomic<bool> objects_fresh{false};
+    std::atomic<std::chrono::steady_clock::time_point> last_perception_time{
+        std::chrono::steady_clock::now()};
+
 
     // Resolve the installed config path — works after colcon build + sourcing install/setup.bash.
     g_bin_poses_file =
@@ -1564,21 +1575,17 @@ int main(int argc, char** argv)
         "/config/bin_poses.json";
 
     auto object_sub = node->create_subscription<object_msgs::msg::ObjectArray>(
-        "perception/objects", 10,
-        [&](const object_msgs::msg::ObjectArray::SharedPtr msg) {
-            // Always keep latest_objects current — don't gate on objects_fresh.
-            // We want the most recent perception data available at the moment a run
-            // starts, not whatever arrived first.  The snapshot is frozen at run-start
-            // (see objects_copy below), so mid-run updates are harmless.
-            std::lock_guard<std::mutex> lock(data_mutex);
-            latest_objects = msg;
-            if (!objects_fresh)
-            {
-                objects_fresh = true;
-                RCLCPP_INFO(LOGGER, "First perception message received (%zu objects)",
-                            msg->objects.size());
-            }
-        });
+    "perception/objects", 10,
+    [&](const object_msgs::msg::ObjectArray::SharedPtr msg) {
+        std::lock_guard<std::mutex> lock(data_mutex);
+        latest_objects = msg;
+        last_perception_time = std::chrono::steady_clock::now();
+        if (!objects_fresh) {
+            objects_fresh = true;
+            RCLCPP_INFO(LOGGER, "First perception message received (%zu objects)",
+                        msg->objects.size());
+        }
+    });
 
     auto goal_sub = node->create_subscription<geometry_msgs::msg::PoseArray>(
         "perception/goal_poses", 10,
@@ -1671,117 +1678,207 @@ int main(int argc, char** argv)
     std::ifstream tty("/dev/tty");
     RCLCPP_INFO(LOGGER, "Ready. Press ENTER to start, 'q' to quit.");
 
-    bool drop_recovery_pending = false;   // set true when we need fresh perception after a drop
+    // ── Tuning constants for the reactive loop ────────────────────────────────
+    // How many consecutive empty perception frames before declaring the platform clear.
+    // Requires the translator to publish empty arrays (not suppress them).
+    const int    EMPTY_THRESHOLD        = 3;
+    // How long (seconds) to wait for ANY perception message before giving up.
+    // This catches "perception node died" — NOT "platform is empty".
+    const int    PERCEPTION_TIMEOUT_SEC = 5;
+    // How close (metres) two failed-grasp positions must be to count as the same object.
+    const double REPEAT_FAIL_RADIUS     = 0.03;
+    // How many times to attempt the same location before skipping it for this run.
+    const int    MAX_REPEAT_FAILS       = 3;
+    // ─────────────────────────────────────────────────────────────────────────
 
     while (rclcpp::ok())
     {
-        // ── Input / recovery gate ─────────────────────────────────────────────
-        if (!drop_recovery_pending)
-        {
-            // Normal: wait for user input
-            std::cout << "\nPress ENTER to start, 'q' to quit.\n>> ";
-            std::string line;
-            std::getline(tty, line);
-            char cmd = line.empty() ? '\n' : line[0];
-            if (cmd == 'q') break;
+        // ── Wait for user input ───────────────────────────────────────────────
+        std::cout << "\nPress ENTER to start, 'q' to quit and h to return robot to home.\n>> ";
+        std::string line;
+        std::getline(tty, line);
+        char cmd_char = line.empty() ? '\n' : line[0];
+        if (cmd_char == 'q') break;
+        if (cmd_char == 'h') {
+            returnHome(arm, gripper_client);
+            std::cout << "\nReturning to Home\n>> ";
+            continue;
+        }
 
-            // debug COMMAND: SAVE POSE
-            if (line.rfind("pose ", 0) == 0)
+        // Inline pose-save command: "pose <label>"
+        if (line.rfind("pose ", 0) == 0)
+        {
+            std::string name = line.substr(5);
+            geometry_msgs::msg::Pose current_pose;
+            try
             {
-                std::string name = line.substr(5);
-                // Same fix as SAVE_BIN: use TF2 to get EEF in "base" frame.
-                geometry_msgs::msg::Pose current_pose;
-                try
-                {
-                    auto tf = tf_buffer->lookupTransform(
-                        "base", arm.getEndEffectorLink(),
-                        tf2::TimePointZero, tf2::durationFromSec(1.0));
-                    current_pose.position.x  = tf.transform.translation.x;
-                    current_pose.position.y  = tf.transform.translation.y;
-                    current_pose.position.z  = tf.transform.translation.z;
-                    current_pose.orientation = tf.transform.rotation;
-                }
-                catch (const tf2::TransformException& ex)
-                {
-                    RCLCPP_ERROR(LOGGER, "TF lookup failed: %s", ex.what());
-                    continue;
-                }
-                saveBinPose(name, current_pose, g_bin_poses_file);
-                RCLCPP_INFO(LOGGER, "Saved pose for '%s'", name.c_str());
+                auto tf = tf_buffer->lookupTransform(
+                    "base", arm.getEndEffectorLink(),
+                    tf2::TimePointZero, tf2::durationFromSec(1.0));
+                current_pose.position.x  = tf.transform.translation.x;
+                current_pose.position.y  = tf.transform.translation.y;
+                current_pose.position.z  = tf.transform.translation.z;
+                current_pose.orientation = tf.transform.rotation;
+            }
+            catch (const tf2::TransformException& ex)
+            {
+                RCLCPP_ERROR(LOGGER, "TF lookup failed: %s", ex.what());
                 continue;
             }
-
-            bool go = (cmd == '\n') || sequence_requested.exchange(false);
-            if (!go) continue;
+            saveBinPose(name, current_pose, g_bin_poses_file);
+            RCLCPP_INFO(LOGGER, "Saved pose for '%s'", name.c_str());
+            continue;
         }
-        else
-        {
-            // Drop recovery: wait for fresh perception (30 s timeout)
-            RCLCPP_WARN(LOGGER, "Drop recovery — waiting for updated perception snapshot...");
-            const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(30);
 
+        bool go = (cmd_char == '\n') || sequence_requested.exchange(false);
+        if (!go) continue;
+
+        // ── Move home first so camera has a clear view ────────────────────────
+        RCLCPP_INFO(LOGGER, "Moving home to clear camera view...");
+        returnHome(arm, gripper_client);
+
+        // ── Reactive per-object pick loop ─────────────────────────────────────
+        // Each iteration:
+        //   1. Invalidate — force a wait for the next fresh perception message.
+        //   2. Wait — block until a new message arrives (or timeout).
+        //   3. If empty N times in a row → platform clear, exit loop.
+        //   4. Pick the closest object from that message.
+        //   5. Execute grasp + transport.
+        //   6. Return home so camera view is restored for the next iteration.
+        int empty_count    = 0;
+        int object_counter = 0;
+
+        // Repeat-fail tracking — detect being stuck on the same unmovable object.
+        bool                      has_last_fail     = false;
+        geometry_msgs::msg::Point last_fail_pos;
+        int                       repeat_fail_count = 0;
+
+        RCLCPP_INFO(LOGGER, "Reactive pick loop started.");
+
+        while (rclcpp::ok())
+        {
+            // Step 1 — invalidate so we always wait for the next fresh message
+            {
+                std::lock_guard<std::mutex> lock(data_mutex);
+                objects_fresh = false;
+            }
+
+            // Step 2 — wait for next perception message
+            auto deadline = std::chrono::steady_clock::now()
+                          + std::chrono::seconds(PERCEPTION_TIMEOUT_SEC);
             while (!objects_fresh.load() && rclcpp::ok())
             {
                 if (std::chrono::steady_clock::now() > deadline)
                 {
-                    RCLCPP_ERROR(LOGGER,
-                        "Timeout waiting for perception after drop — returning to manual control");
-                    drop_recovery_pending = false;
-                    goto wait_for_input;   // break out to outer loop and wait for ENTER
+                    RCLCPP_WARN(LOGGER,
+                        "No perception message in %ds — perception node down? Stopping.",
+                        PERCEPTION_TIMEOUT_SEC);
+                    goto pick_loop_done;
                 }
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
 
-            drop_recovery_pending = false;
-            RCLCPP_INFO(LOGGER, "Fresh perception received — retrying");
+            // Step 3 — snapshot the latest message
+            object_msgs::msg::ObjectArray snap;
+            {
+                std::lock_guard<std::mutex> lock(data_mutex);
+                snap = *latest_objects;
+            }
+
+            // Step 4 — check for empty scene.
+            // Requires translator to publish empty arrays (not suppress them):
+            // remove the "if not obj_array.objects: return" guard in
+            // plastic_detections_translator.py so empty frames reach us here.
+            if (snap.objects.empty())
+            {
+                if (++empty_count >= EMPTY_THRESHOLD)
+                {
+                    RCLCPP_INFO(LOGGER,
+                        "Platform clear (%d consecutive empty frames) — done.",
+                        EMPTY_THRESHOLD);
+                    break;
+                }
+                RCLCPP_INFO(LOGGER, "Empty frame %d/%d", empty_count, EMPTY_THRESHOLD);
+                continue;
+            }
+            empty_count = 0;   // reset on any non-empty frame
+
+            // Step 5 — pick the closest object to the robot base (XY distance)
+            auto best = std::min_element(
+                snap.objects.begin(), snap.objects.end(),
+                [](const auto& a, const auto& b) {
+                    return std::hypot(a.pose.position.x, a.pose.position.y)
+                         < std::hypot(b.pose.position.x, b.pose.position.y);
+                });
+
+            // Step 6 — repeat-fail guard: avoid looping forever on a stuck object
+            if (has_last_fail)
+            {
+                double dx = best->pose.position.x - last_fail_pos.x;
+                double dy = best->pose.position.y - last_fail_pos.y;
+                if (std::hypot(dx, dy) < REPEAT_FAIL_RADIUS)
+                {
+                    if (++repeat_fail_count >= MAX_REPEAT_FAILS)
+                    {
+                        RCLCPP_ERROR(LOGGER,
+                            "Object at (%.3f, %.3f) failed %d times — skipping location",
+                            best->pose.position.x, best->pose.position.y,
+                            repeat_fail_count);
+                        has_last_fail     = false;
+                        repeat_fail_count = 0;
+                        continue;   // next iteration will see the same or a different object
+                    }
+                    RCLCPP_WARN(LOGGER, "Same location failed %d/%d — retrying",
+                        repeat_fail_count, MAX_REPEAT_FAILS);
+                }
+                else
+                {
+                    repeat_fail_count = 0;
+                    has_last_fail     = false;
+                }
+            }
+
+            // Step 7 — process this object
+            PickResult res = processOneObject(
+                arm, gripper_client, psi, *best, object_counter++, node);
+
+            // Step 8 — handle result; always return home to restore camera view
+            switch (res)
+            {
+                case PickResult::SUCCESS:
+                    RCLCPP_INFO(LOGGER, "Pick %d succeeded — returning home", object_counter);
+                    has_last_fail     = false;
+                    repeat_fail_count = 0;
+                    returnHome(arm, gripper_client);
+                    break;
+
+                case PickResult::DROPPED:
+                    // Arm already finished moving to bin (empty-handed).
+                    // Dropped object will reappear in next perception frame.
+                    RCLCPP_WARN(LOGGER,
+                        "Object dropped during transport — returning home; "
+                        "dropped object will be picked up next iteration");
+                    returnHome(arm, gripper_client);
+                    break;
+
+                case PickResult::GRASP_FAILED:
+                    last_fail_pos = best->pose.position;
+                    has_last_fail = true;
+                    RCLCPP_WARN(LOGGER,
+                        "Grasp failed — returning home and retrying with fresh perception");
+                    returnHome(arm, gripper_client);
+                    break;
+
+                case PickResult::SKIPPED:
+                    // Unknown class — don't count as a failure
+                    break;
+            }
         }
 
-        {
-            // ── Snapshot ─────────────────────────────────────────────────────
-            object_msgs::msg::ObjectArray objects_copy;
-            geometry_msgs::msg::PoseArray  goals_copy;
-            {
-                std::lock_guard<std::mutex> lock(data_mutex);
-                if (!latest_objects) {
-                    RCLCPP_WARN(LOGGER, "No perception data yet.");
-                    continue;
-                }
-                objects_copy = *latest_objects;
-                if (latest_goals)
-                    goals_copy = *latest_goals;
-            }
-
-            for (std::size_t i = 0; i < objects_copy.objects.size(); ++i)
-                spawnCollisionObject(psi, objects_copy.objects[i], "object_" + std::to_string(i));
-
-            bool completed = MainLoop(arm, gripper_client, psi, objects_copy, goals_copy, node);
-
-            if (!completed)
-            {
-                // Object was dropped mid-transport.
-                // Remove any remaining stale collision objects, then get fresh data.
-                RCLCPP_WARN(LOGGER,
-                    "Clearing %zu stale collision objects and requesting fresh perception",
-                    objects_copy.objects.size());
-                for (std::size_t i = 0; i < objects_copy.objects.size(); ++i)
-                    psi.removeCollisionObjects({"object_" + std::to_string(i)});
-
-                // Let the subscription accept a new snapshot
-                std::lock_guard<std::mutex> lock(data_mutex);
-                objects_fresh = false;
-                drop_recovery_pending = true;
-            }
-            else
-            {
-                // Normal completion — reset snapshot flag for next run
-                std::lock_guard<std::mutex> lock(data_mutex);
-                objects_fresh = false;
-            }
-        }
-
-        continue;   // back to top of outer while
-
-        wait_for_input: ;   // jump target for perception timeout
+        pick_loop_done:
+        RCLCPP_INFO(LOGGER,
+            "Pick sequence complete. %d objects processed.", object_counter);
+        returnHome(arm, gripper_client);
     }
 
     rclcpp::shutdown();
