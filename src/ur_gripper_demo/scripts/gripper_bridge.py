@@ -10,40 +10,21 @@ WHY THIS EXISTS
 On the real robot the gripper_action_controller is not configured / does not start
 (the OnRobot RG driver exposes a raw position controller instead).  This bridge
 presents the standard GripperCommand action interface to MoveIt while doing its
-own stall/completion detection via /joint_states.
+own completion detection via /joint_states.
 
-STALL / GRIP DETECTION
------------------------
-The OnRobot RG driver on this setup publishes NaN for both the effort and
-velocity fields of the finger_width joint, so neither can be used for grip
-detection.  Instead the bridge uses POSITION-DELTA stall detection:
+GRASP STRATEGY
+--------------
+Send the command, wait GRASP_SETTLE_S seconds, read the current finger width,
+command that width back (hold), return stalled=True.
 
-  If the finger_width position changes by less than MOTION_TOL over
-  STALL_POLLS consecutive 50 ms polls, the gripper has physically stopped.
-
-  If stopped short of the target while closing → object in gripper
-    → result: stalled=True,  reached_goal=False
-    → immediately hold at current position to silence the clicking
-
-  |pos - target| < REACHED_TOL → reached target (open or free-space close)
-    → result: stalled=False, reached_goal=True
-
-  Exceeded TIMEOUT with neither condition met
-    → result: stalled=True,  reached_goal=False  (conservative fallback)
-
-  A SETTLE_POLLS grace period at the start prevents false stall detection
-  before the fingers have begun to move.
-
-OPEN vs CLOSE
--------------
-Stall detection is only active when CLOSING (target < start_pos).
-When OPENING, the bridge simply waits for the position to reach the target
-and ignores any transient stall signal (fingers may briefly slow while
-releasing a held object).
+No direction detection, no goal-reaching checks.  The reactive pick loop in
+motion_controller_reactive handles the "was anything actually grasped?" question
+— if the object wasn't picked it stays on the platform and perception sees it
+again next iteration.
 
 NOTE: Do NOT run this node in simulation — in sim the gripper_action_controller
 is properly configured, and two action servers on the same topic will conflict.
-Gate this node with   condition=IfCondition(PythonExpression(["'", sim, "' == 'false'"]))
+Gate with condition=IfCondition(PythonExpression(["'", sim, "' == 'false'"]))
 in the launch file (already done in ur_moveit.launch.py).
 """
 
@@ -61,13 +42,10 @@ import threading
 import time
 
 # ── tunables ──────────────────────────────────────────────────────────────────
-REACHED_TOL   = 0.001   # m  – position within this of target → reached_goal
-MOTION_TOL    = 0.0005  # m  – minimum per-poll displacement to count as "moving"
-STALL_POLLS   = 6       # consecutive still polls before declaring stall (~300 ms)
-SETTLE_POLLS  = 8       # ignore stall detection for first N polls (~400 ms grace)
-POLL_INTERVAL = 0.05    # s  – how often to check joint states
-TIMEOUT       = 5.0     # s  – absolute fallback; RG2 full stroke is ~3 s
-GRIPPER_JOINT = "finger_width"
+GRASP_SETTLE_S = 2.0    # s  – wait after command before holding
+                         #      RG2 reaches stall well within 3 s from fully open
+POLL_INTERVAL  = 0.05   # s  – joint state poll interval
+GRIPPER_JOINT  = "finger_width"
 # ──────────────────────────────────────────────────────────────────────────────
 
 
@@ -77,14 +55,12 @@ class GripperBridge(Node):
 
         self._cb_group = ReentrantCallbackGroup()
 
-        # Publisher to the actual position controller
         self._cmd_pub = self.create_publisher(
             Float64MultiArray,
             "/finger_width_controller/commands",
             10,
         )
 
-        # Subscriber for joint states
         self._current_pos = None
         self._js_lock     = threading.Lock()
         self.create_subscription(
@@ -95,7 +71,6 @@ class GripperBridge(Node):
             callback_group=self._cb_group,
         )
 
-        # Action server
         self._action_server = ActionServer(
             self,
             GripperCommand,
@@ -120,7 +95,7 @@ class GripperBridge(Node):
                     if not math.isnan(p):
                         self._current_pos = p
         except ValueError:
-            pass  # GRIPPER_JOINT not present in this message — ignore
+            pass
 
     def _get_pos(self):
         with self._js_lock:
@@ -138,27 +113,19 @@ class GripperBridge(Node):
         effort = goal_handle.request.command.max_effort
 
         self.get_logger().info(
-            f"Gripper goal received: target={target:.4f} m, effort={effort:.1f}"
+            f"Gripper goal: target={target:.4f} m  effort={effort:.1f} N"
         )
 
-        # Send the position command once; the controller handles the trajectory.
         self._send_command(target)
 
-        result   = GripperCommand.Result()
+        # Wait for the gripper to settle (reach stall or target position)
+        deadline = time.time() + GRASP_SETTLE_S
         feedback = GripperCommand.Feedback()
-        deadline = time.time() + TIMEOUT
-
-        is_closing:  bool | None = None   # latched on first valid reading
-        prev_pos:    float | None = None  # position at previous poll
-        stall_count: int = 0              # consecutive still polls
-        poll_count:  int = 0              # total polls for settle grace period
 
         while time.time() < deadline:
-
-            # ── cancellation check ────────────────────────────────────────────
             if goal_handle.is_cancel_requested:
-                self.get_logger().info("Gripper goal cancelled")
                 cur = self._get_pos()
+                result = GripperCommand.Result()
                 result.stalled      = False
                 result.reached_goal = False
                 result.position     = cur if cur is not None else target
@@ -168,81 +135,28 @@ class GripperBridge(Node):
 
             time.sleep(POLL_INTERVAL)
             cur = self._get_pos()
+            if cur is not None:
+                feedback.position     = cur
+                feedback.stalled      = False
+                feedback.reached_goal = False
+                goal_handle.publish_feedback(feedback)
 
-            if cur is None:
-                continue  # no joint state received yet
-
-            poll_count += 1
-
-            # Latch direction on first valid reading
-            if is_closing is None:
-                is_closing = target < cur
-                self.get_logger().info(
-                    f"Gripper direction: {'CLOSING' if is_closing else 'OPENING'} "
-                    f"(start={cur:.4f} m → target={target:.4f} m)"
-                )
-
-            # ── reached target (open or free-space close) ─────────────────────
-            if abs(cur - target) < REACHED_TOL:
-                self.get_logger().info(
-                    f"Gripper reached target: pos={cur:.4f} m"
-                )
-                result.stalled      = False
-                result.reached_goal = True
-                result.position     = cur
-                result.effort       = effort
-                goal_handle.succeed()
-                return result
-
-            # ── position-delta stall detection (closing only) ─────────────────
-            # Not checked during the settle window or when opening.
-            if is_closing and poll_count > SETTLE_POLLS:
-                if prev_pos is not None:
-                    delta = abs(cur - prev_pos)
-                    if delta < MOTION_TOL:
-                        stall_count += 1
-                    else:
-                        stall_count = 0  # still moving — reset counter
-
-                    if stall_count >= STALL_POLLS:
-                        self.get_logger().info(
-                            f"Position-delta stall detected at pos={cur:.4f} m "
-                            f"(target={target:.4f} m, delta={delta*1000:.2f} mm over last poll)"
-                        )
-                        # Hold here so the controller stops fighting the object.
-                        self._send_command(cur)
-                        result.stalled      = True
-                        result.reached_goal = False
-                        result.position     = cur
-                        result.effort       = effort
-                        goal_handle.succeed()
-                        return result
-
-            # Publish live feedback
-            feedback.position     = cur
-            feedback.stalled      = (stall_count >= STALL_POLLS)
-            feedback.reached_goal = False
-            goal_handle.publish_feedback(feedback)
-
-            prev_pos = cur
-
-        # ── timeout — absolute fallback ───────────────────────────────────────
+        # Settle complete — hold at current width so controller stops fighting
         cur = self._get_pos()
-        self.get_logger().warn(
-            f"Gripper action timed out at pos={cur} "
-            f"(target={target:.4f} m) — treating as stalled"
+        hold_pos = cur if cur is not None else target
+        self.get_logger().info(
+            f"Settle complete — holding at {hold_pos:.4f} m"
         )
-        # Hold at current position to silence the clicking.
-        if cur is not None:
-            self._send_command(cur)
+        self._send_command(hold_pos)
+
+        result = GripperCommand.Result()
         result.stalled      = True
         result.reached_goal = False
-        result.position     = cur if cur is not None else target
+        result.position     = hold_pos
         result.effort       = effort
         goal_handle.succeed()
         return result
 
-    # ── helpers ───────────────────────────────────────────────────────────────
     def _send_command(self, position: float):
         msg = Float64MultiArray()
         msg.data = [position]

@@ -393,6 +393,28 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    reactive_controller_node = Node(
+        package="ur_gripper_demo",
+        executable="motion_controller_reactive",
+        name="motion_controller_reactive",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", demo_type, "' == 'reactive'"])
+        ),
+        parameters=[
+            robot_description,
+            robot_description_semantic,
+            robot_description_kinematics,
+            robot_description_planning,
+            planning_pipeline_config,
+            trajectory_execution,
+            moveit_controllers,
+            planning_scene_monitor_parameters,
+            {"use_sim_time": use_sim_time},
+            {"sim": sim},
+        ],
+    )
+
     Perception_info_translator = Node(
         package='ur_gripper_demo',
         executable='plastic_detections_translator',
@@ -427,6 +449,7 @@ def launch_setup(context, *args, **kwargs):
         demo_node,
         pick_place_node,
         unit_test_node,
+        reactive_controller_node,
         Perception_info_translator,
         gripper_bridge_node,
     ]
@@ -559,7 +582,7 @@ def generate_launch_description():
             "demo_type",
             default_value="demo",
             description="Which demo node to run",
-            choices=["demo", "pick_place", "none", "motion_controller_test"],
+            choices=["demo", "pick_place", "none", "motion_controller_test", "reactive"],
         )
     )
     declared_arguments.append(

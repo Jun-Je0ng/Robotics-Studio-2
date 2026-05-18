@@ -4,6 +4,7 @@ project(ur_gripper_demo)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
 
 # MoveIt packages
 find_package(moveit_core REQUIRED)
@@ -96,6 +97,7 @@ add_executable(gripper_demo_node src/gripper_demo_clean.cpp)
 # add_executable(gripper_pick_place src/pick_n_place_try2.cpp)
 add_executable(gripper_pick_place src/pick_n_place_try2_1.cpp)
 add_executable(motion_controller src/motion_controller.cpp)
+add_executable(motion_controller_reactive src/motion_controller_reactive.cpp)
 
 
 target_include_directories(gripper_demo_node PUBLIC
@@ -143,6 +145,7 @@ ament_target_dependencies(motion_controller
   control_msgs
   ament_index_cpp
   geometry_msgs
+  tf2_ros
   moveit_core
   moveit_ros_planning
   moveit_ros_planning_interface
@@ -157,10 +160,32 @@ target_link_libraries(motion_controller
   nlohmann_json::nlohmann_json
 )
 
+ament_target_dependencies(motion_controller_reactive
+  rclcpp
+  rclcpp_action
+  control_msgs
+  ament_index_cpp
+  geometry_msgs
+  tf2_ros
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  moveit_visual_tools
+  std_srvs
+  graph_msgs
+  object_msgs
+)
+
+target_link_libraries(motion_controller_reactive
+  moveit_visual_tools::moveit_visual_tools
+  nlohmann_json::nlohmann_json
+)
+
 install(TARGETS
   # ur3_demo_node
   gripper_demo_node
   gripper_pick_place
+  motion_controller_reactive
   motion_controller
   DESTINATION lib/${PROJECT_NAME}
 )
