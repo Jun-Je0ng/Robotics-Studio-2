@@ -42,7 +42,7 @@ const std::string GRIPPER_GROUP = "ur_onrobot_gripper";
 const double PREGRASP_HEIGHT    = 0.03;   // metres above object centre
 const double GRIPPER_OPEN       = 0.110;
 const double GRIPPER_CLOSED     = 0.001;
-const double SAFE_Z_HEIGHT      = 0.20;
+const double SAFE_Z_HEIGHT      = 0.30;
 
 // RG2 physical limits
 const double RG2_MAX_SPAN       = 0.110;  // metres
@@ -1019,7 +1019,9 @@ bool executeTopDownGrasp(
                               + (r.obj.dimensions[2] / 2.0)
                               + PREGRASP_HEIGHT
                               - fingerExtension(r.grasp.grip_width);
-
+        raise_pose.position.z = r.obj.pose.position.z
+                              + SAFE_Z_HEIGHT;
+                              
         if (!moveCartesian(arm, raise_pose))
         {
             RCLCPP_WARN(LOGGER, "Raise failed on attempt %d — detaching", attempt);
