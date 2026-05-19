@@ -1,0 +1,21 @@
+-- Install configuration: ""
+-- Execute custom install script
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/launch/view_robot.launch.py
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/rviz/view_robot.rviz
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/urdf/ur_onrobot.urdf.xacro
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/urdf/ur_onrobot_macro.xacro
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ament_index/resource_index/package_run_dependencies/ur_onrobot_description
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ament_index/resource_index/parent_prefix_path/ur_onrobot_description
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/environment/ament_prefix_path.sh
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/environment/ament_prefix_path.dsv
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/environment/path.sh
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/environment/path.dsv
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/local_setup.bash
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/local_setup.sh
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/local_setup.zsh
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/local_setup.dsv
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/package.dsv
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ament_index/resource_index/packages/ur_onrobot_description
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/cmake/ur_onrobot_descriptionConfig.cmake
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/cmake/ur_onrobot_descriptionConfig-version.cmake
+-- Symlinking: /home/billy/git/Robotics-Studio-2/install/ur_onrobot_description/share/ur_onrobot_description/package.xml

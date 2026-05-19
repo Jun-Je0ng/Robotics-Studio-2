@@ -1,0 +1,5 @@
+{
+    "cmake.configureOnOpen": false,
+    "cmake.autoSelectActiveFolder": false,
+    "C_Cpp.default.configurationProvider": "ms-ros2.vscode-ros"
+}
