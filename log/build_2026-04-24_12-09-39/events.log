@@ -1,0 +1,515 @@
+[0.000000] (-) TimerEvent: {}
+[0.000658] (-) JobUnselected: {'identifier': 'object_msgs'}
+[0.000706] (-) JobUnselected: {'identifier': 'onrobot_description'}
+[0.000746] (-) JobUnselected: {'identifier': 'onrobot_driver'}
+[0.000765] (-) JobUnselected: {'identifier': 'ur3_demo_cpp'}
+[0.001086] (-) JobUnselected: {'identifier': 'ur_description_local'}
+[0.001148] (-) JobUnselected: {'identifier': 'ur_onrobot_control'}
+[0.001237] (-) JobUnselected: {'identifier': 'ur_onrobot_description'}
+[0.001453] (-) JobUnselected: {'identifier': 'ur_onrobot_moveit_config'}
+[0.001650] (ur_gripper_demo) JobQueued: {'identifier': 'ur_gripper_demo', 'dependencies': OrderedDict([('object_msgs', '/home/billy/git/Robotics-Studio-2/install/object_msgs')])}
+[0.001761] (ur_gripper_demo) JobStarted: {'identifier': 'ur_gripper_demo'}
+[0.063860] (ur_gripper_demo) JobProgress: {'identifier': 'ur_gripper_demo', 'progress': 'cmake'}
+[0.064851] (ur_gripper_demo) Command: {'cmd': ['/usr/bin/cmake', '/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo', '-DCMAKE_INSTALL_PREFIX=/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo'], 'cwd': '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'billy'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/billy/git/Robotics-Studio-2/install/object_msgs/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/lib:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools/lib:/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/billy'), ('OLDPWD', '/home/billy'), ('ROS_PYTHON_VERSION', '3'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'billy'), ('NAME', 'BillyZen'), ('WSL_INTEROP', '/run/WSL/3590_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/billy/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForLinux_2.6.3.0_x64__8wekyb3d8bbwe:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/STMicroelectronics/STM32 ST-LINK Utility/ST-LINK Utility:/mnt/c/Program Files/nodejs/:/mnt/c/Program Files/PostgreSQL/18/bin:/mnt/c/Program Files/MATLAB/R2025b/bin:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Python313/Scripts/:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Python313/:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/bilgu/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/bilgu/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/bilgu/AppData/Local/GitHubDesktop/bin:/mnt/c/Users/bilgu/AppData/Roaming/npm:/snap/bin'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GALLIUM_DRIVER', 'llvmpipe'), ('CMAKE_MODULE_PATH', '/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/share/moveit_task_constructor_core/cmake'), ('PWD', '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble'), ('WSLENV', '')]), 'shell': False}
+[0.082446] (ur_gripper_demo) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.13 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.099379] (-) TimerEvent: {}
+[0.199986] (-) TimerEvent: {}
+[0.207498] (ur_gripper_demo) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.213409] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rclcpp: 16.0.18 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.298009] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.8 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.300695] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.8 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.300892] (-) TimerEvent: {}
+[0.306841] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.8 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.315314] (ur_gripper_demo) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.324418] (ur_gripper_demo) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.351909] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[0.353825] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.10 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[0.401222] (-) TimerEvent: {}
+[0.501944] (-) TimerEvent: {}
+[0.602737] (-) TimerEvent: {}
+[0.703394] (-) TimerEvent: {}
+[0.803908] (-) TimerEvent: {}
+[0.904548] (-) TimerEvent: {}
+[1.005366] (-) TimerEvent: {}
+[1.106440] (-) TimerEvent: {}
+[1.207538] (-) TimerEvent: {}
+[1.308105] (-) TimerEvent: {}
+[1.408792] (-) TimerEvent: {}
+[1.509320] (-) TimerEvent: {}
+[1.609792] (-) TimerEvent: {}
+[1.710403] (-) TimerEvent: {}
+[1.811109] (-) TimerEvent: {}
+[1.911794] (-) TimerEvent: {}
+[2.012473] (-) TimerEvent: {}
+[2.113256] (-) TimerEvent: {}
+[2.213932] (-) TimerEvent: {}
+[2.314645] (-) TimerEvent: {}
+[2.415903] (-) TimerEvent: {}
+[2.517426] (-) TimerEvent: {}
+[2.618160] (-) TimerEvent: {}
+[2.718657] (-) TimerEvent: {}
+[2.819281] (-) TimerEvent: {}
+[2.919717] (-) TimerEvent: {}
+[3.020193] (-) TimerEvent: {}
+[3.120699] (-) TimerEvent: {}
+[3.221338] (-) TimerEvent: {}
+[3.321921] (-) TimerEvent: {}
+[3.422540] (-) TimerEvent: {}
+[3.523197] (-) TimerEvent: {}
+[3.623953] (-) TimerEvent: {}
+[3.625373] (ur_gripper_demo) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[3.664942] (ur_gripper_demo) StdoutLine: {'line': b'-- Found geometry_msgs: 4.9.1 (/opt/ros/humble/share/geometry_msgs/cmake)\n'}
+[3.674514] (ur_gripper_demo) StdoutLine: {'line': b'-- Found moveit_core: 2.5.9 (/opt/ros/humble/share/moveit_core/cmake)\n'}
+[3.686935] (ur_gripper_demo) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: chrono date_time filesystem iostreams program_options regex serialization system thread \n'}
+[3.724182] (-) TimerEvent: {}
+[3.824990] (-) TimerEvent: {}
+[3.926036] (-) TimerEvent: {}
+[4.026565] (-) TimerEvent: {}
+[4.127262] (-) TimerEvent: {}
+[4.195729] (ur_gripper_demo) StdoutLine: {'line': b'-- Found parameter_traits: 0.6.0 (/opt/ros/humble/share/parameter_traits/cmake)\n'}
+[4.200717] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rclcpp_lifecycle: 16.0.18 (/opt/ros/humble/share/rclcpp_lifecycle/cmake)\n'}
+[4.217074] (ur_gripper_demo) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: filesystem \n'}
+[4.227474] (-) TimerEvent: {}
+[4.328104] (-) TimerEvent: {}
+[4.428527] (-) TimerEvent: {}
+[4.529007] (-) TimerEvent: {}
+[4.629481] (-) TimerEvent: {}
+[4.730064] (-) TimerEvent: {}
+[4.830810] (-) TimerEvent: {}
+[4.931317] (-) TimerEvent: {}
+[5.031739] (-) TimerEvent: {}
+[5.058523] (ur_gripper_demo) StdoutLine: {'line': b'-- library: /usr/lib/x86_64-linux-gnu/libcurl.so\n'}
+[5.106122] (ur_gripper_demo) StdoutLine: {'line': b'-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target\n'}
+[5.131916] (-) TimerEvent: {}
+[5.232980] (-) TimerEvent: {}
+[5.333723] (-) TimerEvent: {}
+[5.434515] (-) TimerEvent: {}
+[5.535252] (-) TimerEvent: {}
+[5.635724] (-) TimerEvent: {}
+[5.736177] (-) TimerEvent: {}
+[5.836698] (-) TimerEvent: {}
+[5.937392] (-) TimerEvent: {}
+[6.038151] (-) TimerEvent: {}
+[6.082404] (ur_gripper_demo) StdoutLine: {'line': b'-- Found moveit_ros_planning: 2.5.9 (/opt/ros/humble/share/moveit_ros_planning/cmake)\n'}
+[6.087205] (ur_gripper_demo) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread chrono \n'}
+[6.103614] (ur_gripper_demo) StdoutLine: {'line': b'-- Found moveit_ros_planning_interface: 2.5.9 (/opt/ros/humble/share/moveit_ros_planning_interface/cmake)\n'}
+[6.107708] (ur_gripper_demo) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: date_time filesystem program_options system thread \n'}
+[6.118312] (ur_gripper_demo) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: thread system filesystem regex date_time program_options \n'}
+[6.133294] (ur_gripper_demo) StdoutLine: {'line': b'-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread \n'}
+[6.138398] (-) TimerEvent: {}
+[6.153312] (ur_gripper_demo) StdoutLine: {'line': b'-- Found moveit_visual_tools: 4.1.2 (/opt/ros/humble/share/moveit_visual_tools/cmake)\n'}
+[6.233773] (ur_gripper_demo) StdoutLine: {'line': b"-- Setting assimp_DIR to: '/opt/ros/humble/share/rviz_assimp_vendor/cmake/../../../opt/rviz_assimp_vendor/lib/cmake/assimp-4.1'\n"}
+[6.238062] (ur_gripper_demo) StdoutLine: {'line': b"-- Setting OGRE_DIR to: '/opt/ros/humble/share/rviz_ogre_vendor/cmake/../../../opt/rviz_ogre_vendor/lib/OGRE/cmake'\n"}
+[6.238497] (-) TimerEvent: {}
+[6.239253] (ur_gripper_demo) StdoutLine: {'line': b'-- Found OGRE\n'}
+[6.239441] (ur_gripper_demo) StdoutLine: {'line': b'--   static     : OFF\n'}
+[6.239515] (ur_gripper_demo) StdoutLine: {'line': b'--   components : HLMS;MeshLodGenerator;Overlay;Paging;Property;RTShaderSystem;Terrain;Volume\n'}
+[6.239823] (ur_gripper_demo) StdoutLine: {'line': b'--   plugins    : Plugin_BSPSceneManager;Plugin_OctreeSceneManager;Plugin_PCZSceneManager;Plugin_ParticleFX;RenderSystem_GL;RenderSystem_GL3Plus;Codec_STBI\n'}
+[6.239925] (ur_gripper_demo) StdoutLine: {'line': b'--   media      : /opt/ros/humble/opt/rviz_ogre_vendor/share/OGRE/Media\n'}
+[6.240007] (ur_gripper_demo) StdoutLine: {'line': b'-- OGRE_LIBRARIES: OgreHLMS;OgreMeshLodGenerator;OgreOverlay;OgrePaging;OgreProperty;OgreRTShaderSystem;OgreTerrain;OgreVolume;OgreMain\n'}
+[6.240055] (ur_gripper_demo) StdoutLine: {'line': b'-- OGRE_LIBRARY_DIRS: /opt/ros/humble/opt/rviz_ogre_vendor/lib\n'}
+[6.240138] (ur_gripper_demo) StdoutLine: {'line': b'-- OGRE_PLUGINS: Plugin_BSPSceneManager;Plugin_OctreeSceneManager;Plugin_PCZSceneManager;Plugin_ParticleFX;RenderSystem_GL;RenderSystem_GL3Plus;Codec_STBI\n'}
+[6.240198] (ur_gripper_demo) StdoutLine: {'line': b'-- OGRE_PLUGIN_DIR: /opt/ros/humble/opt/rviz_ogre_vendor/lib/OGRE\n'}
+[6.240318] (ur_gripper_demo) StdoutLine: {'line': b'-- rviz_ogre_vendor::OgreOverlay for IMPORTED_LOCATION_RELEASE: /opt/ros/humble/opt/rviz_ogre_vendor/lib/libOgreOverlay.so\n'}
+[6.240389] (ur_gripper_demo) StdoutLine: {'line': b'-- rviz_ogre_vendor::OgreOverlay for IMPORTED_LOCATION_DEBUG: /opt/ros/humble/opt/rviz_ogre_vendor/lib/libOgreOverlay.so\n'}
+[6.240477] (ur_gripper_demo) StdoutLine: {'line': b'-- rviz_ogre_vendor::OgreMain for IMPORTED_LOCATION_RELEASE: /opt/ros/humble/opt/rviz_ogre_vendor/lib/libOgreMain.so\n'}
+[6.240572] (ur_gripper_demo) StdoutLine: {'line': b'-- rviz_ogre_vendor::OgreMain for IMPORTED_LOCATION_DEBUG: /opt/ros/humble/opt/rviz_ogre_vendor/lib/libOgreMain.so\n'}
+[6.338807] (-) TimerEvent: {}
+[6.439447] (-) TimerEvent: {}
+[6.539929] (-) TimerEvent: {}
+[6.640591] (-) TimerEvent: {}
+[6.741210] (-) TimerEvent: {}
+[6.841795] (-) TimerEvent: {}
+[6.942370] (-) TimerEvent: {}
+[7.043320] (-) TimerEvent: {}
+[7.143925] (-) TimerEvent: {}
+[7.244860] (-) TimerEvent: {}
+[7.305329] (ur_gripper_demo) StdoutLine: {'line': b'-- Found rclpy: 3.3.20 (/opt/ros/humble/share/rclpy/cmake)\n'}
+[7.305677] (ur_gripper_demo) StdoutLine: {'line': b'-- Found object_msgs: 0.0.1 (/home/billy/git/Robotics-Studio-2/install/object_msgs/share/object_msgs/cmake)\n'}
+[7.345086] (-) TimerEvent: {}
+[7.440141] (ur_gripper_demo) StdoutLine: {'line': b'-- Configuring done\n'}
+[7.445251] (-) TimerEvent: {}
+[7.504934] (ur_gripper_demo) StdoutLine: {'line': b'-- Generating done\n'}
+[7.521795] (ur_gripper_demo) StdoutLine: {'line': b'-- Build files have been written to: /home/billy/git/Robotics-Studio-2/build/ur_gripper_demo\n'}
+[7.540336] (ur_gripper_demo) CommandEnded: {'returncode': 0}
+[7.541094] (ur_gripper_demo) JobProgress: {'identifier': 'ur_gripper_demo', 'progress': 'build'}
+[7.541727] (ur_gripper_demo) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo', '--', '-j16', '-l16'], 'cwd': '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'billy'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/billy/git/Robotics-Studio-2/install/object_msgs/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/lib:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools/lib:/home/billy/git/Robotics-Studio-2/install/onrobot_driver/lib:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/billy'), ('OLDPWD', '/home/billy'), ('ROS_PYTHON_VERSION', '3'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('WSL_DISTRO_NAME', 'Ubuntu-22.04'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'billy'), ('NAME', 'BillyZen'), ('WSL_INTEROP', '/run/WSL/3590_interop'), ('PULSE_SERVER', 'unix:/mnt/wslg/PulseServer'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('TERM', 'xterm-256color'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/billy/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForLinux_2.6.3.0_x64__8wekyb3d8bbwe:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/STMicroelectronics/STM32 ST-LINK Utility/ST-LINK Utility:/mnt/c/Program Files/nodejs/:/mnt/c/Program Files/PostgreSQL/18/bin:/mnt/c/Program Files/MATLAB/R2025b/bin:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Python313/Scripts/:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Python313/:/mnt/c/Users/bilgu/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/bilgu/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/bilgu/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/bilgu/AppData/Local/GitHubDesktop/bin:/mnt/c/Users/bilgu/AppData/Roaming/npm:/snap/bin'), ('XDG_RUNTIME_DIR', '/run/user/1000/'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('AMENT_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GALLIUM_DRIVER', 'llvmpipe'), ('CMAKE_MODULE_PATH', '/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/share/moveit_task_constructor_core/cmake'), ('PWD', '/home/billy/git/Robotics-Studio-2/build/ur_gripper_demo'), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/object_msgs/local/lib/python3.10/dist-packages:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('WSL2_GUI_APPS_ENABLED', '1'), ('HOSTTYPE', 'x86_64'), ('CMAKE_PREFIX_PATH', '/home/billy/git/Robotics-Studio-2/install/object_msgs:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_moveit_config:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_control:/home/billy/git/Robotics-Studio-2/install/ur_onrobot_description:/home/billy/git/Robotics-Studio-2/install/ur_gripper_demo:/home/billy/git/Robotics-Studio-2/install/ur_description_local:/home/billy/git/Robotics-Studio-2/install/ur3_demo_cpp:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_visualization:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_demo:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_capabilities:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_core:/home/billy/git/Robotics-Studio-2/install/rviz_marker_tools:/home/billy/git/Robotics-Studio-2/install/onrobot_driver:/home/billy/git/Robotics-Studio-2/install/onrobot_description:/home/billy/git/Robotics-Studio-2/install/moveit_task_constructor_msgs:/opt/ros/humble'), ('WSLENV', '')]), 'shell': False}
+[7.545444] (-) TimerEvent: {}
+[7.596510] (ur_gripper_demo) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target gripper_demo_node\x1b[0m\n'}
+[7.609678] (ur_gripper_demo) StdoutLine: {'line': b'[ 25%] \x1b[32mBuilding CXX object CMakeFiles/gripper_pick_place.dir/src/pick_n_place_try2_1.cpp.o\x1b[0m\n'}
+[7.619446] (ur_gripper_demo) StdoutLine: {'line': b'[ 25%] Built target ament_cmake_python_symlink_ur_gripper_demo\n'}
+[7.642037] (ur_gripper_demo) StdoutLine: {'line': b'[ 75%] Built target gripper_demo_node\n'}
+[7.645667] (-) TimerEvent: {}
+[7.746049] (-) TimerEvent: {}
+[7.838420] (ur_gripper_demo) StdoutLine: {'line': b'running egg_info\n'}
+[7.838965] (ur_gripper_demo) StdoutLine: {'line': b'writing ur_gripper_demo.egg-info/PKG-INFO\n'}
+[7.839290] (ur_gripper_demo) StdoutLine: {'line': b'writing dependency_links to ur_gripper_demo.egg-info/dependency_links.txt\n'}
+[7.839565] (ur_gripper_demo) StdoutLine: {'line': b'writing top-level names to ur_gripper_demo.egg-info/top_level.txt\n'}
+[7.842098] (ur_gripper_demo) StdoutLine: {'line': b"reading manifest file 'ur_gripper_demo.egg-info/SOURCES.txt'\n"}
+[7.842562] (ur_gripper_demo) StdoutLine: {'line': b"writing manifest file 'ur_gripper_demo.egg-info/SOURCES.txt'\n"}
+[7.846217] (-) TimerEvent: {}
+[7.875119] (ur_gripper_demo) StdoutLine: {'line': b'[ 75%] Built target ament_cmake_python_build_ur_gripper_demo_egg\n'}
+[7.946797] (-) TimerEvent: {}
+[8.047234] (-) TimerEvent: {}
+[8.147651] (-) TimerEvent: {}
+[8.248131] (-) TimerEvent: {}
+[8.348589] (-) TimerEvent: {}
+[8.449056] (-) TimerEvent: {}
+[8.549580] (-) TimerEvent: {}
+[8.649994] (-) TimerEvent: {}
+[8.750443] (-) TimerEvent: {}
+[8.851256] (-) TimerEvent: {}
+[8.951729] (-) TimerEvent: {}
+[9.052237] (-) TimerEvent: {}
+[9.152755] (-) TimerEvent: {}
+[9.253269] (-) TimerEvent: {}
+[9.353780] (-) TimerEvent: {}
+[9.454335] (-) TimerEvent: {}
+[9.554857] (-) TimerEvent: {}
+[9.655424] (-) TimerEvent: {}
+[9.756017] (-) TimerEvent: {}
+[9.860088] (-) TimerEvent: {}
+[9.960593] (-) TimerEvent: {}
+[10.061170] (-) TimerEvent: {}
+[10.161697] (-) TimerEvent: {}
+[10.262123] (-) TimerEvent: {}
+[10.362704] (-) TimerEvent: {}
+[10.463407] (-) TimerEvent: {}
+[10.563892] (-) TimerEvent: {}
+[10.664593] (-) TimerEvent: {}
+[10.765155] (-) TimerEvent: {}
+[10.865930] (-) TimerEvent: {}
+[10.966712] (-) TimerEvent: {}
+[11.067404] (-) TimerEvent: {}
+[11.168009] (-) TimerEvent: {}
+[11.268525] (-) TimerEvent: {}
+[11.369304] (-) TimerEvent: {}
+[11.470283] (-) TimerEvent: {}
+[11.571122] (-) TimerEvent: {}
+[11.671808] (-) TimerEvent: {}
+[11.772538] (-) TimerEvent: {}
+[11.873048] (-) TimerEvent: {}
+[11.973772] (-) TimerEvent: {}
+[12.074665] (-) TimerEvent: {}
+[12.175082] (-) TimerEvent: {}
+[12.275677] (-) TimerEvent: {}
+[12.376627] (-) TimerEvent: {}
+[12.477086] (-) TimerEvent: {}
+[12.577956] (-) TimerEvent: {}
+[12.678558] (-) TimerEvent: {}
+[12.779072] (-) TimerEvent: {}
+[12.879601] (-) TimerEvent: {}
+[12.980065] (-) TimerEvent: {}
+[13.080522] (-) TimerEvent: {}
+[13.181105] (-) TimerEvent: {}
+[13.281807] (-) TimerEvent: {}
+[13.382736] (-) TimerEvent: {}
+[13.483312] (-) TimerEvent: {}
+[13.583826] (-) TimerEvent: {}
+[13.684469] (-) TimerEvent: {}
+[13.784884] (-) TimerEvent: {}
+[13.885387] (-) TimerEvent: {}
+[13.985899] (-) TimerEvent: {}
+[14.086781] (-) TimerEvent: {}
+[14.187472] (-) TimerEvent: {}
+[14.287895] (-) TimerEvent: {}
+[14.388356] (-) TimerEvent: {}
+[14.488809] (-) TimerEvent: {}
+[14.589504] (-) TimerEvent: {}
+[14.690204] (-) TimerEvent: {}
+[14.790728] (-) TimerEvent: {}
+[14.891272] (-) TimerEvent: {}
+[14.991706] (-) TimerEvent: {}
+[15.092209] (-) TimerEvent: {}
+[15.192950] (-) TimerEvent: {}
+[15.293429] (-) TimerEvent: {}
+[15.393972] (-) TimerEvent: {}
+[15.494523] (-) TimerEvent: {}
+[15.595029] (-) TimerEvent: {}
+[15.695857] (-) TimerEvent: {}
+[15.796515] (-) TimerEvent: {}
+[15.897041] (-) TimerEvent: {}
+[15.997612] (-) TimerEvent: {}
+[16.098205] (-) TimerEvent: {}
+[16.198756] (-) TimerEvent: {}
+[16.299362] (-) TimerEvent: {}
+[16.399798] (-) TimerEvent: {}
+[16.500343] (-) TimerEvent: {}
+[16.600824] (-) TimerEvent: {}
+[16.701294] (-) TimerEvent: {}
+[16.801869] (-) TimerEvent: {}
+[16.902396] (-) TimerEvent: {}
+[17.002830] (-) TimerEvent: {}
+[17.103351] (-) TimerEvent: {}
+[17.155459] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:\x1b[m\x1b[K In function \xe2\x80\x98\x1b[01m\x1b[Kvoid loadBinPoses(const string&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[17.155804] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:186:5:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Knlohmann\x1b[m\x1b[K\xe2\x80\x99 has not been declared\n'}
+[17.155907] (ur_gripper_demo) StderrLine: {'line': b'  186 |     \x1b[01;31m\x1b[Knlohmann\x1b[m\x1b[K::json j;\n'}
+[17.155957] (ur_gripper_demo) StderrLine: {'line': b'      |     \x1b[01;31m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[17.162649] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:187:11:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kj\x1b[m\x1b[K\xe2\x80\x99 was not declared in this scope; did you mean \xe2\x80\x98\x1b[01m\x1b[Kjn\x1b[m\x1b[K\xe2\x80\x99?\n'}
+[17.162936] (ur_gripper_demo) StderrLine: {'line': b'  187 |     in >> \x1b[01;31m\x1b[Kj\x1b[m\x1b[K;\n'}
+[17.163045] (ur_gripper_demo) StderrLine: {'line': b'      |           \x1b[01;31m\x1b[K^\x1b[m\x1b[K\n'}
+[17.163093] (ur_gripper_demo) StderrLine: {'line': b'      |           \x1b[32m\x1b[Kjn\x1b[m\x1b[K\n'}
+[17.164208] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:\x1b[m\x1b[K In function \xe2\x80\x98\x1b[01m\x1b[Kvoid saveBinPose(const string&, const Pose&, const string&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[17.164355] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:222:5:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Knlohmann\x1b[m\x1b[K\xe2\x80\x99 has not been declared\n'}
+[17.164405] (ur_gripper_demo) StderrLine: {'line': b'  222 |     \x1b[01;31m\x1b[Knlohmann\x1b[m\x1b[K::json j;\n'}
+[17.164443] (ur_gripper_demo) StderrLine: {'line': b'      |     \x1b[01;31m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[17.173446] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:232:9:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kj\x1b[m\x1b[K\xe2\x80\x99 was not declared in this scope\n'}
+[17.173719] (ur_gripper_demo) StderrLine: {'line': b'  232 |         \x1b[01;31m\x1b[Kj\x1b[m\x1b[K[k] = {\n'}
+[17.173795] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K^\x1b[m\x1b[K\n'}
+[17.179493] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:239:12:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kj\x1b[m\x1b[K\xe2\x80\x99 was not declared in this scope; did you mean \xe2\x80\x98\x1b[01m\x1b[Kjn\x1b[m\x1b[K\xe2\x80\x99?\n'}
+[17.179678] (ur_gripper_demo) StderrLine: {'line': b'  239 |     out << \x1b[01;31m\x1b[Kj\x1b[m\x1b[K.dump(4);\n'}
+[17.179762] (ur_gripper_demo) StderrLine: {'line': b'      |            \x1b[01;31m\x1b[K^\x1b[m\x1b[K\n'}
+[17.179805] (ur_gripper_demo) StderrLine: {'line': b'      |            \x1b[32m\x1b[Kjn\x1b[m\x1b[K\n'}
+[17.203508] (-) TimerEvent: {}
+[17.212354] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:\x1b[m\x1b[K In function \xe2\x80\x98\x1b[01m\x1b[KGraspGeometry computeGraspGeometry(const Object&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[17.212591] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:521:10:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[Kredeclaration of \xe2\x80\x98\x1b[01m\x1b[Kbool tall_object\x1b[m\x1b[K\xe2\x80\x99\n'}
+[17.212636] (ur_gripper_demo) StderrLine: {'line': b'  521 |     bool \x1b[01;31m\x1b[Ktall_object\x1b[m\x1b[K  = height > 0.05;\n'}
+[17.212723] (ur_gripper_demo) StderrLine: {'line': b'      |          \x1b[01;31m\x1b[K^~~~~~~~~~~\x1b[m\x1b[K\n'}
+[17.212766] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:520:10:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kbool tall_object\x1b[m\x1b[K\xe2\x80\x99 previously declared here\n'}
+[17.212803] (ur_gripper_demo) StderrLine: {'line': b'  520 |     bool \x1b[01;36m\x1b[Ktall_object\x1b[m\x1b[K  = height > xy_max * 1.2;\n'}
+[17.212837] (ur_gripper_demo) StderrLine: {'line': b'      |          \x1b[01;36m\x1b[K^~~~~~~~~~~\x1b[m\x1b[K\n'}
+[17.238276] (ur_gripper_demo) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/humble/include/rclcpp/rclcpp/logging.hpp:24\x1b[m\x1b[K,\n'}
+[17.238521] (ur_gripper_demo) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/humble/include/rclcpp/rclcpp/client.hpp:40\x1b[m\x1b[K,\n'}
+[17.238657] (ur_gripper_demo) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/humble/include/rclcpp/rclcpp/callback_group.hpp:24\x1b[m\x1b[K,\n'}
+[17.238708] (ur_gripper_demo) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/humble/include/rclcpp/rclcpp/any_executable.hpp:20\x1b[m\x1b[K,\n'}
+[17.238746] (ur_gripper_demo) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/humble/include/rclcpp/rclcpp/memory_strategy.hpp:25\x1b[m\x1b[K,\n'}
+[17.238793] (ur_gripper_demo) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/humble/include/rclcpp/rclcpp/memory_strategies.hpp:18\x1b[m\x1b[K,\n'}
+[17.238824] (ur_gripper_demo) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/humble/include/rclcpp/rclcpp/executor_options.hpp:20\x1b[m\x1b[K,\n'}
+[17.238853] (ur_gripper_demo) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/humble/include/rclcpp/rclcpp/executor.hpp:37\x1b[m\x1b[K,\n'}
+[17.238882] (ur_gripper_demo) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/humble/include/rclcpp/rclcpp/executors/multi_threaded_executor.hpp:25\x1b[m\x1b[K,\n'}
+[17.238914] (ur_gripper_demo) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/humble/include/rclcpp/rclcpp/executors.hpp:21\x1b[m\x1b[K,\n'}
+[17.238942] (ur_gripper_demo) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/humble/include/rclcpp/rclcpp/rclcpp.hpp:155\x1b[m\x1b[K,\n'}
+[17.238970] (ur_gripper_demo) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:1\x1b[m\x1b[K:\n'}
+[17.239028] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:\x1b[m\x1b[K In function \xe2\x80\x98\x1b[01m\x1b[Kvoid MainLoop(moveit::planning_interface::MoveGroupInterface&, const SharedPtr&, moveit::planning_interface::PlanningSceneInterface&, const ObjectArray&, const PoseArray&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[17.239078] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:1108:85:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[Krequest for member \xe2\x80\x98\x1b[01m\x1b[Kc_str\x1b[m\x1b[K\xe2\x80\x99 in \xe2\x80\x98\x1b[01m\x1b[Kr.ResolvedObject::grasp.GraspGeometry::strategy\x1b[m\x1b[K\xe2\x80\x99, which is of non-class type \xe2\x80\x98\x1b[01m\x1b[Kconst GraspStrategy\x1b[m\x1b[K\xe2\x80\x99\n'}
+[17.239128] (ur_gripper_demo) StderrLine: {'line': b' 1108 |             RCLCPP_INFO(LOGGER, "Skipping unknonwn strategy\'%s\' ", r.grasp.strategy.\x1b[01;31m\x1b[Kc_str\x1b[m\x1b[K());\n'}
+[17.239204] (ur_gripper_demo) StderrLine: {'line': b'      |                                                                                     \x1b[01;31m\x1b[K^~~~~\x1b[m\x1b[K\n'}
+[17.239310] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:1109:21:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[Kexpected \xe2\x80\x98\x1b[01m\x1b[K;\x1b[m\x1b[K\xe2\x80\x99 before \xe2\x80\x98\x1b[01m\x1b[K}\x1b[m\x1b[K\xe2\x80\x99 token\n'}
+[17.239352] (ur_gripper_demo) StderrLine: {'line': b' 1109 |             continue\n'}
+[17.239384] (ur_gripper_demo) StderrLine: {'line': b'      |                     \x1b[01;31m\x1b[K^\x1b[m\x1b[K\n'}
+[17.239414] (ur_gripper_demo) StderrLine: {'line': b'      |                     \x1b[32m\x1b[K;\x1b[m\x1b[K\n'}
+[17.239443] (ur_gripper_demo) StderrLine: {'line': b' 1110 |         \x1b[32m\x1b[K}\x1b[m\x1b[K\n'}
+[17.239472] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[32m\x1b[K~\x1b[m\x1b[K            \n'}
+[17.239502] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:1113:60:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[Kinvalid initialization of reference of type \xe2\x80\x98\x1b[01m\x1b[Kconst string&\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kconst std::__cxx11::basic_string<char>&\x1b[m\x1b[K\xe2\x80\x99} from expression of type \xe2\x80\x98\x1b[01m\x1b[Kmoveit::planning_interface::MoveGroupInterface\x1b[m\x1b[K\xe2\x80\x99\n'}
+[17.239533] (ur_gripper_demo) StderrLine: {'line': b' 1113 |         geometry_msgs::msg::Pose bin_pose = getDropOffPose(\x1b[01;31m\x1b[Karm\x1b[m\x1b[K, r.bin_index);\n'}
+[17.239562] (ur_gripper_demo) StderrLine: {'line': b'      |                                                            \x1b[01;31m\x1b[K^~~\x1b[m\x1b[K\n'}
+[17.239591] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:244:60:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kin passing argument 1 of \xe2\x80\x98\x1b[01m\x1b[Kgeometry_msgs::msg::Pose getDropOffPose(const string&)\x1b[m\x1b[K\xe2\x80\x99\n'}
+[17.239626] (ur_gripper_demo) StderrLine: {'line': b'  244 | geometry_msgs::msg::Pose getDropOffPose(\x1b[01;36m\x1b[Kconst std::string& class_name\x1b[m\x1b[K)\n'}
+[17.239655] (ur_gripper_demo) StderrLine: {'line': b'      |                                         \x1b[01;36m\x1b[K~~~~~~~~~~~~~~~~~~~^~~~~~~~~~\x1b[m\x1b[K\n'}
+[17.240566] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:\x1b[m\x1b[K In function \xe2\x80\x98\x1b[01m\x1b[Kvoid handleCommand(const string&, moveit::planning_interface::MoveGroupInterface&, const SharedPtr&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[17.240655] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:1150:20:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[Ktoo few arguments to function \xe2\x80\x98\x1b[01m\x1b[Kvoid saveBinPose(const string&, const Pose&, const string&)\x1b[m\x1b[K\xe2\x80\x99\n'}
+[17.240695] (ur_gripper_demo) StderrLine: {'line': b' 1150 |         \x1b[01;31m\x1b[KsaveBinPose(label, p)\x1b[m\x1b[K;\n'}
+[17.240727] (ur_gripper_demo) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K~~~~~~~~~~~^~~~~~~~~~\x1b[m\x1b[K\n'}
+[17.240758] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:213:6:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[17.240795] (ur_gripper_demo) StderrLine: {'line': b'  213 | void \x1b[01;36m\x1b[KsaveBinPose\x1b[m\x1b[K(\n'}
+[17.240824] (ur_gripper_demo) StderrLine: {'line': b'      |      \x1b[01;36m\x1b[K^~~~~~~~~~~\x1b[m\x1b[K\n'}
+[17.303677] (-) TimerEvent: {}
+[17.380410] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:\x1b[m\x1b[K In lambda function:\n'}
+[17.380655] (ur_gripper_demo) StderrLine: {'line': b'\x1b[01m\x1b[K/home/billy/git/Robotics-Studio-2/src/ur_gripper_demo/src/pick_n_place_try2_1.cpp:1229:34:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Karm\x1b[m\x1b[K\xe2\x80\x99 was not declared in this scope\n'}
+[17.380735] (ur_gripper_demo) StderrLine: {'line': b' 1229 |         handleCommand(msg->data, \x1b[01;31m\x1b[Karm\x1b[m\x1b[K, gripper_pub);\n'}
+[17.380791] (ur_gripper_demo) StderrLine: {'line': b'      |                                  \x1b[01;31m\x1b[K^~~\x1b[m\x1b[K\n'}
+[17.403842] (-) TimerEvent: {}
+[17.504371] (-) TimerEvent: {}
+[17.604995] (-) TimerEvent: {}
+[17.705501] (-) TimerEvent: {}
+[17.806008] (-) TimerEvent: {}
+[17.906564] (-) TimerEvent: {}
+[18.007256] (-) TimerEvent: {}
+[18.107770] (-) TimerEvent: {}
+[18.208270] (-) TimerEvent: {}
+[18.308695] (-) TimerEvent: {}
+[18.409150] (-) TimerEvent: {}
+[18.509654] (-) TimerEvent: {}
+[18.610538] (-) TimerEvent: {}
+[18.710988] (-) TimerEvent: {}
+[18.811487] (-) TimerEvent: {}
+[18.911960] (-) TimerEvent: {}
+[19.012475] (-) TimerEvent: {}
+[19.113096] (-) TimerEvent: {}
+[19.213803] (-) TimerEvent: {}
+[19.314324] (-) TimerEvent: {}
+[19.415067] (-) TimerEvent: {}
+[19.515601] (-) TimerEvent: {}
+[19.616038] (-) TimerEvent: {}
+[19.716503] (-) TimerEvent: {}
+[19.817018] (-) TimerEvent: {}
+[19.917687] (-) TimerEvent: {}
+[20.018395] (-) TimerEvent: {}
+[20.118935] (-) TimerEvent: {}
+[20.219416] (-) TimerEvent: {}
+[20.319864] (-) TimerEvent: {}
+[20.420444] (-) TimerEvent: {}
+[20.521104] (-) TimerEvent: {}
+[20.621629] (-) TimerEvent: {}
+[20.722092] (-) TimerEvent: {}
+[20.822524] (-) TimerEvent: {}
+[20.923126] (-) TimerEvent: {}
+[21.023812] (-) TimerEvent: {}
+[21.124328] (-) TimerEvent: {}
+[21.224847] (-) TimerEvent: {}
+[21.325300] (-) TimerEvent: {}
+[21.425830] (-) TimerEvent: {}
+[21.526291] (-) TimerEvent: {}
+[21.626776] (-) TimerEvent: {}
+[21.727233] (-) TimerEvent: {}
+[21.827685] (-) TimerEvent: {}
+[21.928143] (-) TimerEvent: {}
+[22.028628] (-) TimerEvent: {}
+[22.129106] (-) TimerEvent: {}
+[22.229579] (-) TimerEvent: {}
+[22.330085] (-) TimerEvent: {}
+[22.430644] (-) TimerEvent: {}
+[22.531189] (-) TimerEvent: {}
+[22.631731] (-) TimerEvent: {}
+[22.732276] (-) TimerEvent: {}
+[22.832737] (-) TimerEvent: {}
+[22.933200] (-) TimerEvent: {}
+[23.033666] (-) TimerEvent: {}
+[23.134145] (-) TimerEvent: {}
+[23.234615] (-) TimerEvent: {}
+[23.335067] (-) TimerEvent: {}
+[23.435590] (-) TimerEvent: {}
+[23.536092] (-) TimerEvent: {}
+[23.636568] (-) TimerEvent: {}
+[23.737003] (-) TimerEvent: {}
+[23.837480] (-) TimerEvent: {}
+[23.938093] (-) TimerEvent: {}
+[24.038548] (-) TimerEvent: {}
+[24.139100] (-) TimerEvent: {}
+[24.239751] (-) TimerEvent: {}
+[24.340177] (-) TimerEvent: {}
+[24.440647] (-) TimerEvent: {}
+[24.541078] (-) TimerEvent: {}
+[24.641576] (-) TimerEvent: {}
+[24.742194] (-) TimerEvent: {}
+[24.842865] (-) TimerEvent: {}
+[24.943317] (-) TimerEvent: {}
+[25.043836] (-) TimerEvent: {}
+[25.144437] (-) TimerEvent: {}
+[25.244858] (-) TimerEvent: {}
+[25.345358] (-) TimerEvent: {}
+[25.446037] (-) TimerEvent: {}
+[25.546543] (-) TimerEvent: {}
+[25.647000] (-) TimerEvent: {}
+[25.747660] (-) TimerEvent: {}
+[25.848145] (-) TimerEvent: {}
+[25.948579] (-) TimerEvent: {}
+[26.049048] (-) TimerEvent: {}
+[26.149540] (-) TimerEvent: {}
+[26.250161] (-) TimerEvent: {}
+[26.350879] (-) TimerEvent: {}
+[26.451449] (-) TimerEvent: {}
+[26.552430] (-) TimerEvent: {}
+[26.653070] (-) TimerEvent: {}
+[26.753569] (-) TimerEvent: {}
+[26.854086] (-) TimerEvent: {}
+[26.954757] (-) TimerEvent: {}
+[27.055254] (-) TimerEvent: {}
+[27.156167] (-) TimerEvent: {}
+[27.256625] (-) TimerEvent: {}
+[27.357067] (-) TimerEvent: {}
+[27.457587] (-) TimerEvent: {}
+[27.558047] (-) TimerEvent: {}
+[27.658504] (-) TimerEvent: {}
+[27.759011] (-) TimerEvent: {}
+[27.859480] (-) TimerEvent: {}
+[27.959986] (-) TimerEvent: {}
+[28.060507] (-) TimerEvent: {}
+[28.161340] (-) TimerEvent: {}
+[28.261941] (-) TimerEvent: {}
+[28.362738] (-) TimerEvent: {}
+[28.463245] (-) TimerEvent: {}
+[28.563770] (-) TimerEvent: {}
+[28.664328] (-) TimerEvent: {}
+[28.765012] (-) TimerEvent: {}
+[28.865653] (-) TimerEvent: {}
+[28.966301] (-) TimerEvent: {}
+[29.066979] (-) TimerEvent: {}
+[29.167507] (-) TimerEvent: {}
+[29.268103] (-) TimerEvent: {}
+[29.368875] (-) TimerEvent: {}
+[29.469654] (-) TimerEvent: {}
+[29.570292] (-) TimerEvent: {}
+[29.671101] (-) TimerEvent: {}
+[29.771595] (-) TimerEvent: {}
+[29.872194] (-) TimerEvent: {}
+[29.972918] (-) TimerEvent: {}
+[30.073414] (-) TimerEvent: {}
+[30.174590] (-) TimerEvent: {}
+[30.275652] (-) TimerEvent: {}
+[30.376277] (-) TimerEvent: {}
+[30.476936] (-) TimerEvent: {}
+[30.577659] (-) TimerEvent: {}
+[30.678565] (-) TimerEvent: {}
+[30.779537] (-) TimerEvent: {}
+[30.880016] (-) TimerEvent: {}
+[30.980618] (-) TimerEvent: {}
+[31.081179] (-) TimerEvent: {}
+[31.181789] (-) TimerEvent: {}
+[31.282478] (-) TimerEvent: {}
+[31.383168] (-) TimerEvent: {}
+[31.483681] (-) TimerEvent: {}
+[31.584182] (-) TimerEvent: {}
+[31.684700] (-) TimerEvent: {}
+[31.785294] (-) TimerEvent: {}
+[31.885980] (-) TimerEvent: {}
+[31.987879] (-) TimerEvent: {}
+[32.088738] (-) TimerEvent: {}
+[32.189166] (-) TimerEvent: {}
+[32.289800] (-) TimerEvent: {}
+[32.390414] (-) TimerEvent: {}
+[32.491196] (-) TimerEvent: {}
+[32.592018] (-) TimerEvent: {}
+[32.692486] (-) TimerEvent: {}
+[32.793077] (-) TimerEvent: {}
+[32.893687] (-) TimerEvent: {}
+[32.994716] (-) TimerEvent: {}
+[33.095590] (-) TimerEvent: {}
+[33.196171] (-) TimerEvent: {}
+[33.296717] (-) TimerEvent: {}
+[33.397207] (-) TimerEvent: {}
+[33.497936] (-) TimerEvent: {}
+[33.598674] (-) TimerEvent: {}
+[33.699116] (-) TimerEvent: {}
+[33.799830] (-) TimerEvent: {}
+[33.900320] (-) TimerEvent: {}
+[34.000820] (-) TimerEvent: {}
+[34.101306] (-) TimerEvent: {}
+[34.201834] (-) TimerEvent: {}
+[34.302273] (-) TimerEvent: {}
+[34.402855] (-) TimerEvent: {}
+[34.503288] (-) TimerEvent: {}
+[34.604024] (-) TimerEvent: {}
+[34.704694] (-) TimerEvent: {}
+[34.805168] (-) TimerEvent: {}
+[34.905599] (-) TimerEvent: {}
+[35.006031] (-) TimerEvent: {}
+[35.106574] (-) TimerEvent: {}
+[35.207302] (-) TimerEvent: {}
+[35.307760] (-) TimerEvent: {}
+[35.408291] (-) TimerEvent: {}
+[35.508809] (-) TimerEvent: {}
+[35.609367] (-) TimerEvent: {}
+[35.709913] (-) TimerEvent: {}
+[35.810479] (-) TimerEvent: {}
+[35.911180] (-) TimerEvent: {}
+[36.011940] (-) TimerEvent: {}
+[36.112372] (-) TimerEvent: {}
+[36.212831] (-) TimerEvent: {}
+[36.313386] (-) TimerEvent: {}
+[36.414083] (-) TimerEvent: {}
+[36.514723] (-) TimerEvent: {}
+[36.615228] (-) TimerEvent: {}
+[36.715767] (-) TimerEvent: {}
+[36.816285] (-) TimerEvent: {}
+[36.916935] (-) TimerEvent: {}
+[37.017598] (-) TimerEvent: {}
+[37.118322] (-) TimerEvent: {}
+[37.218851] (-) TimerEvent: {}
+[37.319578] (-) TimerEvent: {}
+[37.343539] (ur_gripper_demo) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/gripper_pick_place.dir/build.make:76: CMakeFiles/gripper_pick_place.dir/src/pick_n_place_try2_1.cpp.o] Error 1\n'}
+[37.343857] (ur_gripper_demo) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:220: CMakeFiles/gripper_pick_place.dir/all] Error 2\n'}
+[37.344159] (ur_gripper_demo) StderrLine: {'line': b'gmake: *** [Makefile:146: all] Error 2\n'}
+[37.355052] (ur_gripper_demo) CommandEnded: {'returncode': 2}
+[37.366174] (ur_gripper_demo) JobEnded: {'identifier': 'ur_gripper_demo', 'rc': 2}
+[37.377051] (-) EventReactorShutdown: {}
