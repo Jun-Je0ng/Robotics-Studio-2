@@ -760,9 +760,11 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseArray, Pose, Point, Quaternion
+from std_msgs.msg import String
 from std_srvs.srv import Trigger
 import random
 import math
+import json
 
 from object_msgs.msg import Object, ObjectArray
 
@@ -1014,13 +1016,156 @@ class ObjectClassificationHelper(Node):
 
 
 # ==============================================================================
+# Coordinate Inject Node
+# Publishes a single detection with KNOWN teach-pendant coordinates onto
+# /plastic_detections (raw JSON) so it flows through the translator unchanged.
+# Use this to verify the translator fix: the object should appear at the
+# correct physical location in RViz after spawning.
+#
+# Trigger:
+#   ros2 service call /inject_detection std_srvs/srv/Trigger {}
+#
+# Edit INJECT_COORDS below to match what your teach pendant showed.
+# ==============================================================================
+
+# ── Object 1: flat/side-lying — expects TOP_DOWN grasp ───────────────────────
+# Paste your teach-pendant reading here (mm).
+# Strategy check: xy_min=80mm < 90mm AND height=60mm ≤ 80mm → TOP_DOWN
+INJECT_COORDS = {
+    'x_mm':  18.0,     # teach-pendant X
+    'y_mm': -292.0,    # teach-pendant Y
+    'z_mm': -133.0,    # teach-pendant Z (table surface)
+}
+INJECT_DIMS = {
+    'dx_mm': 80.0,
+    'dy_mm': 80.0,
+    'dz_mm': 60.0,
+}
+INJECT_CLASS      = 'hdpe_bottle'
+INJECT_CONFIDENCE = 0.95
+
+# ── Object 2: tall upright bottle — expects SIDE_HORIZONTAL grasp ─────────────
+# Placed 80 mm in X and 80 mm in Y away from object 1 so they don't overlap.
+# Strategy check: xy_min=70mm < 90mm BUT height=250mm > 80mm → SIDE_HORIZONTAL
+INJECT_TALL_COORDS = {
+    'x_mm':  -200.0,     # offset from object 1
+    'y_mm': -400.0,    # offset from object 1
+    'z_mm': -70.0,    # same table height
+}
+INJECT_TALL_DIMS = {
+    'dx_mm': 60.0,     # bottle diameter
+    'dy_mm': 60.0,
+    'dz_mm': 130.0,    # tall upright bottle — well above TOP_DOWN_MAX_HEIGHT (80 mm)
+}
+INJECT_TALL_CLASS      = 'hdpe_bottle'
+INJECT_TALL_CONFIDENCE = 0.92
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class CoordinateInjectNode(Node):
+    """
+    Publishes a single detection with exact known coordinates onto
+    /plastic_detections so the translator (and the full pipeline) processes it.
+
+    After calling the service, look in RViz: the spawned collision object
+    should appear at the physical location matching the teach pendant reading.
+    """
+
+    def __init__(self):
+        super().__init__('coordinate_inject_node')
+
+        self.pub = self.create_publisher(String, 'plastic_detections', 10)
+        self.srv = self.create_service(Trigger, 'inject_detection', self.callback)
+
+        self.get_logger().info(
+            f'CoordinateInjectNode ready — injects 2 objects:\n'
+            f'  [0] FLAT  ({INJECT_CLASS})  '
+            f'pos=({INJECT_COORDS["x_mm"]}, {INJECT_COORDS["y_mm"]}, {INJECT_COORDS["z_mm"]}) mm  '
+            f'dims=[{INJECT_DIMS["dx_mm"]}x{INJECT_DIMS["dy_mm"]}x{INJECT_DIMS["dz_mm"]}] mm  '
+            f'→ expects TOP_DOWN\n'
+            f'  [1] TALL  ({INJECT_TALL_CLASS})  '
+            f'pos=({INJECT_TALL_COORDS["x_mm"]}, {INJECT_TALL_COORDS["y_mm"]}, {INJECT_TALL_COORDS["z_mm"]}) mm  '
+            f'dims=[{INJECT_TALL_DIMS["dx_mm"]}x{INJECT_TALL_DIMS["dy_mm"]}x{INJECT_TALL_DIMS["dz_mm"]}] mm  '
+            f'→ expects SIDE_HORIZONTAL\n'
+            f'  Trigger: ros2 service call /inject_detection std_srvs/srv/Trigger {{}}'
+        )
+
+    @staticmethod
+    def _make_detection(coords, dims, cls, confidence):
+        """Build one entry for the /plastic_detections JSON array."""
+        return {
+            'pose': {
+                'position': {
+                    'x': coords['x_mm'],
+                    'y': coords['y_mm'],
+                    'z': coords['z_mm'],
+                },
+                'orientation': {'qx': 0.0, 'qy': 0.0, 'qz': 0.0, 'qw': 1.0},
+            },
+            'dimensions': {
+                'dx_mm': dims['dx_mm'],
+                'dy_mm': dims['dy_mm'],
+                'dz_mm': dims['dz_mm'],
+            },
+            'classification': {
+                'class':      cls,
+                'confidence': confidence,
+            },
+            'debug': {
+                'z_table_mm':    coords['z_mm'],
+                'z_approach_mm': coords['z_mm'] + 150.0,
+                'angle_deg':     0.0,
+                'angle_rad':     0.0,
+                'depth_m':       abs(coords['z_mm']) / 1000.0,
+                'dz_source':     'depth',
+            },
+        }
+
+    def callback(self, request, response):
+        TCP_OFFSET_M = 0.218  # gripper TCP offset added by translator
+
+        flat = self._make_detection(
+            INJECT_COORDS, INJECT_DIMS, INJECT_CLASS, INJECT_CONFIDENCE)
+
+        tall = self._make_detection(
+            INJECT_TALL_COORDS, INJECT_TALL_DIMS,
+            INJECT_TALL_CLASS, INJECT_TALL_CONFIDENCE)
+
+        msg = String()
+        # msg.data = json.dumps([flat, tall])
+        msg.data = json.dumps([flat])
+        self.pub.publish(msg)
+
+        # Log expected positions after translator transform (Y flip + Z offset)
+        for label, coords, dims in [
+            ('FLAT (TOP_DOWN)',         INJECT_COORDS,      INJECT_DIMS),
+            ('TALL (SIDE_HORIZONTAL)',  INJECT_TALL_COORDS, INJECT_TALL_DIMS),
+        ]:
+            ex = coords['x_mm'] / 1000.0
+            ey = -coords['y_mm'] / 1000.0
+            ez = coords['z_mm'] / 1000.0 + TCP_OFFSET_M
+            self.get_logger().info(
+                f'  {label}: inject ({coords["x_mm"]}, {coords["y_mm"]}, {coords["z_mm"]}) mm'
+                f'  →  expect ({ex:.3f}, {ey:.3f}, {ez:.3f}) m  '
+                f'dims [{dims["dx_mm"]:.0f}x{dims["dy_mm"]:.0f}x{dims["dz_mm"]:.0f}] mm'
+            )
+
+        response.success = True
+        response.message = 'Two detections injected on /plastic_detections'
+        return response
+
+
+# ==============================================================================
 # Main
 # ==============================================================================
 
 def main(args=None):
     rclpy.init(args=args)
-    node = ObjectClassificationHelper(num_objects=3)
+    # ── Swap node here ──────────────────────────────────────────────────────
+    node = CoordinateInjectNode()         # ← full-pipeline coordinate test
+    # node = ObjectClassificationHelper(num_objects=3)
     # node = PickPlaceTestHelper()
+    # ────────────────────────────────────────────────────────────────────────
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()

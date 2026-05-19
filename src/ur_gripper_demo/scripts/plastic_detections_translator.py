@@ -11,6 +11,7 @@ Classification mapping: 'pet_bottle'/'hdpe_bottle' → 'plastic'
 
 Run standalone:
     ros2 run <your_pkg> plastic_detections_translator
+Or include in your launch file alongside pick_place_demo.
 """
 
 import rclpy
@@ -25,8 +26,15 @@ import json
 
 # Minimum confidence to pass through — detections below this are dropped
 MIN_CONFIDENCE = 0.50
-
+ROBOT_FRAME = 'base'
 MM_TO_M = 1e-3
+
+# Distance from tool0 / onrobot_base_link to gripper_tcp along the gripper Z axis.
+# Source: rg2_macro.xacro  <origin xyz="0 0 0.218"/>  on tcp_joint.
+# The calibration was performed with the pendant reporting the tool0 frame,
+# so perceived z values are offset by this amount relative to the gripper fingertip.
+# Adding it here converts to a frame where z=0 is the trolley work surface.
+GRIPPER_TCP_OFFSET_M = 0.190
 
 
 def mm_to_m(v: float) -> float:
@@ -64,7 +72,8 @@ class PlasticDetectionsTranslator(Node):
 
         stamp     = self.get_clock().now().to_msg()
         obj_array = ObjectArray()
-        obj_array.header.frame_id = 'base_link'
+        # obj_array.header.frame_id = 'base_link'
+        obj_array.header.frame_id = ROBOT_FRAME
         obj_array.header.stamp    = stamp
 
         for i, det in enumerate(detections):
@@ -79,14 +88,17 @@ class PlasticDetectionsTranslator(Node):
 
             obj_array.objects.append(obj)
 
-        if not obj_array.objects:
-            self.get_logger().warn('No valid objects after translation — not publishing')
-            return
-
+        # Always publish — including empty arrays.
+        # The motion controller uses consecutive empty messages to detect a clear
+        # platform and terminate the pick loop.  Suppressing empty arrays here
+        # would break that termination signal.
         self.pub.publish(obj_array)
-        self.get_logger().info(
-            f'Published {len(obj_array.objects)} object(s) on /perception/objects'
-        )
+        if obj_array.objects:
+            self.get_logger().debug(
+                f'Published {len(obj_array.objects)} object(s) on /perception/objects'
+            )
+        else:
+            self.get_logger().debug('Published empty ObjectArray (platform clear)')
 
     def _convert(self, det: dict, stamp) -> Object | None:
         """
@@ -109,24 +121,33 @@ class PlasticDetectionsTranslator(Node):
         ori = det['pose']['orientation']
 
         pose = Pose()
-        pose.position.x = mm_to_m(pos['x'])
-        pose.position.y = mm_to_m(pos['y'])
-        pose.position.z = mm_to_m(pos['z'])
-        pose.orientation.x = ori['qx']
-        pose.orientation.y = ori['qy']
-        pose.orientation.z = ori['qz']
-        pose.orientation.w = ori['qw']
+        pose.position.x = mm_to_m(pos['x'])                      # camera X is mirrored relative to robot base_link X
+        pose.position.y = mm_to_m(pos['y'])                      # UR pendant Y is opposite to URDF base_link Y
+        pose.position.z =  mm_to_m(pos['z']) + GRIPPER_TCP_OFFSET_M  # shift from tool0 frame → trolley surface frame
+        # Negating x and y positions is a 180° Z rotation; apply the same to orientation.
+        # q_new = Rz(π) * q_original  →  (-qy, qx, qw, -qz)
+        # pose.orientation.x = -ori['qy']
+        # pose.orientation.y =  ori['qx']
+        # pose.orientation.z =  ori['qw']
+        # pose.orientation.w = -ori['qz']
+
+
+        # axes mismatch
+        pose.orientation.x = -ori['qx']   # negate for Y reflection
+        pose.orientation.y =  ori['qy']   # unchanged
+        pose.orientation.z = -ori['qz']   # negate for Y reflection
+        pose.orientation.w =  ori['qw']   # unchanged
 
         # ── Dimensions (mm → m) ───────────────────────────────────────────────
         dims = det['dimensions']
         dx = mm_to_m(dims['dx_mm'])
-        dy = mm_to_m(dims['dy_mm'])
+        dy = mm_to_m(dims['dy_mm']/2)
         # dz_mm is optional — fall back to dy (long axis) if depth failed
-        dz = mm_to_m(dims['dz_mm']) if 'dz_mm' in dims else dy
+        dz = mm_to_m(dims['dz_mm']/2) if 'dz_mm' in dims else dy
 
         # ── Build message ─────────────────────────────────────────────────────
         obj = Object()
-        obj.header.frame_id  = 'base_link'
+        obj.header.frame_id  = ROBOT_FRAME
         obj.header.stamp     = stamp
         obj.pose             = pose
         obj.classification   = ml_class

@@ -74,6 +74,7 @@ def launch_setup(context, *args, **kwargs):
 
     # *** Changed: Load which node to run
     demo_type = LaunchConfiguration("demo_type")
+    sim = LaunchConfiguration("sim")
 
     # *** CHANGED: use ur_description_package for UR-specific config params ***
     joint_limit_params = PathJoinSubstitution(
@@ -370,11 +371,73 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    unit_test_node = Node(
+        package="ur_gripper_demo",
+        executable="motion_controller",
+        name="motion_controller_test",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", demo_type, "' == 'motion_controller_test'"])
+        ),
+        parameters=[
+            robot_description,
+            robot_description_semantic,
+            robot_description_kinematics,
+            robot_description_planning,
+            planning_pipeline_config,
+            trajectory_execution,
+            moveit_controllers,
+            planning_scene_monitor_parameters,
+            {"use_sim_time": use_sim_time},
+            {"sim": sim},
+        ],
+    )
+
+    reactive_controller_node = Node(
+        package="ur_gripper_demo",
+        executable="motion_controller_reactive",
+        name="motion_controller_reactive",
+        output="screen",
+        condition=IfCondition(
+            PythonExpression(["'", demo_type, "' == 'reactive'"])
+        ),
+        parameters=[
+            robot_description,
+            robot_description_semantic,
+            robot_description_kinematics,
+            robot_description_planning,
+            planning_pipeline_config,
+            trajectory_execution,
+            moveit_controllers,
+            planning_scene_monitor_parameters,
+            {"use_sim_time": use_sim_time},
+            {"sim": sim},
+        ],
+    )
+
     Perception_info_translator = Node(
         package='ur_gripper_demo',
         executable='plastic_detections_translator',
         name='plastic_detections_translator',
         output='screen',
+    )
+
+    # Gripper bridge — real robot only.
+    # On the real robot the gripper_action_controller is not configured by the
+    # OnRobot RG driver, so this bridge presents the standard GripperCommand
+    # action interface and detects stall/grip via the effort field of the
+    # finger_width joint in /joint_states (set by the hardware interface from
+    # the RG status register grip-detected bit).
+    # Not started in simulation because the gripper_action_controller works
+    # there and two servers on the same action topic would conflict.
+    gripper_bridge_node = Node(
+        package='ur_gripper_demo',
+        executable='gripper_bridge',
+        name='gripper_bridge',
+        output='screen',
+        condition=IfCondition(
+            PythonExpression(["'", sim, "' == 'false'"])
+        ),
     )
 
     # nodes_to_start = [move_group_node, rviz_node, servo_node, demo_node]
@@ -385,7 +448,10 @@ def launch_setup(context, *args, **kwargs):
         servo_node,
         demo_node,
         pick_place_node,
+        unit_test_node,
+        reactive_controller_node,
         Perception_info_translator,
+        gripper_bridge_node,
     ]
 
     return nodes_to_start
@@ -516,7 +582,15 @@ def generate_launch_description():
             "demo_type",
             default_value="demo",
             description="Which demo node to run",
-            choices=["demo", "pick_place", "none"],
+            choices=["demo", "pick_place", "none", "motion_controller_test", "reactive"],
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "sim",
+            default_value="false",
+            description="Set to true when running in simulation: disables gripper stall detection "
+                        "and always reports a successful grasp.",
         )
     )
 
