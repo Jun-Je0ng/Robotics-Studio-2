@@ -1,1 +1,0 @@
-/home/billy/git/Robotics-Studio-2/build/object_msgs/ament_cmake_core/object_msgsConfig-version.cmake

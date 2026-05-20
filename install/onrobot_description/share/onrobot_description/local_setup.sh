@@ -1,1 +1,0 @@
-/home/billy/git/Robotics-Studio-2/build/onrobot_description/ament_cmake_environment_hooks/local_setup.sh

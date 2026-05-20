@@ -1,1 +1,0 @@
-/home/billy/git/Robotics-Studio-2/build/ur_description_local/ament_cmake_core/ur_description_localConfig.cmake
