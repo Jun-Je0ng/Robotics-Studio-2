@@ -20,6 +20,8 @@
 #include <tf2_ros/transform_listener.h>
 #include <geometric_shapes/shapes.h>
 #include <geometric_shapes/shape_operations.h>
+#include <moveit/robot_trajectory/robot_trajectory.h>
+#include <moveit/trajectory_processing/iterative_time_parameterization.h>
 
 #include <geometry_msgs/msg/wrench_stamped.hpp>
 
@@ -926,6 +928,14 @@ bool moveCartesian(
         return false;
     }
 
+    // computeCartesianPath does not inherit setMaxVelocityScalingFactor —
+    // manually apply time parametrization so joint velocities respect the 0.03 limit.
+    robot_trajectory::RobotTrajectory rt(arm.getRobotModel(), arm.getName());
+    rt.setRobotTrajectoryMsg(*arm.getCurrentState(), traj);
+    trajectory_processing::IterativeParabolicTimeParameterization iptp;
+    iptp.computeTimeStamps(rt, 0.03, 0.03);
+    rt.getRobotTrajectoryMsg(traj);
+
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     plan.trajectory_ = traj;
     arm.setMaxVelocityScalingFactor(0.03);
@@ -993,6 +1003,7 @@ bool moveToPose(
 bool executeTopDownGrasp(
     moveit::planning_interface::MoveGroupInterface& arm,
     const GripperActionClient::SharedPtr& gripper_client,
+    moveit::planning_interface::PlanningSceneInterface& psi,
     const ResolvedObject& r,
     rclcpp::Node::SharedPtr node,
     int max_attempts = 3)
@@ -1036,9 +1047,11 @@ bool executeTopDownGrasp(
             continue;
         }
 
-        // Raise — use motion planning (not Cartesian) so the planner can route
-        // around the attached collision object if it would intersect the arm
-        // on a straight vertical path.
+        // Remove collision geometry before raising — the attached box causes
+        // "Invalid goal state" self-collision in the raise configuration.
+        detachObject(arm, r.id);
+        removeObject(psi, r.id);
+
         geometry_msgs::msg::Pose raise_pose = grasp_pose;
         raise_pose.position.z = r.obj.pose.position.z + SAFE_Z_HEIGHT;
 
@@ -1453,7 +1466,7 @@ PickResult processOneObject(
 
     bool grasped = false;
     if (r.grasp.strategy == GraspStrategy::TOP_DOWN)
-        grasped = executeTopDownGrasp(arm, gripper_client, r, node);
+        grasped = executeTopDownGrasp(arm, gripper_client, psi, r, node);
     // else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL)
     //     grasped = executeSideHorizontalGrasp(arm, gripper_client, r, node);
     // else if (r.grasp.strategy == GraspStrategy::SIDE_VERTICAL)
