@@ -597,9 +597,20 @@ void spawnCollisionObject(
     co.header.frame_id = frame_id;
     co.operation       = moveit_msgs::msg::CollisionObject::ADD;
 
+    // Cap each dimension so a long/thick object collision box cannot
+    // intersect the robot arm during raise.  Objects are confirmed flat
+    // (≤5 cm height) so clamp z; x/y capped at 0.15 m so the box
+    // doesn't reach the forearm when the object is attached horizontally.
+    const double MAX_DIM   = 0.15;   // m — max footprint dimension
+    const double MAX_Z_DIM = 0.05;   // m — max height (flat objects only)
+
+    double dx = std::min(obj.dimensions[0] - RG2_FINGER_MARGIN, MAX_DIM);
+    double dy = std::min(obj.dimensions[1] - RG2_FINGER_MARGIN, MAX_DIM);
+    double dz = std::min(obj.dimensions[2],                      MAX_Z_DIM);
+
     shape_msgs::msg::SolidPrimitive box;
     box.type       = shape_msgs::msg::SolidPrimitive::BOX;
-    box.dimensions = {obj.dimensions[0] - RG2_FINGER_MARGIN, obj.dimensions[1] - RG2_FINGER_MARGIN, obj.dimensions[2]};
+    box.dimensions = {dx, dy, dz};
 
     co.primitives.push_back(box);
     co.primitive_poses.push_back(obj.pose);
@@ -607,9 +618,7 @@ void spawnCollisionObject(
     psi.addCollisionObjects({co});
 
     RCLCPP_INFO(LOGGER, "Spawned '%s'  [%.3f x %.3f x %.3f]  class=%s",
-        id.c_str(),
-        obj.dimensions[0] - 0.02, obj.dimensions[1] - 0.02, obj.dimensions[2],
-        obj.classification.c_str());
+        id.c_str(), dx, dy, dz, obj.classification.c_str());
 }
 
 // void spawnCollisionObject(
@@ -851,6 +860,8 @@ void attachObject(
 
     std::vector<std::string> touch_links = {
         "wrist_3_link",
+        "wrist_2_link",
+        "wrist_1_link",
         "tool0",
         // RG2 gripper
         "onrobot_base_link",
@@ -1013,22 +1024,32 @@ bool executeTopDownGrasp(
             continue;
         }
 
-        // Raise
+        // Raise — use motion planning (not Cartesian) so the planner can route
+        // around the attached collision object if it would intersect the arm
+        // on a straight vertical path.
         geometry_msgs::msg::Pose raise_pose = grasp_pose;
-        raise_pose.position.z = r.obj.pose.position.z
-                              + (r.obj.dimensions[2] / 2.0)
-                              + PREGRASP_HEIGHT
-                              - fingerExtension(r.grasp.grip_width);
-        raise_pose.position.z = r.obj.pose.position.z
-                              + SAFE_Z_HEIGHT;
+        raise_pose.position.z = r.obj.pose.position.z + SAFE_Z_HEIGHT;
+
                               
         if (!moveCartesian(arm, raise_pose))
         {
             RCLCPP_WARN(LOGGER, "Raise failed on attempt %d — detaching", attempt);
-            openGripper(gripper_client);
-            detachObject(arm, r.id);
-            continue;
+            if (!moveToPose(arm, raise_pose))
+                {
+                    RCLCPP_WARN(LOGGER, "Raise failed on attempt %d — detaching", attempt);
+                    openGripper(gripper_client);
+                    detachObject(arm, r.id);
+                    continue;
+                }
         }
+
+        // if (!moveToPose(arm, raise_pose))
+        // {
+        //     RCLCPP_WARN(LOGGER, "Raise failed on attempt %d — detaching", attempt);
+        //     openGripper(gripper_client);
+        //     detachObject(arm, r.id);
+        //     continue;
+        // }
 
         RCLCPP_INFO(LOGGER, "Grasp succeeded on attempt %d", attempt);
         return true;
@@ -1421,10 +1442,10 @@ PickResult processOneObject(
     bool grasped = false;
     if (r.grasp.strategy == GraspStrategy::TOP_DOWN)
         grasped = executeTopDownGrasp(arm, gripper_client, r, node);
-    else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL)
-        grasped = executeSideHorizontalGrasp(arm, gripper_client, r, node);
-    else if (r.grasp.strategy == GraspStrategy::SIDE_VERTICAL)
-        grasped = executeSideVerticalGrasp(arm, gripper_client, psi, r, node);
+    // else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL)
+    //     grasped = executeSideHorizontalGrasp(arm, gripper_client, r, node);
+    // else if (r.grasp.strategy == GraspStrategy::SIDE_VERTICAL)
+    //     grasped = executeSideVerticalGrasp(arm, gripper_client, psi, r, node);
     else
     {
         RCLCPP_WARN(LOGGER, "Unknown strategy — skipping '%s'", r.id.c_str());
@@ -1638,9 +1659,13 @@ int main(int argc, char** argv)
     moveit::planning_interface::MoveGroupInterface arm(node, ARM_GROUP);
     moveit::planning_interface::PlanningSceneInterface psi;
 
-    arm.setPlannerId("BiTRRTkConfigDefault");
-    arm.setMaxVelocityScalingFactor(0.05);
-    arm.setMaxAccelerationScalingFactor(0.05);
+    // RRTConnect produces cleaner trajectory waypoints than BiTRRT.
+    // BiTRRT occasionally places waypoints so close together that TOTG
+    // time-parameterisation allocates near-zero time intervals, causing
+    // the UR driver to report "velocity NNN required in 0.002 seconds".
+    arm.setPlannerId("RRTConnectkConfigDefault");
+    arm.setMaxVelocityScalingFactor(0.03);
+    arm.setMaxAccelerationScalingFactor(0.03);
     arm.setPlanningTime(3.0);
     arm.setGoalJointTolerance(0.01);
     arm.setGoalOrientationTolerance(0.01);
@@ -1704,6 +1729,10 @@ int main(int argc, char** argv)
         if (cmd_char == 'h') {
             returnHome(arm, gripper_client);
             std::cout << "\nReturning to Home\n>> ";
+            continue;
+        }
+        if (cmd_char == 'b') {
+            std::cout << "\nRemoving object data\n>> ";
             continue;
         }
 
