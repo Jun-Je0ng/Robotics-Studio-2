@@ -34,8 +34,9 @@ import threading
 # CONFIG
 # ──────────────────────────────────────────────────────────────────────────────
 
-MODEL_PATH       = "/home/billy/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/best.pt"
-CALIBRATION_FILE = "/home/billy/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/camera_to_robot_calibration.json"
+import os as _os
+MODEL_PATH       = _os.path.join(_os.path.dirname(__file__), 'best.pt')
+CALIBRATION_FILE = _os.path.join(_os.path.dirname(__file__), 'camera_to_robot_calibration.json')
 
 DEPTH_KERNEL_SIZE    = 11
 SMOOTHING_WINDOW     = 5

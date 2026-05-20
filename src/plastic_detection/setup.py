@@ -7,7 +7,7 @@ setup(
     version='0.0.0',
     packages=find_packages(exclude=['test']),
     package_data={
-        package_name: ['camera_to_robot_calibration.json'],
+        package_name: ['camera_to_robot_calibration.json', 'best.pt'],
     },
     data_files=[
         ('share/ament_index/resource_index/packages',
