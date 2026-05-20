@@ -1,1 +1,0 @@
-/home/billy/git/Robotics-Studio-2/build/ur_onrobot_control/ament_cmake_core/ur_onrobot_controlConfig-version.cmake

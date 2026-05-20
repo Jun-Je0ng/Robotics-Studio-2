@@ -1,1 +1,0 @@
-/home/billy/git/Robotics-Studio-2/build/object_msgs/rosidl_typesupport_introspection_c/object_msgs/msg/detail/object__rosidl_typesupport_introspection_c.h
