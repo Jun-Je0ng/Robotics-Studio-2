@@ -42,7 +42,7 @@ const std::string GRIPPER_GROUP = "ur_onrobot_gripper";
 const double PREGRASP_HEIGHT    = 0.03;   // metres above object centre
 const double GRIPPER_OPEN       = 0.110;
 const double GRIPPER_CLOSED     = 0.001;
-const double SAFE_Z_HEIGHT      = 0.30;
+const double SAFE_Z_HEIGHT      = 0.15;   // reduced from 0.30 — UR3e workspace limit at tray XY coords is ~0.24m; 0.35m was unreachable
 
 // RG2 physical limits
 const double RG2_MAX_SPAN       = 0.110;  // metres
@@ -583,7 +583,11 @@ void returnHome(
     arm.setNamedTarget("up");
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     if (arm.plan(plan) == moveit::core::MoveItErrorCode::SUCCESS)
+    {
+        arm.setMaxVelocityScalingFactor(0.03);
+        arm.setMaxAccelerationScalingFactor(0.03);
         arm.execute(plan);
+    }
     openGripper(gripper_client, 0.088);
 }
 
@@ -847,7 +851,11 @@ bool moveToPregrasp(
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     bool ok = (arm.plan(plan) == moveit::core::MoveItErrorCode::SUCCESS);
     if (ok)
+    {
+        arm.setMaxVelocityScalingFactor(0.03);
+        arm.setMaxAccelerationScalingFactor(0.03);
         arm.execute(plan);
+    }
     else
         RCLCPP_WARN(LOGGER, "Pregrasp plan failed for '%s'", r.id.c_str());
 
@@ -920,6 +928,8 @@ bool moveCartesian(
 
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     plan.trajectory_ = traj;
+    arm.setMaxVelocityScalingFactor(0.03);
+    arm.setMaxAccelerationScalingFactor(0.03);
     return arm.execute(plan) == moveit::core::MoveItErrorCode::SUCCESS;
 }
 
@@ -974,6 +984,8 @@ bool moveToPose(
 
     RCLCPP_INFO(LOGGER, "Executing lowest-cost plan (cost=%.3f) out of %d attempts",
                 best_cost, num_attempts);
+    arm.setMaxVelocityScalingFactor(0.03);
+    arm.setMaxAccelerationScalingFactor(0.03);
     return arm.execute(best_plan) == moveit::core::MoveItErrorCode::SUCCESS;
 }
 
@@ -1666,7 +1678,7 @@ int main(int argc, char** argv)
     arm.setPlannerId("RRTConnectkConfigDefault");
     arm.setMaxVelocityScalingFactor(0.03);
     arm.setMaxAccelerationScalingFactor(0.03);
-    arm.setPlanningTime(3.0);
+    arm.setPlanningTime(10.0);
     arm.setGoalJointTolerance(0.01);
     arm.setGoalOrientationTolerance(0.01);
     arm.setGoalPositionTolerance(0.005);

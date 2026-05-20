@@ -417,8 +417,8 @@ def launch_setup(context, *args, **kwargs):
 
     Perception_info_translator = Node(
         package='ur_gripper_demo',
-        # executable='plastic_detections_translator',
-        executable='plastic_detections_translator_calibrated',
+        executable='plastic_detections_translator',
+        # executable='plastic_detections_translator_calibrated',
         name='plastic_detections_translator',
         output='screen',
     )
