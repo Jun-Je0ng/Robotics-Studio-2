@@ -29,6 +29,24 @@ MIN_CONFIDENCE = 0.50
 ROBOT_FRAME = 'base'
 MM_TO_M = 1e-3
 
+# ── Tray boundary clamp (robot base frame, metres) ────────────────────────────
+# Objects reported outside these bounds are clamped to the tray edge.
+# This catches gross OBB errors (camera angle / calibration drift) that would
+# send the robot outside the reachable tray area.
+# Set to None to disable clamping on that axis.
+#
+#         Y_MAX (far edge, away from robot)
+#          ┌──────────────────────┐
+#   X_MIN  │        TRAY          │  X_MAX
+#          └──────────────────────┘
+#         Y_MIN (near edge, towards robot)
+#
+TRAY_X_MIN =  -0.220   # m  — left  edge
+TRAY_X_MAX =   0.220   # m  — right edge
+TRAY_Y_MIN =  -0.440   # m  — near  edge
+TRAY_Y_MAX =  -0.160   # m  — far   edge
+# ──────────────────────────────────────────────────────────────────────────────
+
 # Distance from tool0 / onrobot_base_link to gripper_tcp along the gripper Z axis.
 # Source: rg2_macro.xacro  <origin xyz="0 0 0.218"/>  on tcp_joint.
 # The calibration was performed with the pendant reporting the tool0 frame,
@@ -144,6 +162,22 @@ class PlasticDetectionsTranslator(Node):
         dy = mm_to_m(dims['dy_mm']/2)
         # dz_mm is optional — fall back to dy (long axis) if depth failed
         dz = mm_to_m(dims['dz_mm']/2) if 'dz_mm' in dims else dy
+
+        # ── Tray boundary clamp ───────────────────────────────────────────────
+        clamped = False
+        if TRAY_X_MIN is not None and pose.position.x < TRAY_X_MIN:
+            pose.position.x = TRAY_X_MIN; clamped = True
+        if TRAY_X_MAX is not None and pose.position.x > TRAY_X_MAX:
+            pose.position.x = TRAY_X_MAX; clamped = True
+        if TRAY_Y_MIN is not None and pose.position.y < TRAY_Y_MIN:
+            pose.position.y = TRAY_Y_MIN; clamped = True
+        if TRAY_Y_MAX is not None and pose.position.y > TRAY_Y_MAX:
+            pose.position.y = TRAY_Y_MAX; clamped = True
+        if clamped:
+            self.get_logger().warn(
+                f'  {ml_class} clamped to tray bounds: '
+                f'({pose.position.x:.3f}, {pose.position.y:.3f})'
+            )
 
         # ── Build message ─────────────────────────────────────────────────────
         obj = Object()
