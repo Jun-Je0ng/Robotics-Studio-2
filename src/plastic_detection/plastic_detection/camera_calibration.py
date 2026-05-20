@@ -1,265 +1,298 @@
+"""
+camera_calibration.py  —  Automatic Camera-to-Robot Calibration
+================================================================
+Detects 4 ArUco markers on the tray corners and computes the camera→robot
+transform automatically.  No manual pendant entry required — the robot-frame
+corner positions are hardcoded below (measure once, reuse forever).
+
+HOW TO USE
+----------
+1. Fill in TRAY_CORNERS_ROBOT_M with the actual robot-frame XYZ (in metres)
+   for each ArUco marker corner.  Do this ONCE by moving the EEF directly
+   above each marker and reading the pendant.
+2. Place the tray in its fixed position.
+3. Run this script:  python3 camera_calibration.py
+4. The live feed shows which markers are detected (green = all 4 ready).
+5. Press SPACE (or wait for auto-capture) to compute and save the calibration.
+6. Press Q to quit without saving.
+
+WHY THIS IS AUTOMATIC
+---------------------
+The tray is always in the same position relative to the robot (±5 mm), so
+the robot-frame corner coordinates are fixed.  Only the camera-frame positions
+need to be measured at run-time — and ArUco detection does that automatically.
+
+DEPTH FIX
+---------
+Uses the same 11×11 median kernel as the detector (not a single raw pixel)
+to reduce noise at the calibration corners.
+"""
+
 import pyrealsense2 as rs
 import numpy as np
 import cv2
 import json
 import os
 
-# Configuration
-CALIBRATION_FILE = "camera_to_robot_calibration.json"
+# ──────────────────────────────────────────────────────────────────────────────
+# TRAY CORNER POSITIONS IN ROBOT BASE FRAME  (metres)
+#
+# Key   = ArUco marker ID (0..3)
+# Value = (x, y, z) measured with EEF directly above each corner marker
+#
+# ▶ Update these values whenever the tray or robot base is repositioned.
+#   These come from reading the pendant (or ros2 topic echo /tf) while the
+#   EEF is touching the table surface at each corner.
+# ──────────────────────────────────────────────────────────────────────────────
+TRAY_CORNERS_ROBOT_M = {
+    0: (-0.20501,  -0.42255, 0.0363),   # front-left  corner
+    1: (-0.20830,  -0.17512, 0.0344),   # back-left   corner
+    2: ( 0.20925,  -0.41904, 0.0355),   # front-right corner
+    3: ( 0.20847,  -0.17327, 0.0355),   # back-right  corner
+}
 
-# RealSense setup
-pipeline = rs.pipeline()
-config = rs.config()
-config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
-config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+CALIBRATION_FILE  = "camera_to_robot_calibration.json"
+DEPTH_KERNEL_SIZE = 11   # same as detector — median over k×k pixel patch
+AUTO_CAPTURE      = True # set False to require SPACE for each marker
 
-pipeline.start(config)
+# ──────────────────────────────────────────────────────────────────────────────
 
-# Get camera intrinsics
-profile      = pipeline.get_active_profile()
-depth_profile = profile.get_stream(rs.stream.depth)
-intr         = depth_profile.as_video_stream_profile().get_intrinsics()
-fx, fy, cx, cy = intr.fx, intr.fy, intr.ppx, intr.ppy
+def median_depth(depth_frame, cx, cy, k=DEPTH_KERNEL_SIZE):
+    """Return median depth (metres) over a k×k patch centred on (cx, cy)."""
+    h = depth_frame.get_height()
+    w = depth_frame.get_width()
+    half = k // 2
+    x0, x1 = max(0, cx - half), min(w, cx + half + 1)
+    y0, y1 = max(0, cy - half), min(h, cy + half + 1)
+    arr    = np.asanyarray(depth_frame.get_data())
+    region = arr[y0:y1, x0:x1]
+    valid  = region[region > 0]
+    if valid.size == 0:
+        return None
+    return float(np.median(valid)) / 1000.0
 
-print(f"Camera intrinsics: fx={fx:.2f}, fy={fy:.2f}, cx={cx:.2f}, cy={cy:.2f}")
 
-# Calibration data storage
-calibration_points = []
-
-# Which marker ID to capture next
-target_marker_id = 0
-
-def detect_target_marker(frame, depth_frame, target_id):
+def detect_all_markers(frame, depth_frame, intr):
     """
-    Detect a specific ArUco marker by ID.
-    Uses the live depth frame passed in.
-    Returns marker info if the target ID is detected, otherwise None.
+    Detect all visible ArUco markers (DICT_4X4_50).
+    Returns dict: {marker_id: {'x', 'y', 'z', 'center_x', 'center_y'}}
+    Depth measured with median kernel.
     """
     aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
     parameters = cv2.aruco.DetectorParameters()
     detector   = cv2.aruco.ArucoDetector(aruco_dict, parameters)
+    corners, ids, _ = detector.detectMarkers(frame)
 
-    corners, ids, rejected = detector.detectMarkers(frame)
+    result = {}
+    if ids is None:
+        return result
 
-    # Draw all detected markers for visual feedback
-    if ids is not None:
-        cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+    cv2.aruco.drawDetectedMarkers(frame, corners, ids)
 
-    if ids is None or len(ids) == 0:
-        return None
+    fx, fy = intr.fx, intr.fy
+    ppx, ppy = intr.ppx, intr.ppy
 
-    # Look specifically for the target marker ID
     for i, marker_id in enumerate(ids.flatten()):
-        if marker_id == target_id:
-            marker_corners = corners[i][0]
+        mid = int(marker_id)
+        if mid not in TRAY_CORNERS_ROBOT_M:
+            continue
 
-            center_x = int(np.mean(marker_corners[:, 0]))
-            center_y = int(np.mean(marker_corners[:, 1]))
+        mc = corners[i][0]
+        cx = int(np.mean(mc[:, 0]))
+        cy = int(np.mean(mc[:, 1]))
 
-            # Use live depth frame
-            depth_img = np.asanyarray(depth_frame.get_data())
-            depth_val = depth_img[center_y, center_x]
+        z = median_depth(depth_frame, cx, cy)
+        if z is None or z <= 0:
+            continue
 
-            if depth_val <= 0:
-                return {'detected': True, 'error': 'invalid_depth'}
+        x = (cx - ppx) * z / fx
+        y = (cy - ppy) * z / fy
 
-            z = depth_val / 1000.0
-            x = (center_x - cx) * z / fx
-            y = (center_y - cy) * z / fy
+        result[mid] = {
+            'x': x, 'y': y, 'z': z,
+            'center_x': cx, 'center_y': cy,
+        }
 
-            return {
-                'x': x, 'y': y, 'z': z,
-                'detected': True,
-                'marker_id': int(marker_id),
-                'center_x': center_x,
-                'center_y': center_y,
-            }
+    return result
 
-    # Target marker not found
-    return None
-
-def get_robot_pose_from_user():
-    """Get current robot pose from user input."""
-    print("\nEnter current UR3e end-effector pose (in robot base frame):")
-    print("(Enter values in MILLIMETRES — will be converted to metres automatically)")
-    try:
-        x = float(input("X position (mm): ")) / 1000.0
-        y = float(input("Y position (mm): ")) / 1000.0
-        z = float(input("Z position (mm): ")) / 1000.0
-        print(f"  → Converted to metres: x={x:.4f}, y={y:.4f}, z={z:.4f}")
-        return {'x': x, 'y': y, 'z': z}
-    except ValueError:
-        print("Invalid input. Please enter numbers.")
-        return None
 
 def compute_transform(camera_points, robot_points):
-    """Compute rigid transform from camera to robot frame using Horn's method."""
-    if len(camera_points) < 3:
-        print("Need at least 3 calibration points")
-        return None
+    """SVD rigid transform (Horn's method): camera frame → robot frame."""
+    cam   = np.array([[p['x'], p['y'], p['z']] for p in camera_points])
+    robot = np.array([[p['x'], p['y'], p['z']] for p in robot_points])
 
-    cam_pts   = np.array([[p['x'], p['y'], p['z']] for p in camera_points])
-    robot_pts = np.array([[p['x'], p['y'], p['z']] for p in robot_points])
+    cam_c   = np.mean(cam,   axis=0)
+    robot_c = np.mean(robot, axis=0)
 
-    cam_centroid   = np.mean(cam_pts, axis=0)
-    robot_centroid = np.mean(robot_pts, axis=0)
-
-    cam_centered   = cam_pts - cam_centroid
-    robot_centered = robot_pts - robot_centroid
-
-    H = cam_centered.T @ robot_centered
-
-    U, s, Vt = np.linalg.svd(H)
-
-    R = Vt.T @ U.T
+    H  = (cam - cam_c).T @ (robot - robot_c)
+    U, _, Vt = np.linalg.svd(H)
+    R  = Vt.T @ U.T
 
     if np.linalg.det(R) < 0:
         Vt[2, :] *= -1
         R = Vt.T @ U.T
 
-    t = robot_centroid - R @ cam_centroid
+    t = robot_c - R @ cam_c
 
     T = np.eye(4)
     T[:3, :3] = R
     T[:3, 3]  = t
-
     return T
 
+
+# ──────────────────────────────────────────────────────────────────────────────
+# MAIN
+# ──────────────────────────────────────────────────────────────────────────────
+
+pipeline = rs.pipeline()
+config   = rs.config()
+config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+pipeline.start(config)
+
+profile       = pipeline.get_active_profile()
+depth_profile = profile.get_stream(rs.stream.depth)
+intr          = depth_profile.as_video_stream_profile().get_intrinsics()
+
+print(f"Camera intrinsics: fx={intr.fx:.2f} fy={intr.fy:.2f} "
+      f"cx={intr.ppx:.2f} cy={intr.ppy:.2f}")
+
+align = rs.align(rs.stream.color)
+
+print("\n=== Automatic Camera-to-Robot Calibration ===")
+print("Place tray in fixed position.  All 4 ArUco markers must be visible.")
+print("SPACE = capture now   |   Q = quit")
+if AUTO_CAPTURE:
+    print("AUTO-CAPTURE enabled — will save as soon as all 4 markers are stable.\n")
+
+captured = {}          # {marker_id: {'camera': ..., 'robot': ...}}
+STABLE_FRAMES = 10     # require marker visible for N consecutive frames before auto-capture
+stable_counts = {}     # {marker_id: consecutive frame count}
+
 try:
-    print("\n=== Camera-to-Robot Calibration ===")
-    print("Instructions:")
-    print("1. Move UR3e end-effector directly above marker 0")
-    print("2. Confirm marker 0 is detected (green outline) in camera feed")
-    print("3. Press SPACE to capture — enter teach pendant XYZ when prompted")
-    print("4. Script will automatically move to next marker ID")
-    print("5. Repeat until all 4 markers captured")
-    print("6. Press C to compute and save calibration")
-    print("7. Press Q to quit")
-    print(f"\n→ Currently targeting marker ID: {target_marker_id}")
-
-    align = rs.align(rs.stream.color)
-
     while True:
         frames         = pipeline.wait_for_frames()
-        aligned_frames = align.process(frames)
-        depth_frame    = aligned_frames.get_depth_frame()
-        color_frame    = aligned_frames.get_color_frame()
-
+        aligned        = align.process(frames)
+        depth_frame    = aligned.get_depth_frame()
+        color_frame    = aligned.get_color_frame()
         if not depth_frame or not color_frame:
             continue
 
-        frame = np.asanyarray(color_frame.get_data())
+        frame    = np.asanyarray(color_frame.get_data())
+        detected = detect_all_markers(frame, depth_frame, intr)
 
-        # Detect only the target marker using live depth frame
-        marker_result = detect_target_marker(frame, depth_frame, target_marker_id)
+        # Update stable counts
+        for mid in list(TRAY_CORNERS_ROBOT_M.keys()):
+            if mid in detected and mid not in captured:
+                stable_counts[mid] = stable_counts.get(mid, 0) + 1
+            else:
+                stable_counts[mid] = 0
 
-        # Status display
-        captured_ids = [p['marker_id'] for p in calibration_points]
-        status_text  = (f"Points: {len(calibration_points)}/4 captured "
-                        f"{captured_ids} | Target: marker {target_marker_id}")
+        # Overlay status
+        needed = set(TRAY_CORNERS_ROBOT_M.keys()) - set(captured.keys())
+        all_stable = all(
+            stable_counts.get(mid, 0) >= STABLE_FRAMES for mid in needed
+        )
 
-        if marker_result is None:
-            cv2.putText(frame, f"Waiting for marker {target_marker_id}...",
-                        (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-        elif 'error' in marker_result:
-            cv2.putText(frame, f"Marker {target_marker_id} detected — INVALID DEPTH",
-                        (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 165, 255), 2)
-        else:
-            # Draw crosshair at marker centre
-            cx_m, cy_m = marker_result['center_x'], marker_result['center_y']
-            cv2.drawMarker(frame, (cx_m, cy_m), (0, 255, 0),
-                           cv2.MARKER_CROSS, 20, 2)
-            cv2.putText(frame,
-                        f"Marker {target_marker_id} DETECTED — hover gripper above, press SPACE",
-                        (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        for mid, cam in detected.items():
+            if mid in captured:
+                colour = (180, 180, 180)
+                label  = f"ID {mid} — DONE"
+            elif stable_counts.get(mid, 0) >= STABLE_FRAMES:
+                colour = (0, 255, 0)
+                label  = f"ID {mid} — READY"
+            else:
+                n = stable_counts.get(mid, 0)
+                colour = (0, 165, 255)
+                label  = f"ID {mid} — stabilising {n}/{STABLE_FRAMES}"
+            cv2.putText(frame, label,
+                        (cam['center_x'] - 60, cam['center_y'] - 15),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, colour, 2)
 
-        cv2.putText(frame, status_text, (10, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-        cv2.putText(frame, "SPACE=capture | C=compute | Q=quit",
-                    (10, 460), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), 1)
+        status_colour = (0, 255, 0) if all_stable and needed else (0, 165, 255)
+        status_text   = (
+            f"Captured: {sorted(captured.keys())} | "
+            f"Pending: {sorted(needed)} | "
+            f"{'ALL READY — press SPACE or auto-capture' if all_stable and needed else ''}"
+        )
+        cv2.putText(frame, status_text, (10, 25),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.45, status_colour, 1)
+        cv2.putText(frame, "SPACE=capture  Q=quit", (10, 460),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.42, (200, 200, 200), 1)
 
         cv2.imshow('Calibration', frame)
-
         key = cv2.waitKey(1) & 0xFF
 
-        if key == ord(' '):
-            if marker_result is None:
-                print(f"Marker {target_marker_id} not detected — make sure it's visible")
-            elif 'error' in marker_result:
-                print(f"Marker {target_marker_id} detected but depth is invalid — reposition")
-            else:
-                print(f"\nMarker {target_marker_id} detected at camera position: "
-                      f"x={marker_result['x']:.4f}, "
-                      f"y={marker_result['y']:.4f}, "
-                      f"z={marker_result['z']:.4f}")
-
-                robot_pose = get_robot_pose_from_user()
-                if robot_pose:
-                    calibration_points.append({
-                        'marker_id': target_marker_id,
-                        'camera':    marker_result,
-                        'robot':     robot_pose,
-                    })
-                    print(f"✓ Calibration point {len(calibration_points)} saved "
-                          f"(marker {target_marker_id})")
-
-                    # Automatically advance to next marker
-                    target_marker_id += 1
-                    if target_marker_id <= 3:
-                        print(f"\n→ Now move to marker {target_marker_id} and press SPACE")
-                    else:
-                        print("\n→ All 4 markers captured! Press C to compute calibration.")
-
-        elif key == ord('c'):
-            if len(calibration_points) >= 3:
-                camera_points_list = [p['camera'] for p in calibration_points]
-                robot_points_list  = [p['robot']  for p in calibration_points]
-
-                T = compute_transform(camera_points_list, robot_points_list)
-
-                if T is not None:
-                    calibration_data = {
-                        'transform_matrix':   T.tolist(),
-                        'calibration_points': calibration_points,
-                        'timestamp':          str(np.datetime64('now')),
-                        'description':        'Camera to UR3e base frame calibration'
+        def do_capture():
+            for mid in list(needed):
+                if stable_counts.get(mid, 0) >= STABLE_FRAMES and mid in detected:
+                    rx, ry, rz = TRAY_CORNERS_ROBOT_M[mid]
+                    captured[mid] = {
+                        'marker_id': mid,
+                        'camera':    detected[mid],
+                        'robot':     {'x': rx, 'y': ry, 'z': rz},
                     }
+                    print(f"  ✓ Marker {mid} captured — "
+                          f"cam=({detected[mid]['x']:.4f}, "
+                          f"{detected[mid]['y']:.4f}, "
+                          f"{detected[mid]['z']:.4f})  "
+                          f"robot=({rx:.4f}, {ry:.4f}, {rz:.4f})")
 
-                    with open(CALIBRATION_FILE, 'w') as f:
-                        json.dump(calibration_data, f, indent=2)
+        if AUTO_CAPTURE and all_stable and needed:
+            print("\nAll markers stable — auto-capturing...")
+            do_capture()
 
-                    print(f"\n✓ Calibration saved to {CALIBRATION_FILE}")
-                    print("Transform matrix:")
-                    print(T)
+        if key == ord(' '):
+            if all_stable and needed:
+                do_capture()
+            elif needed:
+                print("Not all needed markers are stable yet.")
 
-                    # Test all captured points
-                    print("\nReprojection test (all points):")
-                    total_error = 0.0
-                    for p in calibration_points:
-                        cam   = p['camera']
-                        rob   = p['robot']
-                        pt    = np.array([cam['x'], cam['y'], cam['z'], 1.0])
-                        pred  = T @ pt
-                        error = np.linalg.norm(pred[:3] - np.array(
-                            [rob['x'], rob['y'], rob['z']]))
-                        total_error += error
-                        print(f"  Marker {p['marker_id']}: "
-                              f"predicted=({pred[0]*1000:.1f}, {pred[1]*1000:.1f}, {pred[2]*1000:.1f})mm "
-                              f"measured=({rob['x']*1000:.1f}, {rob['y']*1000:.1f}, {rob['z']*1000:.1f})mm "
-                              f"error={error*1000:.1f}mm")
-                    print(f"  Average error: {(total_error/len(calibration_points))*1000:.1f}mm")
+        if key == ord('q'):
+            print("Quit — no calibration saved.")
+            break
 
-            else:
-                print(f"Need at least 3 points, have {len(calibration_points)}")
+        # All captured → compute and save
+        if not needed:
+            print(f"\nAll {len(captured)} markers captured — computing transform...")
+            pts = list(captured.values())
+            cam_pts   = [p['camera'] for p in pts]
+            robot_pts = [p['robot']  for p in pts]
 
-        elif key == ord('q'):
+            T = compute_transform(cam_pts, robot_pts)
+
+            # Reprojection error
+            print("Reprojection test:")
+            total_err = 0.0
+            for p in pts:
+                cam   = p['camera']
+                rob   = p['robot']
+                pt    = np.array([cam['x'], cam['y'], cam['z'], 1.0])
+                pred  = T @ pt
+                err   = np.linalg.norm(pred[:3] - np.array(
+                    [rob['x'], rob['y'], rob['z']]))
+                total_err += err
+                print(f"  Marker {p['marker_id']}: "
+                      f"pred=({pred[0]*1000:.1f}, {pred[1]*1000:.1f}, {pred[2]*1000:.1f})mm "
+                      f"actual=({rob['x']*1000:.1f}, {rob['y']*1000:.1f}, {rob['z']*1000:.1f})mm "
+                      f"err={err*1000:.1f}mm")
+            print(f"  Average error: {(total_err/len(pts))*1000:.1f}mm")
+
+            calibration_data = {
+                'transform_matrix':   T.tolist(),
+                'calibration_points': pts,
+                'timestamp':          str(np.datetime64('now')),
+                'description':        'Camera to UR3e base frame — auto calibration',
+                'tray_corners_robot': {
+                    str(k): list(v)
+                    for k, v in TRAY_CORNERS_ROBOT_M.items()
+                },
+            }
+            with open(CALIBRATION_FILE, 'w') as f:
+                json.dump(calibration_data, f, indent=2)
+            print(f"\n✓ Calibration saved to {CALIBRATION_FILE}")
             break
 
 finally:
     pipeline.stop()
     cv2.destroyAllWindows()
-
-    if os.path.exists(CALIBRATION_FILE):
-        print(f"\nCalibration saved to {CALIBRATION_FILE}")
-    else:
-        print("\nNo calibration saved.")
