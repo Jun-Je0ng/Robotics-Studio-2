@@ -158,7 +158,7 @@ class PlasticDetectionsTranslator(Node):
 
         # ── Dimensions (mm → m) ───────────────────────────────────────────────
         dims = det['dimensions']
-        dx = mm_to_m(dims['dx_mm'])
+        dx = mm_to_m(dims['dx_mm']/1.5)
         dy = mm_to_m(dims['dy_mm']/2)
         # dz_mm is optional — fall back to dy (long axis) if depth failed
         dz = mm_to_m(dims['dz_mm']/2) if 'dz_mm' in dims else dy

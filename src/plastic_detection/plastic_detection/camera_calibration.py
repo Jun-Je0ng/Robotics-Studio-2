@@ -45,10 +45,10 @@ import os
 #   EEF is touching the table surface at each corner.
 # ──────────────────────────────────────────────────────────────────────────────
 TRAY_CORNERS_ROBOT_M = {
-    0: (-0.20501,  -0.42255, 0.0363),   # front-left  corner
-    1: (-0.20830,  -0.17512, 0.0344),   # back-left   corner
-    2: ( 0.20925,  -0.41904, 0.0355),   # front-right corner
-    3: ( 0.20847,  -0.17327, 0.0355),   # back-right  corner
+    0: (0.20260,  -0.18140, 0.05164),   # front-right  corner   // from camera perspective/side
+    1: (0.20003,  -0.42785, 0.05571),   # back-right   corner
+    2: ( -0.21212,  -0.18155, 0.05210),   # front-left corner
+    3: ( -0.21399,  -0.41729, 0.04784),   # back-left  corner
 }
 
 CALIBRATION_FILE  = "camera_to_robot_calibration.json"
