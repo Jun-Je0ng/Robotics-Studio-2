@@ -22,6 +22,11 @@ setup(
         'console_scripts': [
             'obb_detector_node = plastic_detection.obb_detector_node:main',
             'grip_pose_node = plastic_detection.grip_pose_node:main',
+            'obb_detector_bottom_point = plastic_detection.obb_detector_bottom_point:main',
+            'obb_detector_tracked = plastic_detection.obb_detector_tracked:main',
+            'obb_detector_unified_plane = plastic_detection.obb_detector_unified_plane:main',
+            'obb_detector_homography = plastic_detection.obb_detector_homography:main',
+            'obb_detector_improved = plastic_detection.obb_detector_improved:main',
         ],
     },
 )

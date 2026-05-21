@@ -20,6 +20,8 @@
 #include <tf2_ros/transform_listener.h>
 #include <geometric_shapes/shapes.h>
 #include <geometric_shapes/shape_operations.h>
+#include <moveit/robot_trajectory/robot_trajectory.h>
+#include <moveit/trajectory_processing/iterative_time_parameterization.h>
 
 #include <geometry_msgs/msg/wrench_stamped.hpp>
 
@@ -42,7 +44,7 @@ const std::string GRIPPER_GROUP = "ur_onrobot_gripper";
 const double PREGRASP_HEIGHT    = 0.03;   // metres above object centre
 const double GRIPPER_OPEN       = 0.110;
 const double GRIPPER_CLOSED     = 0.001;
-const double SAFE_Z_HEIGHT      = 0.30;
+const double SAFE_Z_HEIGHT      = 0.10;
 
 // RG2 physical limits
 const double RG2_MAX_SPAN       = 0.110;  // metres
@@ -892,6 +894,26 @@ void removeObject(
 }
 
 
+// bool moveCartesian(
+//     moveit::planning_interface::MoveGroupInterface& arm,
+//     const geometry_msgs::msg::Pose& target,
+//     double max_step = 0.002,
+//     double min_fraction = 0.9){
+//     std::vector<geometry_msgs::msg::Pose> waypoints{target};
+//     moveit_msgs::msg::RobotTrajectory traj;
+//     double fraction = arm.computeCartesianPath(waypoints, max_step, 0.0, traj);
+
+//     if (fraction < min_fraction)
+//     {
+//         RCLCPP_ERROR(LOGGER, "Cartesian path only %.0f%% complete", fraction * 100.0);
+//         return false;
+//     }
+
+//     moveit::planning_interface::MoveGroupInterface::Plan plan;
+//     plan.trajectory_ = traj;
+//     return arm.execute(plan) == moveit::core::MoveItErrorCode::SUCCESS;
+// }
+
 bool moveCartesian(
     moveit::planning_interface::MoveGroupInterface& arm,
     const geometry_msgs::msg::Pose& target,
@@ -907,8 +929,18 @@ bool moveCartesian(
         return false;
     }
 
+    // computeCartesianPath does not inherit setMaxVelocityScalingFactor —
+    // manually apply time parametrization so joint velocities respect the 0.03 limit.
+    robot_trajectory::RobotTrajectory rt(arm.getRobotModel(), arm.getName());
+    rt.setRobotTrajectoryMsg(*arm.getCurrentState(), traj);
+    trajectory_processing::IterativeParabolicTimeParameterization iptp;
+    iptp.computeTimeStamps(rt, 0.03, 0.03);
+    rt.getRobotTrajectoryMsg(traj);
+
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     plan.trajectory_ = traj;
+    arm.setMaxVelocityScalingFactor(0.03);
+    arm.setMaxAccelerationScalingFactor(0.03);
     return arm.execute(plan) == moveit::core::MoveItErrorCode::SUCCESS;
 }
 
@@ -1442,22 +1474,22 @@ PickResult processOneObject(
     // ── Transport to bin with drop monitoring ─────────────────────────────────
     geometry_msgs::msg::Pose bin_pose = getDropOffPose(obj.classification);
 
-    DropMonitor drop_monitor;
-    if (!g_sim_mode) drop_monitor.start(gripper_client);
+    // DropMonitor drop_monitor;
+    // if (!g_sim_mode) drop_monitor.start(gripper_client);
 
     moveToPose(arm, bin_pose);
 
-    drop_monitor.stop();
+    // drop_monitor.stop();
 
-    if (drop_monitor.object_dropped.load())
-    {
-        RCLCPP_WARN(LOGGER, "Object '%s' dropped during transport", r.id.c_str());
-        detachObject(arm, r.id);
-        removeObject(psi, r.id);
-        // The dropped object will appear in the next perception frame
-        // and be picked up naturally in the next loop iteration.
-        return PickResult::DROPPED;
-    }
+    // if (drop_monitor.object_dropped.load())
+    // {
+    //     RCLCPP_WARN(LOGGER, "Object '%s' dropped during transport", r.id.c_str());
+    //     detachObject(arm, r.id);
+    //     removeObject(psi, r.id);
+    //     // The dropped object will appear in the next perception frame
+    //     // and be picked up naturally in the next loop iteration.
+    //     return PickResult::DROPPED;
+    // }
 
     // ── Normal release ────────────────────────────────────────────────────────
     openGripper(gripper_client);
