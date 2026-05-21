@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 import json
-import threading
-import time
 from datetime import datetime
 
 import tkinter as tk
@@ -48,9 +46,6 @@ _SD_IDX = {k: i for i, (k, _, _) in enumerate(_SD_STATES)}
 class StatusGui(Node):
     def __init__(self):
         super().__init__("status_gui")
-
-        self.jog_active = False
-        self.jog_thread = None
 
         self._latest_detections = []
         self._sd_cur = 0
@@ -158,42 +153,6 @@ class StatusGui(Node):
                   bg=C['blue'], fg=C['bg'], width=12).pack(side=tk.LEFT, padx=(0, 6))
         self._btn(row2, "▷◁  Close", "close_gripper",
                   bg=C['card'], fg=C['text'], width=12).pack(side=tk.LEFT)
-
-        # ── Cartesian Jog ─────────────────────────────────────────
-        self._section_label(p, "CARTESIAN JOG")
-
-        jog = tk.Frame(p, bg=C['bg'])
-        jog.pack(pady=(0, 6))
-
-        js = dict(font=("Helvetica", 11, "bold"), width=5, height=2,
-                  bg=C['card'], fg=C['text'], relief="flat", cursor="hand2",
-                  activebackground=C['border'], activeforeground=C['text'],
-                  borderwidth=0)
-
-        tk.Button(jog, text="+Y", command=lambda: self._jog("+y"), **js).grid(row=0, column=1, padx=3, pady=3)
-        tk.Button(jog, text="-X", command=lambda: self._jog("-x"), **js).grid(row=1, column=0, padx=3, pady=3)
-        tk.Label (jog, text="·", bg=C['bg'], fg=C['border'],
-                  font=("Helvetica", 18), width=5).grid(row=1, column=1)
-        tk.Button(jog, text="+X", command=lambda: self._jog("+x"), **js).grid(row=1, column=2, padx=3, pady=3)
-        tk.Button(jog, text="-Y", command=lambda: self._jog("-y"), **js).grid(row=2, column=1, padx=3, pady=3)
-
-        tk.Label(jog, text="Z", bg=C['bg'], fg=C['muted'],
-                 font=("Helvetica", 8, "bold")).grid(row=0, column=3, padx=(14, 0))
-        tk.Button(jog, text="+Z", command=lambda: self._jog("+z"), **js).grid(row=1, column=3, padx=(14, 3), pady=3)
-        tk.Button(jog, text="-Z", command=lambda: self._jog("-z"), **js).grid(row=2, column=3, padx=(14, 3), pady=3)
-
-        sr = tk.Frame(p, bg=C['bg'])
-        sr.pack(fill=tk.X, pady=(2, 4))
-        tk.Label(sr, text="Step (mm):", bg=C['bg'], fg=C['muted'],
-                 font=("Helvetica", 9)).pack(side=tk.LEFT)
-        self.step_var = tk.DoubleVar(value=10.0)
-        tk.Spinbox(sr, from_=1, to=100, increment=5, textvariable=self.step_var,
-                   width=7, font=("Helvetica", 9),
-                   bg=C['card'], fg=C['text'], insertbackground=C['text'],
-                   buttonbackground=C['border'], relief="flat").pack(side=tk.LEFT, padx=8)
-
-        self._btn(p, "■  Stop Jog", None, bg=C['surface'], fg=C['muted'],
-                  width=28, command=self._stop_jog).pack(fill=tk.X, pady=(0, 2))
 
         # ── Poses ─────────────────────────────────────────────────
         self._section_label(p, "POSES")
@@ -567,34 +526,6 @@ class StatusGui(Node):
         self._save_bin(name)
         self._bin_custom_var.set("")
 
-    def _jog(self, direction):
-        if self.jog_active:
-            self._stop_jog()
-        step = self.step_var.get() / 1000.0
-        cmds = {
-            "+x": f"jog_cartesian {step} 0 0 0 0 0",
-            "-x": f"jog_cartesian -{step} 0 0 0 0 0",
-            "+y": f"jog_cartesian 0 {step} 0 0 0 0",
-            "-y": f"jog_cartesian 0 -{step} 0 0 0 0",
-            "+z": f"jog_cartesian 0 0 {step} 0 0 0",
-            "-z": f"jog_cartesian 0 0 -{step} 0 0 0",
-        }
-        if direction in cmds:
-            self.jog_active = True
-            self.jog_thread = threading.Thread(
-                target=self._jog_worker, args=(cmds[direction],), daemon=True)
-            self.jog_thread.start()
-
-    def _stop_jog(self):
-        self.jog_active = False
-
-    def _jog_worker(self, command):
-        while self.jog_active:
-            msg = String()
-            msg.data = command
-            self.cmd_pub.publish(msg)
-            time.sleep(0.1)
-
     # ══════════════════════════════════════════════════════════════════════════
     # ROS callbacks — existing topics
     # ══════════════════════════════════════════════════════════════════════════
@@ -738,7 +669,6 @@ class StatusGui(Node):
         self.root.attributes('-fullscreen', False)
 
     def _on_close(self):
-        self._stop_jog()
         self.destroy_node()
         rclpy.shutdown()
         self.root.destroy()

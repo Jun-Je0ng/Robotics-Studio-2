@@ -122,9 +122,6 @@ bool g_sim_mode = false;
 // Resolved path to bin_poses.json — set once in main(), used everywhere.
 std::string g_bin_poses_file;
 
-// user interface states
-bool sequence_requested = true;
-
 // settings
 int attempts = 2;
 
@@ -1576,16 +1573,6 @@ void handleCommand(
         saveBinPose(label, p, g_bin_poses_file);
         RCLCPP_INFO(LOGGER, "CMD: SAVED %s → %s", label.c_str(), g_bin_poses_file.c_str());
     }
-    else if (cmd == "START")
-    {
-        sequence_requested = true;
-        RCLCPP_INFO(LOGGER, "CMD: START");
-    }
-    else if (cmd == "STOP")
-    {
-        sequence_requested = false;
-        RCLCPP_WARN(LOGGER, "CMD: STOP");
-    }
     else
     {
         RCLCPP_WARN(LOGGER, "Unknown command: %s", cmd.c_str());
@@ -1617,6 +1604,8 @@ int main(int argc, char** argv)
     object_msgs::msg::ObjectArray::SharedPtr latest_objects;
     geometry_msgs::msg::PoseArray::SharedPtr latest_goals;
     std::atomic<bool> sequence_requested{false};
+    std::atomic<bool> stop_requested{false};
+    std::atomic<bool> home_requested{false};
     std::atomic<bool> objects_fresh{false};
     std::atomic<std::chrono::steady_clock::time_point> last_perception_time{
         std::chrono::steady_clock::now()};
@@ -1728,17 +1717,37 @@ int main(int argc, char** argv)
     auto cmd_sub = node->create_subscription<std_msgs::msg::String>(
         "/motion_system/command", 10,
         [&](const std_msgs::msg::String::SharedPtr msg){
-        const std::string& cmd = msg->data;
-        if (cmd.rfind("TARGET_CLASS:", 0) == 0)
-        {
+        const std::string& raw = msg->data;
+        // Normalise to uppercase for keyword matching; class names stay in raw
+        std::string upper = raw;
+        std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+
+        if (upper == "START") {
+            sequence_requested = true;
+            RCLCPP_INFO(LOGGER, "CMD: START");
+        } else if (upper == "STOP") {
+            stop_requested = true;
+            arm.stop();
+            RCLCPP_WARN(LOGGER, "CMD: STOP — halting motion");
+        } else if (upper == "HOME") {
+            home_requested = true;
+            RCLCPP_INFO(LOGGER, "CMD: HOME");
+        } else if (upper == "ESTOP") {
+            arm.stop();
+            stop_requested = true;
+            RCLCPP_ERROR(LOGGER, "CMD: ESTOP — motion halted");
+        } else if (upper == "RESET") {
+            arm.stop();
+            stop_requested = false;
+            home_requested = true;
+            RCLCPP_WARN(LOGGER, "CMD: RESET — stopping and homing");
+        } else if (raw.rfind("TARGET_CLASS:", 0) == 0) {
             std::lock_guard<std::mutex> lock(data_mutex);
-            target_class = cmd.substr(13);
+            target_class = raw.substr(13);
             RCLCPP_INFO(LOGGER, "Pick priority set to: '%s'",
                 target_class.empty() ? "any" : target_class.c_str());
-        }
-        else
-        {
-            handleCommand(cmd, arm, gripper_client, tf_buffer);
+        } else {
+            handleCommand(raw, arm, gripper_client, tf_buffer);
         }
     });
 
@@ -1746,8 +1755,7 @@ int main(int argc, char** argv)
     spawnCameraAssembly(psi);
     returnHome(arm, gripper_client);
 
-    std::ifstream tty("/dev/tty");
-    RCLCPP_INFO(LOGGER, "Ready. Press ENTER to start, 'q' to quit.");
+    RCLCPP_INFO(LOGGER, "Ready. Send START via GUI or /motion_system/command topic.");
 
     // ── Tuning constants for the reactive loop ────────────────────────────────
     // How many consecutive empty perception frames before declaring the platform clear.
@@ -1765,50 +1773,20 @@ int main(int argc, char** argv)
     publishState("IDLE");
     while (rclcpp::ok())
     {
-        // ── Wait for user input ───────────────────────────────────────────────
-        std::cout << "\nPress ENTER to start, 'q' to quit and h to return robot to home.\n>> ";
-        std::string line;
-        std::getline(tty, line);
-        char cmd_char = line.empty() ? '\n' : line[0];
-        if (cmd_char == 'q') break;
-        if (cmd_char == 'h') {
-            publishState("HOMING");
-            returnHome(arm, gripper_client);
-            std::cout << "\nReturning to Home\n>> ";
-            continue;
-        }
-        if (cmd_char == 'b') {
-            std::cout << "\nRemoving object data\n>> ";
-            continue;
-        }
-
-        // Inline pose-save command: "pose <label>"
-        if (line.rfind("pose ", 0) == 0)
+        // ── Wait for START (or HOME) from GUI ─────────────────────────────────
+        while (rclcpp::ok() && !sequence_requested.load())
         {
-            std::string name = line.substr(5);
-            geometry_msgs::msg::Pose current_pose;
-            try
+            if (home_requested.exchange(false))
             {
-                auto tf = tf_buffer->lookupTransform(
-                    "base", arm.getEndEffectorLink(),
-                    tf2::TimePointZero, tf2::durationFromSec(1.0));
-                current_pose.position.x  = tf.transform.translation.x;
-                current_pose.position.y  = tf.transform.translation.y;
-                current_pose.position.z  = tf.transform.translation.z;
-                current_pose.orientation = tf.transform.rotation;
+                publishState("HOMING");
+                returnHome(arm, gripper_client);
+                publishState("IDLE");
             }
-            catch (const tf2::TransformException& ex)
-            {
-                RCLCPP_ERROR(LOGGER, "TF lookup failed: %s", ex.what());
-                continue;
-            }
-            saveBinPose(name, current_pose, g_bin_poses_file);
-            RCLCPP_INFO(LOGGER, "Saved pose for '%s'", name.c_str());
-            continue;
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-
-        bool go = (cmd_char == '\n') || sequence_requested.exchange(false);
-        if (!go) continue;
+        if (!rclcpp::ok()) break;
+        sequence_requested = false;
+        stop_requested     = false;
 
         // ── Move home first so camera has a clear view ────────────────────────
         RCLCPP_INFO(LOGGER, "Moving home to clear camera view...");
@@ -1833,7 +1811,7 @@ int main(int argc, char** argv)
 
         RCLCPP_INFO(LOGGER, "Reactive pick loop started.");
 
-        while (rclcpp::ok())
+        while (rclcpp::ok() && !stop_requested.load())
         {
             // Step 1 — invalidate so we always wait for the next fresh message
             {
@@ -1962,6 +1940,7 @@ int main(int argc, char** argv)
                     RCLCPP_WARN(LOGGER,
                         "Object dropped during transport — returning home; "
                         "dropped object will be picked up next iteration");
+                    publishState("HOMING");
                     returnHome(arm, gripper_client);
                     break;
 
