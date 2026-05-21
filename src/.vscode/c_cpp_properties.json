@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/jun/git/Robotics-Studio-1/41068_ws/install/41068_ignition_bringup/include/**",
+        "/home/jun/ros2_ws/install/turtlesim/include/**",
+        "/home/jun/ros2_ws/src/install/turtlesim/include/**",
+        "/home/jun/ros2_ws/src/install/onrobot_driver/include/**",
+        "/opt/ros/humble/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

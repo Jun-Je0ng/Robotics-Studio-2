@@ -51,6 +51,13 @@ TRAY_CORNERS_ROBOT_M = {
     3: ( -0.21399,  -0.41729, 0.04784),   # back-left  corner
 }
 
+# TRAY_CORNERS_ROBOT_M = { # useful for testing on table without robot
+#     0: (0.2075,  -0.035, 0.0),   # front-right  corner   // from camera perspective/side
+#     1: (0.2075,  -0.282, 0.0),   # back-right   corner
+#     2: ( -0.2075,  -0.035, 0.0),   # front-left corner
+#     3: ( -0.2075,  -0.282, 0.0),   # back-left  corner
+# }
+
 CALIBRATION_FILE  = "camera_to_robot_calibration.json"
 DEPTH_KERNEL_SIZE = 11   # same as detector — median over k×k pixel patch
 AUTO_CAPTURE      = True # set False to require SPACE for each marker
@@ -138,6 +145,22 @@ def compute_transform(camera_points, robot_points):
     T[:3, :3] = R
     T[:3, 3]  = t
     return T
+
+
+def compute_homography(calibration_pts):
+    """
+    2D homography: image pixel (u, v) → robot XY in mm.
+    This is the correct approach for 4 coplanar calibration points —
+    the 3D SVD fit is degenerate when all robot points share the same Z.
+    """
+    src = np.array(
+        [[p['camera']['center_x'], p['camera']['center_y']] for p in calibration_pts],
+        dtype=np.float32)
+    dst = np.array(
+        [[p['robot']['x'] * 1000, p['robot']['y'] * 1000] for p in calibration_pts],
+        dtype=np.float32)
+    H, _ = cv2.findHomography(src, dst)
+    return H
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -259,10 +282,28 @@ try:
             cam_pts   = [p['camera'] for p in pts]
             robot_pts = [p['robot']  for p in pts]
 
-            T = compute_transform(cam_pts, robot_pts)
+            T   = compute_transform(cam_pts, robot_pts)
+            H_pix = compute_homography(pts)
 
-            # Reprojection error
-            print("Reprojection test:")
+            # Homography reprojection (pixel → robot XY)
+            print("Homography pixel→robot XY test:")
+            total_h_err = 0.0
+            for p in pts:
+                px = np.array([[[p['camera']['center_x'],
+                                  p['camera']['center_y']]]], dtype=np.float32)
+                pred_xy = cv2.perspectiveTransform(px, H_pix)[0][0]
+                actual  = np.array([p['robot']['x'] * 1000,
+                                     p['robot']['y'] * 1000])
+                err = np.linalg.norm(pred_xy - actual)
+                total_h_err += err
+                print(f"  Marker {p['marker_id']}: "
+                      f"pred=({pred_xy[0]:.1f}, {pred_xy[1]:.1f})mm "
+                      f"actual=({actual[0]:.1f}, {actual[1]:.1f})mm "
+                      f"err={err:.1f}mm")
+            print(f"  Average homography error: {total_h_err/len(pts):.1f}mm")
+
+            # Reprojection error (3D SVD — kept for reference only)
+            print("3D SVD reprojection test (reference):")
             total_err = 0.0
             for p in pts:
                 cam   = p['camera']
@@ -279,7 +320,8 @@ try:
             print(f"  Average error: {(total_err/len(pts))*1000:.1f}mm")
 
             calibration_data = {
-                'transform_matrix':   T.tolist(),
+                'transform_matrix':          T.tolist(),
+                'homography_pixel_to_robot_mm': H_pix.tolist(),
                 'calibration_points': pts,
                 'timestamp':          str(np.datetime64('now')),
                 'description':        'Camera to UR3e base frame — auto calibration',

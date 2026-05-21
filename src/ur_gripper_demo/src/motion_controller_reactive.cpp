@@ -44,7 +44,7 @@ const std::string GRIPPER_GROUP = "ur_onrobot_gripper";
 const double PREGRASP_HEIGHT    = 0.03;   // metres above object centre
 const double GRIPPER_OPEN       = 0.110;
 const double GRIPPER_CLOSED     = 0.001;
-const double SAFE_Z_HEIGHT      = 0.15;   // reduced from 0.30 — UR3e workspace limit at tray XY coords is ~0.24m; 0.35m was unreachable
+const double SAFE_Z_HEIGHT      = 0.10;   // reduced from 0.30 — UR3e workspace limit at tray XY coords is ~0.24m; 0.35m was unreachable
 
 // RG2 physical limits
 const double RG2_MAX_SPAN       = 0.110;  // metres
@@ -1050,6 +1050,7 @@ bool executeTopDownGrasp(
         detachObject(arm, r.id);
         removeObject(psi, r.id);
 
+
         geometry_msgs::msg::Pose raise_pose = grasp_pose;
         raise_pose.position.z = r.obj.pose.position.z + SAFE_Z_HEIGHT;
 
@@ -1066,13 +1067,6 @@ bool executeTopDownGrasp(
                 }
         }
 
-        // if (!moveToPose(arm, raise_pose))
-        // {
-        //     RCLCPP_WARN(LOGGER, "Raise failed on attempt %d — detaching", attempt);
-        //     openGripper(gripper_client);
-        //     detachObject(arm, r.id);
-        //     continue;
-        // }
 
         RCLCPP_INFO(LOGGER, "Grasp succeeded on attempt %d", attempt);
         return true;
@@ -1486,22 +1480,22 @@ PickResult processOneObject(
     // ── Transport to bin with drop monitoring ─────────────────────────────────
     geometry_msgs::msg::Pose bin_pose = getDropOffPose(obj.classification);
 
-    DropMonitor drop_monitor;
-    if (!g_sim_mode) drop_monitor.start(gripper_client);
+    // DropMonitor drop_monitor;
+    // if (!g_sim_mode) drop_monitor.start(gripper_client);
 
     moveToPose(arm, bin_pose);
 
-    drop_monitor.stop();
+    // drop_monitor.stop();
 
-    if (drop_monitor.object_dropped.load())
-    {
-        RCLCPP_WARN(LOGGER, "Object '%s' dropped during transport", r.id.c_str());
-        detachObject(arm, r.id);
-        removeObject(psi, r.id);
-        // The dropped object will appear in the next perception frame
-        // and be picked up naturally in the next loop iteration.
-        return PickResult::DROPPED;
-    }
+    // if (drop_monitor.object_dropped.load())
+    // {
+    //     RCLCPP_WARN(LOGGER, "Object '%s' dropped during transport", r.id.c_str());
+    //     detachObject(arm, r.id);
+    //     removeObject(psi, r.id);
+    //     // The dropped object will appear in the next perception frame
+    //     // and be picked up naturally in the next loop iteration.
+    //     return PickResult::DROPPED;
+    // }
 
     // ── Normal release ────────────────────────────────────────────────────────
     openGripper(gripper_client);
