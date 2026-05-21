@@ -78,6 +78,30 @@ def camera_to_robot(T, cam_xyz):
     r = T @ p
     return {"x": float(r[0]), "y": float(r[1]), "z": float(r[2])}
 
+def table_ray_intersect(T, cam_xyz, table_z_m):
+    """
+    Project the camera ray through cam_xyz onto the table plane (z = table_z_m)
+    in robot frame.  This corrects the systematic XY error caused by the
+    camera viewing at an angle — instead of using wherever the depth sensor
+    happens to hit on the object surface, we follow the ray from the camera
+    origin through that surface point until it hits the table, giving the
+    true footprint of the object regardless of its height.
+
+    Returns (x_m, y_m) in robot frame metres, or None if ray is parallel to
+    the table (shouldn't happen with a downward-angled camera).
+    """
+    # Camera origin in robot frame  (last column of T, homogeneous dropped)
+    O = T[:3, 3]
+    # Deprojected surface point in robot frame
+    P = (T @ np.array([cam_xyz[0], cam_xyz[1], cam_xyz[2], 1.0]))[:3]
+    D = P - O  # ray direction (unnormalised — t is still valid)
+    if abs(D[2]) < 1e-6:
+        return None  # ray parallel to table
+    t = (table_z_m - O[2]) / D[2]
+    if t <= 0:
+        return None  # intersection would be behind the camera
+    return float(O[0] + t * D[0]), float(O[1] + t * D[1])
+
 def angle_to_quaternion(angle_rad):
     """Convert 2D OBB rotation angle to 3D quaternion (rotation around Z axis)."""
     r = Rotation.from_euler('z', angle_rad)
@@ -153,7 +177,16 @@ class OBBDetectorNode(Node):
         with open(CALIBRATION_FILE) as f:
             data = json.load(f)
         self.T = np.array(data["transform_matrix"])
-        self.get_logger().info('Calibration loaded.')
+
+        # Derive table Z from calibration corner heights (average of robot z values)
+        cal_pts = data.get("calibration_points", [])
+        if cal_pts:
+            self.table_z_m = float(np.mean([p["robot"]["z"] for p in cal_pts]))
+        else:
+            self.table_z_m = 0.035  # fallback: ~35 mm above robot base
+        self.get_logger().info(
+            f'Calibration loaded — table Z = {self.table_z_m*1000:.1f} mm in robot frame'
+        )
 
         # RealSense setup
         self.pipeline = rs.pipeline()
@@ -245,9 +278,19 @@ class OBBDetectorNode(Node):
                     depth_m = prev
                 self.prev_depths[cls_name] = depth_m
 
-                # Camera → robot
-                cam_xyz   = deproject(self.intrinsics, cx, cy, depth_m)
-                raw_robot = camera_to_robot(self.T, cam_xyz)
+                # Camera → robot via table-plane ray intersection
+                # This corrects the XY shift caused by the angled camera:
+                # instead of using the surface point the depth sensor hit
+                # (which is somewhere up the side of a 3D object), we follow
+                # the camera ray from that surface point down to the table
+                # plane, giving the true XY footprint of the object.
+                cam_xyz = deproject(self.intrinsics, cx, cy, depth_m)
+                xy = table_ray_intersect(self.T, cam_xyz, self.table_z_m)
+                if xy is None:
+                    # Fallback to direct transform if ray is parallel to table
+                    raw_robot = camera_to_robot(self.T, cam_xyz)
+                else:
+                    raw_robot = {"x": xy[0], "y": xy[1], "z": self.table_z_m}
 
                 # Temporal smoothing
                 if cls_name not in self.pose_histories:
@@ -286,16 +329,31 @@ class OBBDetectorNode(Node):
 
                 # Overlay info on display frame
                 if SHOW_DISPLAY:
+                    # Class + stability
                     cv2.putText(display,
-                                f"{cls_name} | x={x_smooth:.0f} "
-                                f"y={y_smooth:.0f} z={z_grip:.0f}mm",
-                                (cx - 80, cy - 30),
+                                f"{cls_name} | {stable_str}",
+                                (cx - 80, cy - 52),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, colour, 2)
+                    # Raw camera-frame XY (before transform) — for comparison
+                    cv2.putText(display,
+                                f"[cam]  x={cam_xyz[0]*1000:.0f} "
+                                f"y={cam_xyz[1]*1000:.0f} "
+                                f"z={cam_xyz[2]*1000:.0f}mm",
+                                (cx - 80, cy - 34),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.42, (180, 180, 255), 1)
+                    # Published robot-frame XY (after ray intersection + smoothing)
+                    cv2.putText(display,
+                                f"[pub]  x={x_smooth:.0f} "
+                                f"y={y_smooth:.0f} "
+                                f"z={z_grip:.0f}mm",
+                                (cx - 80, cy - 18),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.42, colour, 2)
+                    # Angle + dimensions
                     cv2.putText(display,
                                 f"angle={angle_deg:.1f}deg | "
-                                f"dz={dz_mm}mm({dz_source}) | {stable_str}",
-                                (cx - 80, cy - 12),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.45, colour, 2)
+                                f"dz={dz_mm}mm({dz_source})",
+                                (cx - 80, cy - 2),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.40, colour, 1)
 
                 # Build dimensions — only include dz if measurement succeeded
                 dimensions = {
