@@ -1,1 +1,0 @@
-/home/billy/git/Robotics-Studio-2/build/object_msgs/rosidl_generator_rs/object_msgs/rust/src/lib.rs
