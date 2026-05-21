@@ -6,10 +6,13 @@ import time
 from datetime import datetime
 
 import tkinter as tk
+import numpy as np
+from PIL import Image as PILImage, ImageTk
 
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
+from sensor_msgs.msg import Image as RosImage
 
 # ── Colour palette ────────────────────────────────────────────────────────────
 C = {
@@ -37,7 +40,6 @@ class StatusGui(Node):
         self.jog_thread = None
 
         self._latest_detections = []
-        self._latest_grip_poses = []
 
         self.cmd_pub = self.create_publisher(String, "/motion_system/command", 10)
 
@@ -56,8 +58,8 @@ class StatusGui(Node):
         # ── Rian's perception topics ──────────────────────────────────────────
         self.create_subscription(String, "/plastic_detections",
                                  self._cb_plastic_detections, 10)
-        self.create_subscription(String, "/grip_pose",
-                                 self._cb_grip_pose,          10)
+        self.create_subscription(RosImage, "/camera/annotated",
+                                 self._cb_camera_frame,        1)
 
         self._build()
 
@@ -68,13 +70,16 @@ class StatusGui(Node):
     def _build(self):
         self.root = tk.Tk()
         self.root.title("UR3e  ·  Control Panel")
-        self.root.geometry("1380x800")
-        self.root.resizable(False, False)
+        self.root.geometry("1380x920")
+        self.root.resizable(True, True)
         self.root.configure(bg=C['bg'])
 
         self._build_header()
         self._build_body()
         self._build_estop_bar()
+
+        self.root.bind("<F11>",  lambda e: self._toggle_fullscreen())
+        self.root.bind("<Escape>", lambda e: self._exit_fullscreen())
 
         self.root.after(100, self._spin_ros)
         self.root.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -185,6 +190,7 @@ class StatusGui(Node):
             self._btn(p, label, cmd, bg=C['card'], fg=C['text'],
                       width=28).pack(fill=tk.X, pady=2)
 
+
     def _build_mid(self, p):
         # ── Status cards ──────────────────────────────────────────
         cards = tk.Frame(p, bg=C['bg'])
@@ -233,6 +239,20 @@ class StatusGui(Node):
     def _build_perception_panel(self, p):
         """Right panel: live feed from Rian's detection + grip pose nodes."""
 
+        self._section_label(p, "CAMERA FEED  (/camera/annotated)")
+
+        cam_wrap = tk.Frame(p, bg=C['card'], padx=4, pady=4)
+        cam_wrap.pack(fill=tk.X, pady=(0, 8))
+
+        self._camera_label = tk.Label(
+            cam_wrap,
+            text="Waiting for camera...",
+            font=("Courier", 9),
+            bg=C['card'], fg=C['muted'],
+            width=336, height=14,  # placeholder size before first frame
+        )
+        self._camera_label.pack()
+
         self._section_label(p, "PERCEPTION  (Rian)")
 
         # ── Detection count card ──────────────────────────────────
@@ -266,7 +286,7 @@ class StatusGui(Node):
             list_wrap,
             font=("Courier", 8),
             bg=C['surface'], fg=C['text'],
-            height=6,
+            height=4,
             relief="flat", borderwidth=0,
             state="disabled",
         )
@@ -276,30 +296,95 @@ class StatusGui(Node):
         self._det_list_box.tag_config("dim",   foreground=C['purple'])
         self._det_list_box.tag_config("muted", foreground=C['muted'])
 
-        # ── Grip pose section ─────────────────────────────────────
-        self._section_label(p, "GRIP POSE  (Rian → /grip_pose)")
+        # ── Pick Priority ─────────────────────────────────────────
+        self._section_label(p, "PICK PRIORITY")
 
-        grip_wrap = tk.Frame(p, bg=C['surface'], padx=2, pady=2)
-        grip_wrap.pack(fill=tk.X, pady=(0, 12))
+        self._target_var = tk.StringVar(value="")
 
-        tk.Label(grip_wrap, text="Computed grip poses",
-                 font=("Helvetica", 8, "bold"),
-                 bg=C['surface'], fg=C['muted']).pack(anchor="w", padx=6, pady=(4, 2))
+        priority_types = [
+            ("",            "Any  (closest first)", C['text']),
+            ("pet_bottle",  "pet_bottle",           C['cyan']),
+            ("hdpe_bottle", "hdpe_bottle",           C['orange']),
+        ]
+        self._priority_conf_labels = {}
 
-        self._grip_list_box = tk.Text(
-            grip_wrap,
-            font=("Courier", 8),
-            bg=C['surface'], fg=C['text'],
-            height=8,
-            relief="flat", borderwidth=0,
-            state="disabled",
-        )
-        self._grip_list_box.pack(fill=tk.X, padx=6, pady=(0, 4))
-        self._grip_list_box.tag_config("cls",   foreground=C['orange'])
-        self._grip_list_box.tag_config("pos",   foreground=C['cyan'])
-        self._grip_list_box.tag_config("grip",  foreground=C['green'])
-        self._grip_list_box.tag_config("jaw",   foreground=C['yellow'])
-        self._grip_list_box.tag_config("muted", foreground=C['muted'])
+        for value, label_text, colour in priority_types:
+            row = tk.Frame(p, bg=C['bg'])
+            row.pack(fill=tk.X, pady=1)
+
+            tk.Radiobutton(
+                row,
+                text=label_text,
+                variable=self._target_var,
+                value=value,
+                command=self._on_priority_change,
+                bg=C['bg'], fg=colour,
+                selectcolor=C['card'],
+                activebackground=C['bg'], activeforeground=colour,
+                font=("Helvetica", 9, "bold"),
+                indicatoron=True,
+            ).pack(side=tk.LEFT)
+
+            if value:  # no confidence label for "Any"
+                conf_lbl = tk.Label(
+                    row, text="—",
+                    font=("Helvetica", 8),
+                    bg=C['bg'], fg=C['muted'],
+                )
+                conf_lbl.pack(side=tk.RIGHT, padx=6)
+                self._priority_conf_labels[value] = conf_lbl
+
+        # ── Bin Poses ─────────────────────────────────────────────
+        self._section_label(p, "BIN POSES")
+
+        tk.Label(p, text="Jog arm over drop bin, then click type to save.",
+                 font=("Helvetica", 8), bg=C['bg'], fg=C['muted'],
+                 wraplength=330, justify=tk.LEFT).pack(anchor="w", pady=(0, 6))
+
+        bin_grid = tk.Frame(p, bg=C['bg'])
+        bin_grid.pack(fill=tk.X, pady=(0, 4))
+        bin_grid.columnconfigure((0, 1), weight=1)
+
+        known_types = [
+            ("pet_bottle",  C['cyan']),
+            ("hdpe_bottle", C['orange']),
+        ]
+        for i, (type_name, colour) in enumerate(known_types):
+            row, col = divmod(i, 2)
+            tk.Button(
+                bin_grid, text=type_name,
+                command=lambda t=type_name: self._save_bin(t),
+                bg=C['card'], fg=colour,
+                font=("Helvetica", 9, "bold"),
+                relief="flat", cursor="hand2", borderwidth=0,
+                activebackground=C['border'], activeforeground=colour,
+                pady=6,
+            ).grid(row=row, column=col, padx=3, pady=3, sticky="ew")
+
+        custom_row = tk.Frame(p, bg=C['bg'])
+        custom_row.pack(fill=tk.X, pady=(4, 2))
+        self._bin_custom_var = tk.StringVar()
+        tk.Entry(
+            custom_row,
+            textvariable=self._bin_custom_var,
+            font=("Helvetica", 9),
+            bg=C['card'], fg=C['text'],
+            insertbackground=C['text'],
+            relief="flat",
+        ).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 6), ipady=4)
+        tk.Button(
+            custom_row, text="Save",
+            command=self._save_bin_custom,
+            bg=C['yellow'], fg=C['bg'],
+            font=("Helvetica", 9, "bold"),
+            relief="flat", cursor="hand2", borderwidth=0,
+            activebackground='#b7860b', activeforeground=C['bg'],
+            padx=8, pady=4,
+        ).pack(side=tk.LEFT)
+
+        self._btn(p, "↺  Reload Bins", "LOAD_BINS",
+                  bg=C['surface'], fg=C['muted'],
+                  width=28).pack(fill=tk.X, pady=(6, 0))
 
         # ── Bilguun's pipeline note ────────────────────────────────
         self._section_label(p, "MOTION SYSTEM  (Bilguun)")
@@ -392,6 +477,24 @@ class StatusGui(Node):
         msg.data = command
         self.cmd_pub.publish(msg)
         self._log(f"→ {command}", "info")
+
+    def _on_priority_change(self):
+        target = self._target_var.get()
+        self.send_command(f"TARGET_CLASS:{target}")
+        label = target if target else "any"
+        self._log(f"Pick priority → {label}", "info")
+
+    def _save_bin(self, type_name: str):
+        self.send_command(f"SAVE_BIN:{type_name}")
+        self._log(f"Bin saved for '{type_name}'", "ok")
+
+    def _save_bin_custom(self):
+        name = self._bin_custom_var.get().strip()
+        if not name:
+            self._log("Enter a type name before saving", "warn")
+            return
+        self._save_bin(name)
+        self._bin_custom_var.set("")
 
     def _jog(self, direction):
         if self.jog_active:
@@ -498,33 +601,32 @@ class StatusGui(Node):
                 f"    dims {dx:.0f}×{dy:.0f} mm\n", "dim")
         self._det_list_box.config(state="disabled")
 
-    def _cb_grip_pose(self, msg):
+        # Update confidence labels in PICK PRIORITY section
+        best_conf = {}  # cls -> highest confidence seen this message
+        for det in detections:
+            cls  = det.get("classification", {}).get("class", "?")
+            conf = det.get("classification", {}).get("confidence", 0.0)
+            if cls not in best_conf or conf > best_conf[cls]:
+                best_conf[cls] = conf
+        for cls, lbl in self._priority_conf_labels.items():
+            if cls in best_conf:
+                lbl.config(text=f"{best_conf[cls]:.2f}", fg=C['green'])
+            else:
+                lbl.config(text="—", fg=C['muted'])
+
+    def _cb_camera_frame(self, msg: RosImage):
         try:
-            grip_poses = json.loads(msg.data)
-        except json.JSONDecodeError:
-            return
-
-        self._latest_grip_poses = grip_poses
-
-        self._grip_list_box.config(state="normal")
-        self._grip_list_box.delete("1.0", tk.END)
-        for gp in grip_poses:
-            cls  = gp.get("class", "?")
-            conf = gp.get("confidence", 0.0)
-            gpos = gp.get("grip_position", {})
-            jaw  = gp.get("jaw_opening_mm", 0.0)
-            appr = gp.get("approach", "?")
-            gx = gpos.get("x", 0); gy = gpos.get("y", 0); gz = gpos.get("z", 0)
-
-            self._grip_list_box.insert(tk.END, f"  {cls}", "cls")
-            self._grip_list_box.insert(tk.END, f"  ({conf:.2f})\n", "muted")
-            self._grip_list_box.insert(tk.END,
-                f"    grip ({gx:.0f}, {gy:.0f}, {gz:.0f}) mm\n", "pos")
-            self._grip_list_box.insert(tk.END,
-                f"    jaw  {jaw:.1f} mm\n", "jaw")
-            self._grip_list_box.insert(tk.END,
-                f"    approach: {appr}\n", "grip")
-        self._grip_list_box.config(state="disabled")
+            frame = np.frombuffer(msg.data, dtype=np.uint8).reshape(
+                msg.height, msg.width, 3)
+            # BGR → RGB
+            frame_rgb = frame[:, :, ::-1]
+            pil_img = PILImage.fromarray(frame_rgb)
+            pil_img = pil_img.resize((336, 252), PILImage.LANCZOS)
+            photo = ImageTk.PhotoImage(pil_img)
+            self._camera_label.config(image=photo, text="", width=336, height=252)
+            self._camera_label.image = photo  # prevent GC
+        except Exception as e:
+            self.get_logger().warn(f'Camera frame decode error: {e}')
 
     # ══════════════════════════════════════════════════════════════════════════
     # Log & lifecycle
@@ -546,6 +648,13 @@ class StatusGui(Node):
     def _spin_ros(self):
         rclpy.spin_once(self, timeout_sec=0.01)
         self.root.after(100, self._spin_ros)
+
+    def _toggle_fullscreen(self):
+        is_full = self.root.attributes('-fullscreen')
+        self.root.attributes('-fullscreen', not is_full)
+
+    def _exit_fullscreen(self):
+        self.root.attributes('-fullscreen', False)
 
     def _on_close(self):
         self._stop_jog()
