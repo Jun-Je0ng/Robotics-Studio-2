@@ -1,7 +1,0 @@
-[31mCMake Error at CMakeLists.txt:40 (file):
-  file does not exist:
-
-    scripts/plastic_detections_translator.py
-
-[0m
-gmake: *** [Makefile:336: cmake_check_build_system] Error 1
