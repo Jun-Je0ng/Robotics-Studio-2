@@ -1,0 +1,20 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/jun/git/Robotics-Studio-2/install/color_detection/lib/python3.10/site-packages",
+        "/home/jun/git/Robotics-Studio-1/41068_ws/install/rs1_gui/lib/python3.10/site-packages",
+        "/home/jun/ros2_ws/install/turtlesim/local/lib/python3.10/dist-packages",
+        "/home/jun/ros2_ws/src/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages",
+        "/home/jun/ros2_ws/src/install/turtlesim/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/jun/git/Robotics-Studio-2/install/color_detection/lib/python3.10/site-packages",
+        "/home/jun/git/Robotics-Studio-1/41068_ws/install/rs1_gui/lib/python3.10/site-packages",
+        "/home/jun/ros2_ws/install/turtlesim/local/lib/python3.10/dist-packages",
+        "/home/jun/ros2_ws/src/install/ur_onrobot_moveit_config/local/lib/python3.10/dist-packages",
+        "/home/jun/ros2_ws/src/install/turtlesim/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ]
+}

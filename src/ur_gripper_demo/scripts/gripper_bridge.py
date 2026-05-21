@@ -42,7 +42,7 @@ import threading
 import time
 
 # ── tunables ──────────────────────────────────────────────────────────────────
-GRASP_SETTLE_S = 4.0    # s  – wait after command before holding
+GRASP_SETTLE_S = 2.0    # s  – wait after command before holding
                          #      RG2 reaches stall well within 3 s from fully open
 POLL_INTERVAL  = 0.05   # s  – joint state poll interval
 GRIPPER_JOINT  = "finger_width"
