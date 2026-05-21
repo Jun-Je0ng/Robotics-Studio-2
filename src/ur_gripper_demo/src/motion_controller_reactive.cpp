@@ -105,6 +105,16 @@ const double GRIPPER_FORCE = 20.0; // the force in Newtons the gripper will appl
 geometry_msgs::msg::WrenchStamped::SharedPtr latest_wrench;
 std::mutex wrench_mutex;
 
+rclcpp::Publisher<std_msgs::msg::String>::SharedPtr g_state_pub;
+
+inline void publishState(const std::string& s)
+{
+    if (!g_state_pub) return;
+    std_msgs::msg::String msg;
+    msg.data = s;
+    g_state_pub->publish(msg);
+}
+
 // Set from the "sim" ROS parameter at startup (see main()).
 // When true, closeGripperForGrasp() skips stall detection and always returns grasped.
 bool g_sim_mode = false;
@@ -1009,7 +1019,7 @@ bool executeTopDownGrasp(
     for (int attempt = 1; attempt <= max_attempts; ++attempt)
     {
         RCLCPP_INFO(LOGGER, "Grasp attempt %d/%d for '%s'", attempt, max_attempts, r.id.c_str());
-
+        publishState("PREGRASP");
         if (!moveToPregrasp(arm, r))
         {
             RCLCPP_WARN(LOGGER, "Pregrasp failed on attempt %d", attempt);
@@ -1018,6 +1028,7 @@ bool executeTopDownGrasp(
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         // Descend
+        publishState("GRASPING");
         geometry_msgs::msg::Pose grasp_pose;
         grasp_pose.position.x = r.obj.pose.position.x;
         grasp_pose.position.y = r.obj.pose.position.y;
@@ -1039,6 +1050,7 @@ bool executeTopDownGrasp(
         bool grasped = closeGripperForGrasp(gripper_client);
         if (!grasped)
         {
+            publishState("FAILED");
             RCLCPP_WARN(LOGGER, "No object detected (gripper not stalled) on attempt %d — releasing", attempt);
             openGripper(gripper_client);
             detachObject(arm, r.id);
@@ -1054,7 +1066,7 @@ bool executeTopDownGrasp(
         geometry_msgs::msg::Pose raise_pose = grasp_pose;
         raise_pose.position.z = r.obj.pose.position.z + SAFE_Z_HEIGHT;
 
-                              
+        publishState("RAISING");
         if (!moveCartesian(arm, raise_pose))
         {
             RCLCPP_WARN(LOGGER, "Raise failed on attempt %d — detaching", attempt);
@@ -1483,6 +1495,7 @@ PickResult processOneObject(
     // DropMonitor drop_monitor;
     // if (!g_sim_mode) drop_monitor.start(gripper_client);
 
+    publishState("TRANSPORTING");
     moveToPose(arm, bin_pose);
 
     // drop_monitor.stop();
@@ -1671,6 +1684,7 @@ int main(int argc, char** argv)
 
     auto status_pub = node->create_publisher<std_msgs::msg::String>(
         "motion_system/status", 10);
+    g_state_pub = node->create_publisher<std_msgs::msg::String>("/robot_state", 10);
 
 
     moveit::planning_interface::MoveGroupInterface arm(node, ARM_GROUP);
@@ -1748,6 +1762,7 @@ int main(int argc, char** argv)
     const int    MAX_REPEAT_FAILS       = 3;
     // ─────────────────────────────────────────────────────────────────────────
 
+    publishState("IDLE");
     while (rclcpp::ok())
     {
         // ── Wait for user input ───────────────────────────────────────────────
@@ -1757,6 +1772,7 @@ int main(int argc, char** argv)
         char cmd_char = line.empty() ? '\n' : line[0];
         if (cmd_char == 'q') break;
         if (cmd_char == 'h') {
+            publishState("HOMING");
             returnHome(arm, gripper_client);
             std::cout << "\nReturning to Home\n>> ";
             continue;
@@ -1796,6 +1812,7 @@ int main(int argc, char** argv)
 
         // ── Move home first so camera has a clear view ────────────────────────
         RCLCPP_INFO(LOGGER, "Moving home to clear camera view...");
+        publishState("HOMING");
         returnHome(arm, gripper_client);
 
         // ── Reactive per-object pick loop ─────────────────────────────────────
@@ -1825,6 +1842,7 @@ int main(int argc, char** argv)
             }
 
             // Step 2 — wait for next perception message
+            publishState("WAITING");
             auto deadline = std::chrono::steady_clock::now()
                           + std::chrono::seconds(PERCEPTION_TIMEOUT_SEC);
             while (!objects_fresh.load() && rclcpp::ok())
@@ -1934,6 +1952,7 @@ int main(int argc, char** argv)
                     RCLCPP_INFO(LOGGER, "Pick %d succeeded — returning home", object_counter);
                     has_last_fail     = false;
                     repeat_fail_count = 0;
+                    publishState("HOMING");
                     returnHome(arm, gripper_client);
                     break;
 
@@ -1951,6 +1970,7 @@ int main(int argc, char** argv)
                     has_last_fail = true;
                     RCLCPP_WARN(LOGGER,
                         "Grasp failed — returning home and retrying with fresh perception");
+                    publishState("HOMING");
                     returnHome(arm, gripper_client);
                     break;
 
@@ -1963,7 +1983,10 @@ int main(int argc, char** argv)
         pick_loop_done:
         RCLCPP_INFO(LOGGER,
             "Pick sequence complete. %d objects processed.", object_counter);
+        publishState("DONE");
+        publishState("HOMING");
         returnHome(arm, gripper_client);
+        publishState("IDLE");
     }
 
     rclcpp::shutdown();

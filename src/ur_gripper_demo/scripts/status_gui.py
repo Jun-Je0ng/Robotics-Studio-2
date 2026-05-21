@@ -31,6 +31,19 @@ C = {
     'purple':  '#bc8cff',
 }
 
+# State diagram — ordered pick-place stages
+_SD_STATES = [
+    ("IDLE",         "IDLE",   C['muted']),
+    ("HOMING",       "HOME",   C['blue']),
+    ("WAITING",      "WAIT",   C['cyan']),
+    ("PREGRASP",     "PICK",   C['yellow']),
+    ("GRASPING",     "GRASP",  C['orange']),
+    ("RAISING",      "RAISE",  C['cyan']),
+    ("TRANSPORTING", "PLACE",  C['cyan']),
+    ("DONE",         "DONE",   C['green']),
+]
+_SD_IDX = {k: i for i, (k, _, _) in enumerate(_SD_STATES)}
+
 
 class StatusGui(Node):
     def __init__(self):
@@ -40,6 +53,8 @@ class StatusGui(Node):
         self.jog_thread = None
 
         self._latest_detections = []
+        self._sd_cur = 0
+        self._sd_failed = False
 
         self.cmd_pub = self.create_publisher(String, "/motion_system/command", 10)
 
@@ -82,6 +97,7 @@ class StatusGui(Node):
         self.root.bind("<Escape>", lambda e: self._exit_fullscreen())
 
         self.root.after(100, self._spin_ros)
+        self.root.after(300, self._redraw_state_diagram)
         self.root.protocol("WM_DELETE_WINDOW", self._on_close)
 
     # ── Header ────────────────────────────────────────────────────────────────
@@ -201,6 +217,8 @@ class StatusGui(Node):
         self._state_card = self._status_card(cards, "ROBOT",    "Idle",    col=1)
         self._obj_card   = self._status_card(cards, "OBJECT",   "—",       col=2)
         self._seq_card   = self._status_card(cards, "SEQUENCE", "—",       col=3)
+
+        self._build_state_diagram(p)
 
         # ── Log header ────────────────────────────────────────────
         lhdr = tk.Frame(p, bg=C['bg'])
@@ -406,6 +424,59 @@ class StatusGui(Node):
                  bg=C['card'], fg=C['muted'],
                  justify=tk.LEFT).pack(anchor="w", pady=(4, 0))
 
+    # ── State diagram ─────────────────────────────────────────────────────────
+
+    def _build_state_diagram(self, parent):
+        frame = tk.Frame(parent, bg=C['card'], padx=6, pady=8)
+        frame.pack(fill=tk.X, pady=(0, 10))
+        tk.Label(frame, text="PICK-PLACE CYCLE",
+                 font=("Helvetica", 7, "bold"),
+                 bg=C['card'], fg=C['muted']).pack(anchor='w', pady=(0, 6))
+        self._sd_canvas = tk.Canvas(
+            frame, bg=C['card'], height=68, highlightthickness=0)
+        self._sd_canvas.pack(fill=tk.X)
+        self._sd_canvas.bind("<Configure>", lambda *_: self._redraw_state_diagram())
+
+    def _redraw_state_diagram(self):
+        c = self._sd_canvas
+        W = c.winfo_width()
+        if W < 20:
+            return
+        c.delete("all")
+        n = len(_SD_STATES)
+        R  = 9
+        cy = 26
+        ly = cy + R + 5
+        xs = [int(W * (i + 0.5) / n) for i in range(n)]
+
+        # Connecting lines
+        for i in range(n - 1):
+            c.create_line(xs[i] + R, cy, xs[i + 1] - R, cy,
+                          fill=C['muted'] if i < self._sd_cur else C['border'],
+                          width=2)
+
+        # Nodes
+        for i in range(n):
+            label, color = _SD_STATES[i][1], _SD_STATES[i][2]
+            x = xs[i]
+            is_cur  = (i == self._sd_cur)
+            is_past = (i < self._sd_cur)
+
+            if is_cur and self._sd_failed:
+                fill, out, lc = C['red'],    C['red'],    C['red']
+            elif is_cur:
+                fill, out, lc = color,       color,       color
+            elif is_past:
+                fill, out, lc = C['border'], C['border'], C['muted']
+            else:
+                fill, out, lc = C['card'],   C['border'], C['muted']
+
+            c.create_oval(x - R, cy - R, x + R, cy + R,
+                          fill=fill, outline=out, width=2)
+            fw = "bold" if is_cur else "normal"
+            c.create_text(x, ly, text=label, anchor='n',
+                          font=("Helvetica", 7, fw), fill=lc)
+
     # ── E-Stop bar ────────────────────────────────────────────────────────────
 
     def _build_estop_bar(self):
@@ -540,6 +611,16 @@ class StatusGui(Node):
                 C['blue']   if "plac" in s.lower() else \
                 C['green']  if "grip" in s.lower() else C['text']
         self._state_card.config(text=s, fg=color)
+        self._update_state_diagram(s)
+
+    def _update_state_diagram(self, state: str):
+        if state == "FAILED":
+            self._sd_failed = True
+        else:
+            self._sd_failed = False
+            if state in _SD_IDX:
+                self._sd_cur = _SD_IDX[state]
+        self._redraw_state_diagram()
 
     def _cb_mot_status(self, msg):
         s = msg.data
