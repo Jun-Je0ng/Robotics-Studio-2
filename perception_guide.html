@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Perception Subsystem — Technical Guide</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    color: #1a1a1a;
+    background: #fff;
+    padding: 40px 50px;
+    max-width: 820px;
+    margin: 0 auto;
+    line-height: 1.65;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    text-align: center;
+    padding: 60px 0 50px 0;
+    border-bottom: 3px solid #1d4ed8;
+    margin-bottom: 36px;
+  }
+  .cover h1 {
+    font-size: 28px;
+    color: #1d4ed8;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+  }
+  .cover .sub {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 6px;
+  }
+  .cover .tag {
+    display: inline-block;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    border-radius: 20px;
+    padding: 3px 14px;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+
+  /* ── Pipeline box ── */
+  .pipeline {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 22px 28px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 2;
+    margin: 18px 0 28px 0;
+  }
+  .pipeline .g { color: #34d399; }
+  .pipeline .b { color: #60a5fa; }
+
+  /* ── Section headings ── */
+  h2 {
+    font-size: 17px;
+    color: #1d4ed8;
+    border-left: 5px solid #1d4ed8;
+    padding-left: 12px;
+    margin: 34px 0 10px 0;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 13px;
+    color: #374151;
+    margin: 18px 0 6px 0;
+    font-weight: 600;
+  }
+
+  /* ── Description box ── */
+  .desc {
+    background: #f8faff;
+    border-left: 4px solid #93c5fd;
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 14px;
+    color: #1e3a5f;
+    font-size: 13px;
+  }
+
+  /* ── Code block ── */
+  pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-radius: 7px;
+    padding: 14px 18px;
+    font-family: 'Courier New', monospace;
+    font-size: 11.5px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin: 0 0 18px 0;
+    page-break-inside: avoid;
+  }
+  .comment { color: #86efac; }
+  .keyword { color: #60a5fa; }
+
+  /* ── Story box ── */
+  .story {
+    background: #fffbeb;
+    border: 2px solid #fbbf24;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 28px 0 0 0;
+    font-size: 13.5px;
+    line-height: 1.8;
+    color: #1c1917;
+    page-break-inside: avoid;
+  }
+  .story strong {
+    color: #92400e;
+    display: block;
+    font-size: 13px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Step badge ── */
+  .step-badge {
+    display: inline-block;
+    background: #1d4ed8;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    text-align: center;
+    line-height: 24px;
+    font-weight: bold;
+    font-size: 12px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ── Print rules ── */
+  @media print {
+    body { padding: 20px 30px; font-size: 12px; }
+    .cover { padding: 30px 0 30px 0; }
+    .cover h1 { font-size: 24px; }
+    h2 { font-size: 15px; margin-top: 24px; }
+    pre { font-size: 10.5px; }
+    @page { margin: 18mm 15mm; }
+  }
+
+  hr { border: none; border-top: 1px solid #e5e7eb; margin: 30px 0; }
+  p { margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ COVER ═══ -->
+<div class="cover">
+  <h1>Perception Subsystem</h1>
+  <div class="sub">Technical Walkthrough — Robotics Studio 2</div>
+  <div class="sub">UR3e + RealSense D4xx + YOLO OBB</div>
+  <span class="tag">Sprint 2 &nbsp;|&nbsp; Jun Jeong</span>
+</div>
+
+<!-- ═══ PIPELINE ═══ -->
+<h2>The Full Pipeline</h2>
+<div class="pipeline">
+<span class="g">RealSense Camera</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="g">RGB Frame + Depth Frame</span> <span class="b">← aligned so pixels match exactly</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="g">YOLO OBB Model</span> <span class="b">→ class, confidence, center pixel, angle</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="g">Depth Sampling (median kernel)</span> <span class="b">→ depth in metres at object center</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="g">Deprojection</span> <span class="b">→ pixel + depth → 3D point in camera space</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="g">Calibration Matrix T</span> <span class="b">→ camera space → robot base_link space</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="g">Temporal Smoothing</span> <span class="b">→ average last 5 positions, kill jitter</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="g">Stability Gate</span> <span class="b">→ 5 consecutive frames required, else reject</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="g">JSON → /plastic_detections</span> <span class="b">→ translator → /perception/objects → robot</span>
+</div>
+
+<hr>
+
+<!-- ═══ PART 1 ═══ -->
+<h2><span class="step-badge">1</span>See It — Camera Setup &amp; Alignment</h2>
+
+<div class="desc">
+  The RealSense is two cameras in one body — an RGB sensor for colour and a separate depth sensor for distance. Because they sit a few centimetres apart, they see slightly different angles. Without alignment, the depth pixel at (300, 200) would belong to a different real-world point than the colour pixel at (300, 200). <code>rs.align</code> warps the depth image to sit exactly on top of the colour image so every pixel matches.
+</div>
+
+<pre><span class="comment"># lines 180-181 — start both cameras: colour and depth at 640×480, 30fps</span>
+cfg.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+cfg.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+
+<span class="comment"># line 185 — set up alignment once at startup (applied every frame below)</span>
+self.align = rs.align(rs.stream.color)
+
+<span class="comment"># line 188 — save camera lens properties (focal length, centre point)</span>
+<span class="comment">#            needed later to convert pixels into real-world distances</span>
+self.intrinsics = depth_profile.as_video_stream_profile().get_intrinsics()
+
+<span class="comment"># line 226 — every frame: run alignment so depth matches colour exactly</span>
+aligned     = self.align.process(frames)
+depth_frame = aligned.get_depth_frame()
+color_frame = aligned.get_color_frame()</pre>
+
+<!-- ═══ PART 2 ═══ -->
+<h2><span class="step-badge">2</span>Recognise It — YOLO OBB Detection</h2>
+
+<div class="desc">
+  A standard bounding box is always axis-aligned — useless for knowing which way a bottle is pointing. Oriented Bounding Box (OBB) draws a rotated rectangle that fits tightly at any angle and returns that angle. The model was trained on images of your specific plastic types. Anything below 70% confidence is dropped before any further processing.
+</div>
+
+<pre><span class="comment"># line 235 — feed colour image into AI, get back oriented bounding boxes</span>
+results = self.model(color_img, verbose=False, imgsz=640, device='cpu')[0]
+
+<span class="comment"># line 245-247 — reject weak detections immediately (threshold = 0.7)</span>
+conf = float(obb_box.conf[0])
+if conf &lt; CONF_THRESHOLD:
+    continue
+
+<span class="comment"># line 249-250 — get the class name: "pet_bottle", "hdpe_bottle", "fabric"…</span>
+cls_id   = int(obb_box.cls[0])
+cls_name = self.model.names[cls_id]
+
+<span class="comment"># line 253-258 — unpack the OBB: center pixel, size in pixels, angle</span>
+cx, cy    = int(xywhr[0]), int(xywhr[1])   <span class="comment"># object center in image</span>
+w_px      = float(xywhr[2])               <span class="comment"># width in pixels</span>
+h_px      = float(xywhr[3])               <span class="comment"># height in pixels</span>
+angle_rad = float(xywhr[4])               <span class="comment"># rotation angle in radians</span></pre>
+
+<!-- ═══ PART 3 ═══ -->
+<h2><span class="step-badge">3</span>Locate It — Depth, Deprojection &amp; Robot Transform</h2>
+
+<div class="desc">
+  This is the core of perception — turning a 2D pixel into a 3D coordinate the robot arm can move to. Three sub-steps: read the depth at the detection centre (using a median to reject noise), convert pixel + depth into a 3D camera-frame point, then multiply by a pre-calibrated 4×4 matrix to land it in the robot's coordinate system. The matrix was computed by placing 4 ArUco markers at known robot positions and solving for the transform.
+</div>
+
+<pre><span class="comment"># line 261 — sample depth at object center using 11×11 median kernel</span>
+depth_m = get_median_depth(depth_frame, cx, cy)
+
+<span class="comment"># inside get_median_depth (lines 67-72):</span>
+arr    = np.asanyarray(depth_frame.get_data())
+region = arr[y0:y1, x0:x1]            <span class="comment"># crop the 11×11 region</span>
+valid  = region[region > 0]            <span class="comment"># throw away zero/invalid pixels</span>
+return float(np.median(valid)) / 1000.0   <span class="comment"># median of good pixels, mm → metres</span>
+
+<span class="comment"># line 265-270 — spike filter: if depth jumps >5 cm it is noise, keep old value</span>
+if abs(depth_m - prev) > DEPTH_JUMP_THRESHOLD:
+    depth_m = prev
+
+<span class="comment"># line 273 — deproject: pixel + depth → 3D point in camera's coordinate frame</span>
+cam_xyz = deproject(self.intrinsics, cx, cy, depth_m)
+
+<span class="comment"># line 274 — apply calibration matrix: camera frame → robot base_link frame</span>
+raw_robot = camera_to_robot(self.T, cam_xyz)
+
+<span class="comment"># inside camera_to_robot (lines 81-83):</span>
+p = np.array([cx, cy, cz, 1.0])   <span class="comment"># 1.0 added so translation works in the multiply</span>
+r = T @ p                          <span class="comment"># 4×4 matrix × 4D vector = robot XYZ</span></pre>
+
+<!-- ═══ PART 4 ═══ -->
+<h2><span class="step-badge">4</span>Trust It — Smoothing &amp; Stability Gating</h2>
+
+<div class="desc">
+  Even with good depth, the 3D position still jitters a few millimetres frame-to-frame — just sensor noise. Temporal smoothing fixes this by averaging the last 5 readings. Stability gating solves a different problem: a shadow, reflection, or passing hand can fool YOLO for one frame. You wait for 5 consecutive detections before telling the robot anything. One missed frame resets the counter to zero.
+</div>
+
+<pre><span class="comment"># lines 277-283 — rolling window: keep last 5 positions, average them</span>
+self.pose_histories[cls_name] = deque(maxlen=5)
+self.pose_histories[cls_name].append(raw_robot)
+x_smooth = float(np.mean([p["x"] for p in hist])) * 1000   <span class="comment"># smooth X in mm</span>
+y_smooth = float(np.mean([p["y"] for p in hist])) * 1000   <span class="comment"># smooth Y in mm</span>
+
+<span class="comment"># lines 374-380 — per-class counter: count up if seen, reset if missed</span>
+if cls_name in seen_this_frame:
+    self.detection_counts[cls_name] += 1
+else:
+    self.detection_counts[cls_name] = 0   <span class="comment"># one miss wipes the entire streak</span>
+
+<span class="comment"># lines 384-387 — only pass to robot once 5 consecutive frames reached</span>
+if count >= STABILITY_FRAMES and cls_name in current_detections:
+    stable.append(current_detections[cls_name])</pre>
+
+<!-- ═══ PART 5 ═══ -->
+<h2><span class="step-badge">5</span>Describe It — Dimensions, Height &amp; Orientation</h2>
+
+<div class="desc">
+  Position alone is not enough — the robot needs to know how big the object is (to set gripper width), how tall it is (to know how deep to reach), and which way it is facing (to align the gripper fingers along the long axis). Height is measured by comparing the depth of the table surface just outside the bounding box against the depth of the object top — the difference is the physical height. Orientation comes from the OBB angle, but it must be negated because the image Y-axis points downward while the robot Y-axis points forward — they are mirrored.
+</div>
+
+<pre><span class="comment"># lines 291-293 — convert pixel dimensions to real mm using focal length + depth</span>
+fx    = self.intrinsics.fx
+dx_mm = pixels_to_mm(w_px, depth_m, fx)   <span class="comment"># real-world length</span>
+dy_mm = pixels_to_mm(h_px, depth_m, fx)   <span class="comment"># real-world width</span>
+
+<span class="comment"># inside pixels_to_mm (line 100) — pinhole camera formula:</span>
+return (pixels / focal_length) * depth_m * 1000.0
+
+<span class="comment"># lines 297-299 — measure height: sample table depth in 4 directions outside box</span>
+dz_mm, dz_source = compute_height_from_depth(
+    depth_frame, cx, cy, w_px / 2, h_px / 2, depth_m
+)
+<span class="comment"># inside (lines 133-137): height = depth_table - depth_object</span>
+<span class="comment">#   table is farther from camera → bigger depth value → positive difference = height</span>
+
+<span class="comment"># line 302 — convert angle to quaternion (3D rotation format used by ROS)</span>
+quaternion = angle_to_quaternion(angle_rad)
+<span class="comment"># inside (line 89): negate angle to fix image Y-axis mirror vs robot Y-axis</span>
+r = Rotation.from_euler('z', -angle_rad)</pre>
+
+<hr>
+
+<!-- ═══ STORY ═══ -->
+<div class="story">
+  <strong>The Whole Story — One Paragraph</strong>
+  The RealSense camera gives you two images every frame — colour and depth — which are physically offset from each other and must be aligned before anything else. Once aligned, the colour image goes into a YOLO OBB model which draws a tight rotated box around each plastic object and tells you its class, confidence, pixel position, and angle. The depth value at that pixel is read using a median kernel to reject noise, then filtered again to remove sudden spikes between frames. That depth plus the pixel position is deprojected into a 3D point in the camera's coordinate space, then multiplied by a pre-calibrated 4×4 matrix to land it in the robot's coordinate space. The position is smoothed over 5 frames to kill jitter, and the detection must appear in 5 consecutive frames before anything is published — so reflections and false positives never reach the robot. On top of position, the system also computes the object's real-world length and width by scaling pixels using the focal length, measures its height from the depth difference between the table and the object top, and converts the rotation angle into a quaternion — negated to fix the Y-axis mirror between camera and robot. The result is a complete 3D description — position, orientation, and dimensions — published over ROS for the robot to act on.
+</div>
+
+</body>
+</html>

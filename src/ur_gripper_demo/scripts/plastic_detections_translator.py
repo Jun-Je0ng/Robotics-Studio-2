@@ -173,11 +173,11 @@ class PlasticDetectionsTranslator(Node):
             pose.position.y = TRAY_Y_MIN; clamped = True
         if TRAY_Y_MAX is not None and pose.position.y > TRAY_Y_MAX:
             pose.position.y = TRAY_Y_MAX; clamped = True
-        if clamped:
-            self.get_logger().warn(
-                f'  {ml_class} clamped to tray bounds: '
-                f'({pose.position.x:.3f}, {pose.position.y:.3f})'
-            )
+        # if clamped:
+        #     self.get_logger().warn(
+        #         f'  {ml_class} clamped to tray bounds: '
+        #         f'({pose.position.x:.3f}, {pose.position.y:.3f})'
+        #     )
 
         # ── Build message ─────────────────────────────────────────────────────
         obj = Object()
