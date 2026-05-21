@@ -54,8 +54,8 @@ import threading
 # CONFIG
 # ──────────────────────────────────────────────────────────────────────────────
 
-MODEL_PATH       = "/home/billy/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/best.pt"
-CALIBRATION_FILE = "/home/billy/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/camera_to_robot_calibration.json"
+MODEL_PATH       = "/home/jun/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/best.pt"
+CALIBRATION_FILE = "/home/jun/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/camera_to_robot_calibration.json"
 
 DEPTH_KERNEL_SIZE    = 11
 SMOOTHING_WINDOW     = 5
@@ -560,7 +560,7 @@ class OBBDetectorImproved(Node):
                     "dz_source":     dz_source,
                     "track_id":      track.track_id,
                     "track_age":     track.detection_count,
-                    "xy_method":     "homography" if self.H else "ray",
+                    "xy_method":     "homography" if self.H is not None else "ray",
                     "sample_point":  "bottom_edge",
                     "bottom_px":     [bx, by],
                 }

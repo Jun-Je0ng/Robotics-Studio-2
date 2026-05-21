@@ -20,8 +20,6 @@
 #include <tf2_ros/transform_listener.h>
 #include <geometric_shapes/shapes.h>
 #include <geometric_shapes/shape_operations.h>
-#include <moveit/robot_trajectory/robot_trajectory.h>
-#include <moveit/trajectory_processing/iterative_time_parameterization.h>
 
 #include <geometry_msgs/msg/wrench_stamped.hpp>
 
@@ -44,7 +42,7 @@ const std::string GRIPPER_GROUP = "ur_onrobot_gripper";
 const double PREGRASP_HEIGHT    = 0.03;   // metres above object centre
 const double GRIPPER_OPEN       = 0.110;
 const double GRIPPER_CLOSED     = 0.001;
-const double SAFE_Z_HEIGHT      = 0.10;
+const double SAFE_Z_HEIGHT      = 0.10;   // reduced from 0.30 — UR3e workspace limit at tray XY coords is ~0.24m; 0.35m was unreachable
 
 // RG2 physical limits
 const double RG2_MAX_SPAN       = 0.110;  // metres
@@ -585,7 +583,11 @@ void returnHome(
     arm.setNamedTarget("up");
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     if (arm.plan(plan) == moveit::core::MoveItErrorCode::SUCCESS)
+    {
+        arm.setMaxVelocityScalingFactor(0.03);
+        arm.setMaxAccelerationScalingFactor(0.03);
         arm.execute(plan);
+    }
     openGripper(gripper_client, 0.088);
 }
 
@@ -599,9 +601,20 @@ void spawnCollisionObject(
     co.header.frame_id = frame_id;
     co.operation       = moveit_msgs::msg::CollisionObject::ADD;
 
+    // Cap each dimension so a long/thick object collision box cannot
+    // intersect the robot arm during raise.  Objects are confirmed flat
+    // (≤5 cm height) so clamp z; x/y capped at 0.15 m so the box
+    // doesn't reach the forearm when the object is attached horizontally.
+    const double MAX_DIM   = 0.15;   // m — max footprint dimension
+    const double MAX_Z_DIM = 0.05;   // m — max height (flat objects only)
+
+    double dx = std::min(obj.dimensions[0] - RG2_FINGER_MARGIN, MAX_DIM);
+    double dy = std::min(obj.dimensions[1] - RG2_FINGER_MARGIN, MAX_DIM);
+    double dz = std::min(obj.dimensions[2],                      MAX_Z_DIM);
+
     shape_msgs::msg::SolidPrimitive box;
     box.type       = shape_msgs::msg::SolidPrimitive::BOX;
-    box.dimensions = {obj.dimensions[0] - RG2_FINGER_MARGIN, obj.dimensions[1] - RG2_FINGER_MARGIN, obj.dimensions[2]};
+    box.dimensions = {dx, dy, dz};
 
     co.primitives.push_back(box);
     co.primitive_poses.push_back(obj.pose);
@@ -609,9 +622,7 @@ void spawnCollisionObject(
     psi.addCollisionObjects({co});
 
     RCLCPP_INFO(LOGGER, "Spawned '%s'  [%.3f x %.3f x %.3f]  class=%s",
-        id.c_str(),
-        obj.dimensions[0] - 0.02, obj.dimensions[1] - 0.02, obj.dimensions[2],
-        obj.classification.c_str());
+        id.c_str(), dx, dy, dz, obj.classification.c_str());
 }
 
 // void spawnCollisionObject(
@@ -840,7 +851,11 @@ bool moveToPregrasp(
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     bool ok = (arm.plan(plan) == moveit::core::MoveItErrorCode::SUCCESS);
     if (ok)
+    {
+        arm.setMaxVelocityScalingFactor(0.03);
+        arm.setMaxAccelerationScalingFactor(0.03);
         arm.execute(plan);
+    }
     else
         RCLCPP_WARN(LOGGER, "Pregrasp plan failed for '%s'", r.id.c_str());
 
@@ -853,6 +868,8 @@ void attachObject(
 
     std::vector<std::string> touch_links = {
         "wrist_3_link",
+        "wrist_2_link",
+        "wrist_1_link",
         "tool0",
         // RG2 gripper
         "onrobot_base_link",
@@ -894,26 +911,6 @@ void removeObject(
 }
 
 
-// bool moveCartesian(
-//     moveit::planning_interface::MoveGroupInterface& arm,
-//     const geometry_msgs::msg::Pose& target,
-//     double max_step = 0.002,
-//     double min_fraction = 0.9){
-//     std::vector<geometry_msgs::msg::Pose> waypoints{target};
-//     moveit_msgs::msg::RobotTrajectory traj;
-//     double fraction = arm.computeCartesianPath(waypoints, max_step, 0.0, traj);
-
-//     if (fraction < min_fraction)
-//     {
-//         RCLCPP_ERROR(LOGGER, "Cartesian path only %.0f%% complete", fraction * 100.0);
-//         return false;
-//     }
-
-//     moveit::planning_interface::MoveGroupInterface::Plan plan;
-//     plan.trajectory_ = traj;
-//     return arm.execute(plan) == moveit::core::MoveItErrorCode::SUCCESS;
-// }
-
 bool moveCartesian(
     moveit::planning_interface::MoveGroupInterface& arm,
     const geometry_msgs::msg::Pose& target,
@@ -928,14 +925,6 @@ bool moveCartesian(
         RCLCPP_ERROR(LOGGER, "Cartesian path only %.0f%% complete", fraction * 100.0);
         return false;
     }
-
-    // computeCartesianPath does not inherit setMaxVelocityScalingFactor —
-    // manually apply time parametrization so joint velocities respect the 0.03 limit.
-    robot_trajectory::RobotTrajectory rt(arm.getRobotModel(), arm.getName());
-    rt.setRobotTrajectoryMsg(*arm.getCurrentState(), traj);
-    trajectory_processing::IterativeParabolicTimeParameterization iptp;
-    iptp.computeTimeStamps(rt, 0.03, 0.03);
-    rt.getRobotTrajectoryMsg(traj);
 
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     plan.trajectory_ = traj;
@@ -995,6 +984,8 @@ bool moveToPose(
 
     RCLCPP_INFO(LOGGER, "Executing lowest-cost plan (cost=%.3f) out of %d attempts",
                 best_cost, num_attempts);
+    arm.setMaxVelocityScalingFactor(0.03);
+    arm.setMaxAccelerationScalingFactor(0.03);
     return arm.execute(best_plan) == moveit::core::MoveItErrorCode::SUCCESS;
 }
 
@@ -1045,14 +1036,12 @@ bool executeTopDownGrasp(
             continue;
         }
 
-        // Raise
+        // Raise — use motion planning (not Cartesian) so the planner can route
+        // around the attached collision object if it would intersect the arm
+        // on a straight vertical path.
         geometry_msgs::msg::Pose raise_pose = grasp_pose;
-        raise_pose.position.z = r.obj.pose.position.z
-                              + (r.obj.dimensions[2] / 2.0)
-                              + PREGRASP_HEIGHT
-                              - fingerExtension(r.grasp.grip_width);
-        raise_pose.position.z = r.obj.pose.position.z
-                              + SAFE_Z_HEIGHT;
+        raise_pose.position.z = r.obj.pose.position.z + SAFE_Z_HEIGHT;
+
                               
         if (!moveCartesian(arm, raise_pose))
         {
@@ -1061,7 +1050,7 @@ bool executeTopDownGrasp(
             detachObject(arm, r.id);
             continue;
         }
-
+        
         RCLCPP_INFO(LOGGER, "Grasp succeeded on attempt %d", attempt);
         return true;
     }
@@ -1453,10 +1442,10 @@ PickResult processOneObject(
     bool grasped = false;
     if (r.grasp.strategy == GraspStrategy::TOP_DOWN)
         grasped = executeTopDownGrasp(arm, gripper_client, r, node);
-    else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL)
-        grasped = executeSideHorizontalGrasp(arm, gripper_client, r, node);
-    else if (r.grasp.strategy == GraspStrategy::SIDE_VERTICAL)
-        grasped = executeSideVerticalGrasp(arm, gripper_client, psi, r, node);
+    // else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL)
+    //     grasped = executeSideHorizontalGrasp(arm, gripper_client, r, node);
+    // else if (r.grasp.strategy == GraspStrategy::SIDE_VERTICAL)
+    //     grasped = executeSideVerticalGrasp(arm, gripper_client, psi, r, node);
     else
     {
         RCLCPP_WARN(LOGGER, "Unknown strategy — skipping '%s'", r.id.c_str());
@@ -1670,10 +1659,14 @@ int main(int argc, char** argv)
     moveit::planning_interface::MoveGroupInterface arm(node, ARM_GROUP);
     moveit::planning_interface::PlanningSceneInterface psi;
 
-    arm.setPlannerId("BiTRRTkConfigDefault");
-    arm.setMaxVelocityScalingFactor(0.05);
-    arm.setMaxAccelerationScalingFactor(0.05);
-    arm.setPlanningTime(3.0);
+    // RRTConnect produces cleaner trajectory waypoints than BiTRRT.
+    // BiTRRT occasionally places waypoints so close together that TOTG
+    // time-parameterisation allocates near-zero time intervals, causing
+    // the UR driver to report "velocity NNN required in 0.002 seconds".
+    arm.setPlannerId("RRTConnectkConfigDefault");
+    arm.setMaxVelocityScalingFactor(0.03);
+    arm.setMaxAccelerationScalingFactor(0.03);
+    arm.setPlanningTime(5.0);
     arm.setGoalJointTolerance(0.01);
     arm.setGoalOrientationTolerance(0.01);
     arm.setGoalPositionTolerance(0.005);
@@ -1736,6 +1729,10 @@ int main(int argc, char** argv)
         if (cmd_char == 'h') {
             returnHome(arm, gripper_client);
             std::cout << "\nReturning to Home\n>> ";
+            continue;
+        }
+        if (cmd_char == 'b') {
+            std::cout << "\nRemoving object data\n>> ";
             continue;
         }
 

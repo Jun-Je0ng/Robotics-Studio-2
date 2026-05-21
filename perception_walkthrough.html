@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perception Subsystem — Technical Walkthrough</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 30px 60px 30px;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.7;
+  }
+  h1 {
+    font-size: 2em;
+    border-bottom: 3px solid #2563eb;
+    padding-bottom: 10px;
+    color: #1e3a8a;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    color: #555;
+    font-size: 0.95em;
+    margin-bottom: 32px;
+  }
+  h2 {
+    font-size: 1.35em;
+    color: #1e3a8a;
+    border-left: 5px solid #2563eb;
+    padding-left: 12px;
+    margin-top: 44px;
+  }
+  h3 {
+    font-size: 1.05em;
+    color: #374151;
+    margin-top: 28px;
+    margin-bottom: 6px;
+  }
+  .pipeline {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 24px 32px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.92em;
+    line-height: 1.9;
+    margin: 20px 0;
+  }
+  .pipeline .arrow { color: #60a5fa; }
+  .pipeline .label { color: #34d399; }
+  pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-size: 0.88em;
+    line-height: 1.6;
+    margin: 12px 0 20px 0;
+  }
+  code {
+    font-family: 'Courier New', monospace;
+    background: #e5e7eb;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: #1f2937;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px 0;
+    font-size: 0.93em;
+  }
+  th {
+    background: #2563eb;
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #d1d5db;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #f3f4f6; }
+  .say-box {
+    background: #eff6ff;
+    border-left: 4px solid #2563eb;
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 10px 0 18px 0;
+    color: #1e3a8a;
+    font-size: 0.95em;
+  }
+  .say-box strong { display: block; margin-bottom: 4px; color: #1e40af; }
+  .qa-block {
+    background: #f0fdf4;
+    border-left: 4px solid #16a34a;
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 14px 0;
+  }
+  .qa-block .q {
+    font-weight: bold;
+    color: #15803d;
+    margin-bottom: 6px;
+  }
+  .qa-block .a {
+    color: #1f2937;
+  }
+  .step-num {
+    display: inline-block;
+    background: #2563eb;
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    text-align: center;
+    line-height: 28px;
+    font-weight: bold;
+    font-size: 0.9em;
+    margin-right: 8px;
+  }
+  .tier-table th { background: #4f46e5; }
+  .note {
+    background: #fefce8;
+    border-left: 4px solid #ca8a04;
+    padding: 12px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 14px 0;
+    font-size: 0.93em;
+    color: #713f12;
+  }
+  .cmd {
+    background: #0f172a;
+    color: #86efac;
+    font-family: 'Courier New', monospace;
+    padding: 14px 20px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-size: 0.9em;
+  }
+  hr { border: none; border-top: 1px solid #d1d5db; margin: 40px 0; }
+</style>
+</head>
+<body>
+
+<h1>Perception Subsystem — Technical Walkthrough</h1>
+<div class="subtitle">UR3e Robotic Plastic Sorter &nbsp;|&nbsp; Sprint 2 &nbsp;|&nbsp; Jun Jeong</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>What the Perception Subsystem Does</h2>
+
+<p>The perception system takes raw camera data and produces structured 3D information about plastic objects — their <strong>position</strong>, <strong>orientation</strong>, <strong>size</strong>, and <strong>type</strong> — in the robot's coordinate frame, so the robot knows exactly where to reach and how to align its gripper.</p>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>The Full Pipeline</h2>
+
+<div class="pipeline">
+<span class="label">RealSense Camera</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="label">RGB Frame + Depth Frame (aligned)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="label">YOLO OBB Model</span> <span class="arrow">→</span> Oriented Bounding Box (pixel coords + angle + confidence)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="label">Depth Sampling</span> <span class="arrow">→</span> 3D point in camera frame (meters)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="label">Calibration Matrix T</span> <span class="arrow">→</span> 3D point in robot base_link frame<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="label">Temporal Smoothing</span> (5-frame running average)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="label">Stability Gating</span> (must appear 5 consecutive frames)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="label">JSON published on /plastic_detections</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="label">plastic_detections_translator</span> <span class="arrow">→</span> /perception/objects (ObjectArray)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+<span class="label">pick_n_place C++ node</span> <span class="arrow">→</span> MoveIt grasp
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>Step-by-Step Code Walkthrough</h2>
+
+<!-- STEP 1 -->
+<h3><span class="step-num">1</span>Camera Setup <code>obb_detector_node.py lines 173–181</code></h3>
+
+<pre><code>cfg.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+cfg.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+profile = self.pipeline.start(cfg)
+self.align = rs.align(rs.stream.color)</code></pre>
+
+<div class="say-box">
+  <strong>What to say:</strong>
+  The RealSense D4xx has two sensors — an RGB camera and a depth sensor. Depth pixels don't naturally line up with color pixels because the sensors are physically separated. <code>rs.align(rs.stream.color)</code> warps the depth image so every pixel at position (u,v) in the color image has a corresponding depth value. Without this, the depth you read at a detection's center pixel would be from the wrong physical location.
+</div>
+
+<!-- STEP 2 -->
+<h3><span class="step-num">2</span>YOLO OBB Detection <code>lines 227–248</code></h3>
+
+<pre><code>results = self.model(color_img, verbose=False, imgsz=640, device='cpu')[0]
+
+for obb_box in results.obb:
+    conf = float(obb_box.conf[0])
+    if conf &lt; CONF_THRESHOLD:  # 0.7
+        continue
+    xywhr = obb_box.xywhr[0].tolist()
+    cx, cy    = int(xywhr[0]), int(xywhr[1])
+    w_px, h_px = float(xywhr[2]), float(xywhr[3])
+    angle_rad  = float(xywhr[4])</code></pre>
+
+<div class="say-box">
+  <strong>What to say:</strong>
+  We use YOLO with Oriented Bounding Boxes (OBB), not standard axis-aligned boxes. A standard box would waste space and give a wrong rotation for a diagonal bottle. OBB gives us <code>(cx, cy, width, height, angle)</code> — the center pixel, dimensions in pixels, and the rotation angle. We reject detections below 70% confidence to avoid false positives.<br><br>
+  <strong>Why OBB matters:</strong> A regular bounding box around a diagonal bottle would be much larger than the bottle and the angle information would be lost. OBB fits tightly at any angle, which is critical for gripper alignment.
+</div>
+
+<!-- STEP 3 -->
+<h3><span class="step-num">3</span>Depth Measurement <code>lines 251–259</code></h3>
+
+<pre><code>depth_m = get_median_depth(depth_frame, cx, cy)
+
+def get_median_depth(depth_frame, cx, cy, k=11):
+    # Takes 11×11 pixel region around center
+    # Returns median of all non-zero depth values (in meters)
+    return float(np.median(valid)) / 1000.0</code></pre>
+
+<div class="say-box">
+  <strong>What to say:</strong>
+  Raw depth data is noisy — individual pixels can be 0 (no return) or spike to wrong values from reflective surfaces. We take an 11×11 pixel region and use the <strong>median</strong> (not mean) because median is robust to outliers. A single bad pixel won't skew it.<br><br>
+  We also have a spike filter: if the depth jumps by more than 5cm between frames, it's almost certainly noise, so we keep the previous frame's value.
+</div>
+
+<pre><code>if prev is not None and abs(depth_m - prev) &gt; DEPTH_JUMP_THRESHOLD:  # 0.05m
+    depth_m = prev</code></pre>
+
+<!-- STEP 4 -->
+<h3><span class="step-num">4</span>3D Deprojection <code>line 263</code></h3>
+
+<pre><code>cam_xyz = deproject(self.intrinsics, cx, cy, depth_m)
+# calls rs.rs2_deproject_pixel_to_point internally</code></pre>
+
+<div class="say-box">
+  <strong>What to say:</strong>
+  Given pixel (u, v) and depth d, the 3D camera-frame point is:<br>
+  &nbsp;&nbsp;X_cam = (u − cx_principal) × d / fx<br>
+  &nbsp;&nbsp;Y_cam = (v − cy_principal) × d / fy<br>
+  &nbsp;&nbsp;Z_cam = d<br><br>
+  The intrinsics (focal lengths fx, fy and principal point cx, cy) come from the camera's factory calibration, retrieved at startup from the RealSense SDK.
+</div>
+
+<!-- STEP 5 -->
+<h3><span class="step-num">5</span>Camera → Robot Transform <code>lines 76–79</code></h3>
+
+<pre><code>def camera_to_robot(T, cam_xyz):
+    p = np.array([cam_xyz[0], cam_xyz[1], cam_xyz[2], 1.0])
+    r = T @ p
+    return {"x": float(r[0]), "y": float(r[1]), "z": float(r[2])}</code></pre>
+
+<div class="say-box">
+  <strong>What to say:</strong>
+  The camera sits above the robot and looks down. The camera has its own coordinate frame (X right, Y down, Z forward into scene). The robot's <code>base_link</code> frame is different. We calibrated a 4×4 homogeneous transform matrix <strong>T</strong> by placing 4 ArUco markers at known robot-frame positions, detecting them in the camera, and solving for T using least-squares. Now we just multiply: <code>robot_point = T @ camera_point</code>. The <code>1.0</code> appended makes it a homogeneous coordinate so translation is included in the matrix multiplication.
+</div>
+
+<!-- STEP 6 -->
+<h3><span class="step-num">6</span>Temporal Smoothing <code>lines 267–274</code></h3>
+
+<pre><code>if cls_name not in self.pose_histories:
+    self.pose_histories[cls_name] = deque(maxlen=SMOOTHING_WINDOW)  # 5 frames
+self.pose_histories[cls_name].append(raw_robot)
+hist = self.pose_histories[cls_name]
+
+x_smooth = float(np.mean([p["x"] for p in hist])) * 1000
+y_smooth = float(np.mean([p["y"] for p in hist])) * 1000</code></pre>
+
+<div class="say-box">
+  <strong>What to say:</strong>
+  Even after median depth, there's still frame-to-frame jitter in the 3D position (a few millimeters). We keep a rolling window of the last 5 readings and average them. This smooths out jitter without adding much latency — only 5 frames × 100ms = 0.5s.
+</div>
+
+<!-- STEP 7 -->
+<h3><span class="step-num">7</span>Height Measurement <code>lines 97–139</code></h3>
+
+<pre><code>def compute_height_from_depth(depth_frame, cx, cy, w_px, h_px, depth_object):
+    margin = 1.1  # 10% beyond the bounding box edge
+    candidates = [
+        (int(cx + w_px * margin), cy),   # right of object
+        (int(cx - w_px * margin), cy),   # left
+        (cx, int(cy + h_px * margin)),   # below
+        (cx, int(cy - h_px * margin)),   # above
+    ]
+    table_depths = [get_median_depth(depth_frame, tx, ty, k=7) for ...]
+    depth_table  = float(np.median(table_depths))
+    height_mm    = (depth_table - depth_object) * 1000.0</code></pre>
+
+<div class="say-box">
+  <strong>What to say:</strong>
+  The camera looks straight down. The table surface is <em>farther</em> from the camera (larger depth value). The object top is <em>closer</em> (smaller depth value). So:<br>
+  &nbsp;&nbsp;<strong>height = depth_table − depth_object</strong><br><br>
+  We sample the table in 4 directions just outside the object's footprint (10% beyond the bounding box edge) and take the median to avoid accidentally sampling the object itself. We validate the result: if height is outside 5–400mm it's rejected as failed. This works for any object orientation because it's purely a vertical measurement.
+</div>
+
+<!-- STEP 8 -->
+<h3><span class="step-num">8</span>Orientation (Angle → Quaternion) <code>lines 81–91</code></h3>
+
+<pre><code>def angle_to_quaternion(angle_rad):
+    # Negate: image Y (downward) maps to robot -Y, so angles are mirrored
+    r = Rotation.from_euler('z', -angle_rad)
+    q = r.as_quat()  # [x, y, z, w]</code></pre>
+
+<div class="say-box">
+  <strong>What to say:</strong>
+  YOLO gives us the OBB angle in image coordinates. The image Y-axis points <strong>downward</strong>, but the robot's Y-axis points <strong>forward</strong> (away from base). This is a mirror flip. If we didn't negate the angle, the gripper would approach at exactly the wrong angle — perpendicular to the bottle instead of along it. By negating, we convert from image convention to robot convention. We then convert from Euler angle (just rotation around Z) to a quaternion, which is the standard format for 3D orientation in ROS.
+</div>
+
+<!-- STEP 9 -->
+<h3><span class="step-num">9</span>Stability Gating <code>lines 362–385</code></h3>
+
+<pre><code>for cls_name in all_classes:
+    if cls_name in seen_this_frame:
+        self.detection_counts[cls_name] += 1
+    else:
+        self.detection_counts[cls_name] = 0   # reset on miss
+
+# Only publish if seen 5 consecutive frames
+stable = []
+for cls_name, count in self.detection_counts.items():
+    if count &gt;= STABILITY_FRAMES and cls_name in current_detections:
+        stable.append(...)</code></pre>
+
+<div class="say-box">
+  <strong>What to say:</strong>
+  A single-frame detection might be a reflection, shadow, or coincidental feature. We require the object to be detected in <strong>5 consecutive frames</strong> before publishing. If it disappears for even one frame, the counter resets to zero. This means the robot only acts on objects that are genuinely and stably present.
+</div>
+
+<!-- STEP 10 -->
+<h3><span class="step-num">10</span>Translator Node <code>plastic_detections_translator.py</code></h3>
+
+<pre><code># Coordinate frame correction
+pose.position.x = -mm_to_m(pos['x'])                       # mirrored X
+pose.position.y = -mm_to_m(pos['y'])                       # mirrored Y
+pose.position.z =  mm_to_m(pos['z']) + GRIPPER_TCP_OFFSET_M  # fingertip frame
+
+# Apply same Rz(π) to orientation
+pose.orientation.x = -ori['qy']
+pose.orientation.y =  ori['qx']
+pose.orientation.z =  ori['qw']
+pose.orientation.w = -ori['qz']</code></pre>
+
+<div class="say-box">
+  <strong>What to say:</strong>
+  The detector publishes a JSON string for debugging flexibility. The translator converts it to a proper ROS message type (<code>ObjectArray</code>) that the C++ pick-place node consumes. The negative signs on X and Y account for the 180° rotation between the camera frame and the robot base frame — the same flip that caused us to negate the angle in step 8. The Z offset (0.18m) converts from the tool0 frame (where the robot pendant reports position) to the actual gripper fingertip frame.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>How to Run / Test Independently</h2>
+
+<div class="cmd">
+# Terminal 1 — source first<br>
+source /opt/ros/humble/setup.bash<br>
+source install/setup.bash<br>
+<br>
+# Run YOLO detector (camera window will appear)<br>
+ros2 run plastic_detection obb_detector_node
+</div>
+
+<div class="cmd">
+# Terminal 2 — translator<br>
+ros2 run ur_gripper_demo plastic_detections_translator
+</div>
+
+<div class="cmd">
+# Terminal 3 — verify output<br>
+ros2 topic echo /plastic_detections      # raw JSON from detector<br>
+ros2 topic echo /perception/objects      # ObjectArray from translator<br>
+ros2 topic hz /plastic_detections        # check publish rate (~10Hz when stable)
+</div>
+
+<div class="note">
+  Place a plastic bottle under the camera. The camera window shows <strong>"Stabilising..."</strong> in orange while counting up to 5 frames, then switches to <strong>"PUBLISHING"</strong> in green. Both nodes run fully independently — no robot or MoveIt needed.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>Configurable Settings</h2>
+
+<table>
+  <tr><th>Parameter</th><th>Default</th><th>Description</th></tr>
+  <tr><td><code>CONF_THRESHOLD</code></td><td>0.7</td><td>Minimum YOLO confidence to process a detection</td></tr>
+  <tr><td><code>STABILITY_FRAMES</code></td><td>5</td><td>Consecutive frames required before publishing</td></tr>
+  <tr><td><code>SMOOTHING_WINDOW</code></td><td>5</td><td>Frames averaged for position smoothing</td></tr>
+  <tr><td><code>DEPTH_KERNEL_SIZE</code></td><td>11</td><td>Pixel kernel size for median depth sampling</td></tr>
+  <tr><td><code>DEPTH_JUMP_THRESHOLD</code></td><td>0.05 m</td><td>Max frame-to-frame depth change before spike rejection</td></tr>
+  <tr><td><code>GRIP_OFFSET</code></td><td>50 mm</td><td>Height above table for grip pose Z</td></tr>
+  <tr><td><code>APPROACH_OFFSET</code></td><td>150 mm</td><td>Height above table for approach pose Z</td></tr>
+  <tr><td><code>SHOW_DISPLAY</code></td><td>True</td><td>Set False to disable the OpenCV camera window</td></tr>
+  <tr><td><code>GRIPPER_TCP_OFFSET_M</code></td><td>0.180 m</td><td>Offset from tool0 to gripper fingertip (translator)</td></tr>
+  <tr><td><code>MIN_CONFIDENCE</code></td><td>0.50</td><td>Secondary confidence filter in translator</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>Known Limitations</h2>
+
+<ul>
+  <li><strong>One object per class:</strong> The system tracks objects by class name. Two bottles of the same type simultaneously will alias — their readings merge rather than being tracked separately.</li>
+  <li><strong>Top-down camera only:</strong> Height measurement assumes the camera views the surface from above. Angled views produce incorrect readings.</li>
+  <li><strong>Flat table assumed:</strong> The work plane model assumes a roughly flat surface. Significant tilt or curves affect position accuracy.</li>
+  <li><strong>Height below ~8mm unreliable:</strong> The RealSense depth noise floor (~3–5mm) approaches the object height for very flat objects.</li>
+  <li><strong>Reflective/transparent objects:</strong> Clear bottles and shiny metal cause depth drop-outs. The median kernel mitigates but doesn't fully correct this.</li>
+  <li><strong>Fixed calibration:</strong> If the camera is physically moved, the transform matrix must be recalibrated.</li>
+  <li><strong>No occlusion handling:</strong> One object hidden behind another will not be detected.</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>Likely Coach Questions — and How to Answer Them</h2>
+
+<div class="qa-block">
+  <div class="q">Q: Why median depth instead of mean?</div>
+  <div class="a">Median is robust to outliers — zero readings from depth drop-outs or spikes from reflective surfaces. One bad pixel in an 11×11 region doesn't distort the median. Mean would be pulled toward those extremes.</div>
+</div>
+
+<div class="qa-block">
+  <div class="q">Q: Why 5 stability frames?</div>
+  <div class="a">At 10Hz, 5 frames = 0.5 seconds. Long enough to reject transient detections (shadows, reflections), short enough not to add meaningful latency to the pick sequence.</div>
+</div>
+
+<div class="qa-block">
+  <div class="q">Q: Why not use the table-plane model for height?</div>
+  <div class="a">The table plane model (get_table_z) is calibrated for XY position of the work surface only — it tells you where the table is, not how tall the object sitting on it is. The depth-difference approach directly measures the vertical drop without any additional assumptions.</div>
+</div>
+
+<div class="qa-block">
+  <div class="q">Q: How accurate is the height measurement?</div>
+  <div class="a">Typically ±3–5mm for objects taller than ~10mm. Below ~8mm the depth noise floor exceeds the object height, which is why we have the 5mm minimum sanity check — anything below that is reported as failed.</div>
+</div>
+
+<div class="qa-block">
+  <div class="q">Q: Why OBB and not a standard bounding box?</div>
+  <div class="a">Standard boxes don't capture rotation. For gripper alignment we need to know which way the long axis of the bottle points to match the gripper fingers to it. OBB gives us that directly as a rotation angle.</div>
+</div>
+
+<div class="qa-block">
+  <div class="q">Q: Why do you negate the angle in angle_to_quaternion?</div>
+  <div class="a">The image Y-axis points downward, but the robot Y-axis points forward. This is a mirror reflection. Without negating, the gripper would be rotated 90° from where it should be — perpendicular to the bottle instead of aligned with it.</div>
+</div>
+
+<div class="qa-block">
+  <div class="q">Q: How was the camera-to-robot calibration done?</div>
+  <div class="a">We placed 4 ArUco markers at known robot positions measured from the teach pendant. We detected their pixel centres in the camera image. Then we solved for the 4×4 homogeneous transform T (least-squares) that maps those camera coordinates to the known robot coordinates. T is saved as a JSON file and loaded at startup.</div>
+</div>
+
+<div class="qa-block">
+  <div class="q">Q: What happens if two objects of the same class are present?</div>
+  <div class="a">Currently the code tracks by class name, so they alias — a known limitation. The system is designed for one object per class on the table at a time.</div>
+</div>
+
+<div class="qa-block">
+  <div class="q">Q: Why publish JSON on /plastic_detections instead of a typed ROS message directly?</div>
+  <div class="a">JSON lets us debug the raw output with just "ros2 topic echo" without needing the custom message type installed. The translator node then converts it to the proper typed message for downstream consumption.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>Requirement Tier Mapping</h2>
+
+<table class="tier-table">
+  <tr><th>Tier</th><th>Requirement</th><th>Your Evidence</th></tr>
+  <tr>
+    <td><strong>Pass</strong></td>
+    <td>Detect object, publish position</td>
+    <td><code>obb_detector_node</code> publishes 3D position on <code>/plastic_detections</code></td>
+  </tr>
+  <tr>
+    <td><strong>Credit</strong></td>
+    <td>Multiple object classes</td>
+    <td>YOLO model classifies: <code>pet_bottle</code>, <code>hdpe_bottle</code>, <code>fabric</code>, <code>metal</code>, <code>plastic</code></td>
+  </tr>
+  <tr>
+    <td><strong>Distinction</strong></td>
+    <td>Full 3D pose + dimensions</td>
+    <td>OBB angle → quaternion orientation; dx/dy/dz in mm, all published per detection</td>
+  </tr>
+  <tr>
+    <td><strong>High Distinction</strong></td>
+    <td>Robust operation, filtering, works across orientations</td>
+    <td>5-frame stability gate, median depth, spike filter, height from depth-difference (orientation-independent)</td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>The Story to Tell (30-second version)</h2>
+
+<div class="say-box">
+  <strong>Opening line:</strong>
+  "We went from a system that guessed object height from a polynomial table model to one that directly measures it using the depth camera. We also discovered and fixed a coordinate frame mismatch for orientation — the image Y-axis is flipped relative to the robot Y-axis, so every angle was mirrored. After fixing both of these the gripper now aligns correctly and knows exactly how far to close around the object."
+</div>
+
+<hr>
+<p style="color:#9ca3af; font-size:0.85em; text-align:center;">Generated for Sprint 2 technical walkthrough &nbsp;|&nbsp; Robotics Studio 2</p>
+
+</body>
+</html>
