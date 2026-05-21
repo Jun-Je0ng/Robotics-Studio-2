@@ -20,6 +20,8 @@
 #include <tf2_ros/transform_listener.h>
 #include <geometric_shapes/shapes.h>
 #include <geometric_shapes/shape_operations.h>
+#include <moveit/robot_trajectory/robot_trajectory.h>
+#include <moveit/trajectory_processing/iterative_time_parameterization.h>
 
 #include <geometry_msgs/msg/wrench_stamped.hpp>
 
@@ -926,6 +928,12 @@ bool moveCartesian(
         return false;
     }
 
+    robot_trajectory::RobotTrajectory rt(arm.getRobotModel(), arm.getName());
+    rt.setRobotTrajectoryMsg(*arm.getCurrentState(), traj);
+    trajectory_processing::IterativeParabolicTimeParameterization iptp;
+    iptp.computeTimeStamps(rt, 0.03, 0.03);
+    rt.getRobotTrajectoryMsg(traj);
+
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     plan.trajectory_ = traj;
     arm.setMaxVelocityScalingFactor(0.03);
@@ -993,6 +1001,7 @@ bool moveToPose(
 bool executeTopDownGrasp(
     moveit::planning_interface::MoveGroupInterface& arm,
     const GripperActionClient::SharedPtr& gripper_client,
+    moveit::planning_interface::PlanningSceneInterface& psi,
     const ResolvedObject& r,
     rclcpp::Node::SharedPtr node,
     int max_attempts = 3)
@@ -1036,9 +1045,11 @@ bool executeTopDownGrasp(
             continue;
         }
 
-        // Raise — use motion planning (not Cartesian) so the planner can route
-        // around the attached collision object if it would intersect the arm
-        // on a straight vertical path.
+        // Remove collision geometry before raising — the attached box causes
+        // "Invalid goal state" self-collision in the raise configuration.
+        detachObject(arm, r.id);
+        removeObject(psi, r.id);
+
         geometry_msgs::msg::Pose raise_pose = grasp_pose;
         raise_pose.position.z = r.obj.pose.position.z + SAFE_Z_HEIGHT;
 
@@ -1453,7 +1464,7 @@ PickResult processOneObject(
 
     bool grasped = false;
     if (r.grasp.strategy == GraspStrategy::TOP_DOWN)
-        grasped = executeTopDownGrasp(arm, gripper_client, r, node);
+        grasped = executeTopDownGrasp(arm, gripper_client, psi, r, node);
     // else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL)
     //     grasped = executeSideHorizontalGrasp(arm, gripper_client, r, node);
     // else if (r.grasp.strategy == GraspStrategy::SIDE_VERTICAL)
@@ -1704,10 +1715,23 @@ int main(int argc, char** argv)
         RCLCPP_INFO(LOGGER, "Bin poses loaded at startup");
     }
 
+    std::string target_class;  // protected by data_mutex; empty = pick any
+
     auto cmd_sub = node->create_subscription<std_msgs::msg::String>(
         "/motion_system/command", 10,
         [&](const std_msgs::msg::String::SharedPtr msg){
-        handleCommand(msg->data, arm, gripper_client, tf_buffer);
+        const std::string& cmd = msg->data;
+        if (cmd.rfind("TARGET_CLASS:", 0) == 0)
+        {
+            std::lock_guard<std::mutex> lock(data_mutex);
+            target_class = cmd.substr(13);
+            RCLCPP_INFO(LOGGER, "Pick priority set to: '%s'",
+                target_class.empty() ? "any" : target_class.c_str());
+        }
+        else
+        {
+            handleCommand(cmd, arm, gripper_client, tf_buffer);
+        }
     });
 
     placeGround(arm, psi);
@@ -1846,13 +1870,37 @@ int main(int argc, char** argv)
             }
             empty_count = 0;   // reset on any non-empty frame
 
-            // Step 5 — pick the closest object to the robot base (XY distance)
-            auto best = std::min_element(
-                snap.objects.begin(), snap.objects.end(),
-                [](const auto& a, const auto& b) {
-                    return std::hypot(a.pose.position.x, a.pose.position.y)
-                         < std::hypot(b.pose.position.x, b.pose.position.y);
-                });
+            // Step 5 — pick object, prioritising target_class if set
+            std::string current_target;
+            {
+                std::lock_guard<std::mutex> lock(data_mutex);
+                current_target = target_class;
+            }
+
+            auto by_dist = [](const auto& a, const auto& b) {
+                return std::hypot(a.pose.position.x, a.pose.position.y)
+                     < std::hypot(b.pose.position.x, b.pose.position.y);
+            };
+
+            // Try closest object of the preferred type first
+            auto best = snap.objects.end();
+            if (!current_target.empty())
+            {
+                for (auto it = snap.objects.begin(); it != snap.objects.end(); ++it)
+                {
+                    if (it->classification == current_target)
+                    {
+                        if (best == snap.objects.end() || by_dist(*it, *best))
+                            best = it;
+                    }
+                }
+                if (best != snap.objects.end())
+                    RCLCPP_INFO(LOGGER,
+                        "Prioritising '%s' — found match", current_target.c_str());
+            }
+            // Fall back to closest of any type
+            if (best == snap.objects.end())
+                best = std::min_element(snap.objects.begin(), snap.objects.end(), by_dist);
 
             // Step 6 — repeat-fail guard: avoid looping forever on a stuck object
             if (has_last_fail)

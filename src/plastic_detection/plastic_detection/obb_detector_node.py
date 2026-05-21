@@ -19,6 +19,7 @@ Visual:
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
+from sensor_msgs.msg import Image as RosImage
 import json
 import numpy as np
 import pyrealsense2 as rs
@@ -34,8 +35,9 @@ import threading
 # CONFIG
 # ──────────────────────────────────────────────────────────────────────────────
 
-MODEL_PATH       = "/home/billy/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/best.pt"
-CALIBRATION_FILE = "/home/billy/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/camera_to_robot_calibration.json"
+import os as _os
+MODEL_PATH       = _os.path.join(_os.path.dirname(__file__), 'best.pt')
+CALIBRATION_FILE = _os.path.join(_os.path.dirname(__file__), 'camera_to_robot_calibration.json')
 
 DEPTH_KERNEL_SIZE    = 11
 SMOOTHING_WINDOW     = 5
@@ -157,6 +159,7 @@ class OBBDetectorNode(Node):
         super().__init__('obb_detector_node')
 
         self.publisher_ = self.create_publisher(String, 'plastic_detections', 10)
+        self.image_pub_ = self.create_publisher(RosImage, '/camera/annotated', 1)
         self.timer = self.create_timer(0.1, self.timer_callback)
 
         # Shared frame for display thread
@@ -245,126 +248,124 @@ class OBBDetectorNode(Node):
         color_img = np.asanyarray(color_frame.get_data())
         results   = self.model(color_img, verbose=False, imgsz=640, device='cpu')[0]
 
-        # Draw OBB boxes on display frame
         display = results.plot()
 
-        seen_this_frame    = set()
-        current_detections = {}
-
+        # ── Pass 1: collect raw OBB data, group by class, sort by cx ─────────
+        per_class_raw = {}  # cls_name -> list of raw dicts, sorted left→right
         if results.obb is not None:
             for obb_box in results.obb:
                 conf = float(obb_box.conf[0])
                 if conf < CONF_THRESHOLD:
                     continue
-
                 cls_id   = int(obb_box.cls[0])
                 cls_name = self.model.names[cls_id]
-
-                xywhr     = obb_box.xywhr[0].tolist()
-                cx, cy    = int(xywhr[0]), int(xywhr[1])
-                w_px      = float(xywhr[2])
-                h_px      = float(xywhr[3])
-                angle_rad = float(xywhr[4])
-                angle_deg = float(np.degrees(angle_rad))
-
-                depth_m = get_median_depth(depth_frame, cx, cy)
+                xywhr    = obb_box.xywhr[0].tolist()
+                cx, cy   = int(xywhr[0]), int(xywhr[1])
+                depth_m  = get_median_depth(depth_frame, cx, cy)
                 if depth_m is None or depth_m <= 0.01 or depth_m > 3.0:
                     continue
+                if cls_name not in per_class_raw:
+                    per_class_raw[cls_name] = []
+                per_class_raw[cls_name].append({
+                    'cx': cx, 'cy': cy,
+                    'w_px': float(xywhr[2]), 'h_px': float(xywhr[3]),
+                    'angle_rad': float(xywhr[4]),
+                    'depth_m': depth_m, 'conf': conf,
+                })
+            for cls_name in per_class_raw:
+                per_class_raw[cls_name].sort(key=lambda d: d['cx'])
 
-                # Spike filter
-                prev = self.prev_depths.get(cls_name)
-                if prev is not None and \
-                        abs(depth_m - prev) > DEPTH_JUMP_THRESHOLD:
+        # ── Pass 2: process each instance with a stable per-instance ID ───────
+        seen_cls_this_frame = set()
+        current_detections  = []  # one entry per bounding box
+
+        for cls_name, instances in per_class_raw.items():
+            seen_cls_this_frame.add(cls_name)
+            n_inst = len(instances)
+
+            for idx, raw in enumerate(instances):
+                # Unique key: cls_name_0, cls_name_1, ... (X-sorted left→right)
+                det_id    = f"{cls_name}_{idx}"
+                conf      = raw['conf']
+                cx, cy    = raw['cx'], raw['cy']
+                w_px      = raw['w_px']
+                h_px      = raw['h_px']
+                angle_rad = raw['angle_rad']
+                depth_m   = raw['depth_m']
+                angle_deg = float(np.degrees(angle_rad))
+
+                # Spike filter (per instance)
+                prev = self.prev_depths.get(det_id)
+                if prev is not None and abs(depth_m - prev) > DEPTH_JUMP_THRESHOLD:
                     depth_m = prev
-                self.prev_depths[cls_name] = depth_m
+                self.prev_depths[det_id] = depth_m
 
                 # Camera → robot via table-plane ray intersection
-                # This corrects the XY shift caused by the angled camera:
-                # instead of using the surface point the depth sensor hit
-                # (which is somewhere up the side of a 3D object), we follow
-                # the camera ray from that surface point down to the table
-                # plane, giving the true XY footprint of the object.
                 cam_xyz = deproject(self.intrinsics, cx, cy, depth_m)
                 xy = table_ray_intersect(self.T, cam_xyz, self.table_z_m)
                 if xy is None:
-                    # Fallback to direct transform if ray is parallel to table
                     raw_robot = camera_to_robot(self.T, cam_xyz)
                 else:
                     raw_robot = {"x": xy[0], "y": xy[1], "z": self.table_z_m}
 
-                # Temporal smoothing
-                if cls_name not in self.pose_histories:
-                    self.pose_histories[cls_name] = deque(maxlen=SMOOTHING_WINDOW)
-                self.pose_histories[cls_name].append(raw_robot)
-                hist = self.pose_histories[cls_name]
+                # Temporal smoothing (per instance)
+                if det_id not in self.pose_histories:
+                    self.pose_histories[det_id] = deque(maxlen=SMOOTHING_WINDOW)
+                self.pose_histories[det_id].append(raw_robot)
+                hist = self.pose_histories[det_id]
 
                 x_smooth = float(np.mean([p["x"] for p in hist])) * 1000
                 y_smooth = float(np.mean([p["y"] for p in hist])) * 1000
 
-                # Work plane Z
                 z_table    = get_table_z(x_smooth, y_smooth)
                 z_approach = z_table + APPROACH_OFFSET
                 z_grip     = z_table + GRIP_OFFSET
 
-                # Convert px → mm
                 fx    = self.intrinsics.fx
                 dx_mm = pixels_to_mm(w_px, depth_m, fx)
                 dy_mm = pixels_to_mm(h_px, depth_m, fx)
 
-                # Compute dz from depth
                 dz_mm, dz_source = compute_dz(
-                    depth_frame, self.intrinsics,
-                    cx, cy, w_px / 2, depth_m
-                )
+                    depth_frame, self.intrinsics, cx, cy, w_px / 2, depth_m)
 
-                # Quaternion
                 quaternion = angle_to_quaternion(angle_rad)
 
-                # Stability indicator
                 count      = self.detection_counts.get(cls_name, 0)
                 stable_str = "STABLE" if count >= STABILITY_FRAMES \
                     else f"stabilising {count}/{STABILITY_FRAMES}"
                 colour = (0, 255, 0) if count >= STABILITY_FRAMES \
                     else (0, 165, 255)
+                # Show index suffix on camera overlay when multiple of same class
+                label = f"{cls_name}#{idx}" if n_inst > 1 else cls_name
 
-                # Overlay info on display frame
                 if SHOW_DISPLAY:
-                    # Class + stability
                     cv2.putText(display,
-                                f"{cls_name} | {stable_str}",
+                                f"{label} | {stable_str}",
                                 (cx - 80, cy - 52),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, colour, 2)
-                    # Raw camera-frame XY (before transform) — for comparison
                     cv2.putText(display,
                                 f"[cam]  x={cam_xyz[0]*1000:.0f} "
                                 f"y={cam_xyz[1]*1000:.0f} "
                                 f"z={cam_xyz[2]*1000:.0f}mm",
                                 (cx - 80, cy - 34),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.42, (180, 180, 255), 1)
-                    # Published robot-frame XY (after ray intersection + smoothing)
                     cv2.putText(display,
                                 f"[pub]  x={x_smooth:.0f} "
                                 f"y={y_smooth:.0f} "
                                 f"z={z_grip:.0f}mm",
                                 (cx - 80, cy - 18),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.42, colour, 2)
-                    # Angle + dimensions
                     cv2.putText(display,
                                 f"angle={angle_deg:.1f}deg | "
                                 f"dz={dz_mm}mm({dz_source})",
                                 (cx - 80, cy - 2),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.40, colour, 1)
 
-                # Build dimensions — only include dz if measurement succeeded
-                dimensions = {
-                    "dx_mm": round(dx_mm, 1),
-                    "dy_mm": round(dy_mm, 1),
-                }
+                dimensions = {"dx_mm": round(dx_mm, 1), "dy_mm": round(dy_mm, 1)}
                 if dz_mm is not None:
                     dimensions["dz_mm"] = dz_mm
 
-                seen_this_frame.add(cls_name)
-                current_detections[cls_name] = {
+                current_detections.append({
                     "pose": {
                         "position": {
                             "x": round(x_smooth, 1),
@@ -386,9 +387,9 @@ class OBBDetectorNode(Node):
                         "depth_m":       round(depth_m, 4),
                         "dz_source":     dz_source,
                     }
-                }
+                })
 
-        # HUD
+        # ── HUD ───────────────────────────────────────────────────────────────
         if SHOW_DISPLAY:
             status = "PUBLISHING" if any(
                 c >= STABILITY_FRAMES
@@ -404,22 +405,31 @@ class OBBDetectorNode(Node):
             with self.frame_lock:
                 self.display_frame = display
 
-        # Update consecutive frame counts
-        all_classes = set(self.detection_counts.keys()) | seen_this_frame
+            h, w = display.shape[:2]
+            img_msg = RosImage()
+            img_msg.header.stamp = self.get_clock().now().to_msg()
+            img_msg.height = h
+            img_msg.width = w
+            img_msg.encoding = 'bgr8'
+            img_msg.step = w * 3
+            img_msg.data = display.tobytes()
+            self.image_pub_.publish(img_msg)
+
+        # ── Update per-class stability counts ─────────────────────────────────
+        all_classes = set(self.detection_counts.keys()) | seen_cls_this_frame
         for cls_name in all_classes:
-            if cls_name in seen_this_frame:
+            if cls_name in seen_cls_this_frame:
                 self.detection_counts[cls_name] = \
                     self.detection_counts.get(cls_name, 0) + 1
             else:
                 self.detection_counts[cls_name] = 0
-                self.stable_detections.pop(cls_name, None)
 
-        # Only publish stable detections
-        stable = []
-        for cls_name, count in self.detection_counts.items():
-            if count >= STABILITY_FRAMES and cls_name in current_detections:
-                self.stable_detections[cls_name] = current_detections[cls_name]
-                stable.append(self.stable_detections[cls_name])
+        # ── Publish stable detections (one entry per bounding box) ────────────
+        stable = [
+            det for det in current_detections
+            if self.detection_counts.get(det['classification']['class'], 0)
+               >= STABILITY_FRAMES
+        ]
 
         if stable:
             msg = String()
