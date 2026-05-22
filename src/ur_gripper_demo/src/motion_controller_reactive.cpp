@@ -935,6 +935,8 @@ bool moveCartesian(
         return false;
     }
 
+    // computeCartesianPath does not inherit setMaxVelocityScalingFactor —
+    // manually apply time parametrization so joint velocities respect the 0.03 limit.
     robot_trajectory::RobotTrajectory rt(arm.getRobotModel(), arm.getName());
     rt.setRobotTrajectoryMsg(*arm.getCurrentState(), traj);
     trajectory_processing::IterativeParabolicTimeParameterization iptp;
@@ -1058,7 +1060,6 @@ bool executeTopDownGrasp(
         // "Invalid goal state" self-collision in the raise configuration.
         detachObject(arm, r.id);
         removeObject(psi, r.id);
-
 
         geometry_msgs::msg::Pose raise_pose = grasp_pose;
         raise_pose.position.z = r.obj.pose.position.z + SAFE_Z_HEIGHT;
