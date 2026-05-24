@@ -57,6 +57,8 @@ def launch_setup(context, *args, **kwargs):
     safety_pos_margin = LaunchConfiguration("safety_pos_margin")
     safety_k_position = LaunchConfiguration("safety_k_position")
 
+    robot_ip = LaunchConfiguration("robot_ip")
+
     # General arguments
     # *** CHANGED: description_package -> ur_description_package to match onrobot launch convention ***
     ur_description_package = LaunchConfiguration("ur_description_package")
@@ -97,7 +99,8 @@ def launch_setup(context, *args, **kwargs):
             # *** CHANGED: URDF now comes from ur_onrobot_description package ***
             PathJoinSubstitution([FindPackageShare("ur_onrobot_description"), "urdf", description_file]),
             " ",
-            "robot_ip:=xxx.yyy.zzz.www",
+            "robot_ip:=",
+            robot_ip,
             " ",
             "joint_limit_params:=",
             joint_limit_params,
@@ -574,6 +577,13 @@ def generate_launch_description():
     )
     declared_arguments.append(
         DeclareLaunchArgument("launch_servo", default_value="true", description="Launch Servo?")
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "robot_ip",
+            default_value="192.168.56.101",
+            description="IP address of the UR robot (or URSim VM).",
+        )
     )
 
 

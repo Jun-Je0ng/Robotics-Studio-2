@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import json
+import os
+import subprocess
 from datetime import datetime
 
 import tkinter as tk
@@ -50,6 +52,9 @@ class StatusGui(Node):
         self._latest_detections = []
         self._sd_cur = 0
         self._sd_failed = False
+        self._bin_poses = {}
+        self._bin_status_labels = {}
+        self._load_bin_poses_from_file()
 
         self.cmd_pub = self.create_publisher(String, "/motion_system/command", 10)
 
@@ -138,9 +143,11 @@ class StatusGui(Node):
         row = tk.Frame(p, bg=C['bg'])
         row.pack(fill=tk.X, pady=(0, 4))
         self._btn(row, "▶  START", "start",
-                  bg=C['green'], fg=C['bg'], width=12).pack(side=tk.LEFT, padx=(0, 6))
+                  bg=C['green'], fg=C['bg'], width=12,
+                  command=self._do_start).pack(side=tk.LEFT, padx=(0, 6))
         self._btn(row, "■  STOP", "stop",
-                  bg=C['red'], fg='white', width=12).pack(side=tk.LEFT)
+                  bg=C['red'], fg='white', width=12,
+                  command=self._do_stop).pack(side=tk.LEFT)
 
         self._btn(p, "⌂  Home", "home",
                   bg=C['card'], fg=C['text'], width=28).pack(fill=tk.X, pady=(4, 0))
@@ -154,16 +161,7 @@ class StatusGui(Node):
         self._btn(row2, "▷◁  Close", "close_gripper",
                   bg=C['card'], fg=C['text'], width=12).pack(side=tk.LEFT)
 
-        # ── Poses ─────────────────────────────────────────────────
-        self._section_label(p, "POSES")
-        for label, cmd in [
-            ("Save Pose",      "save_pose"),
-            ("Save to File",   "save_poses_file"),
-            ("Load from File", "load_poses"),
-            ("Clear All",      "clear_poses"),
-        ]:
-            self._btn(p, label, cmd, bg=C['card'], fg=C['text'],
-                      width=28).pack(fill=tk.X, pady=2)
+
 
 
     def _build_mid(self, p):
@@ -172,12 +170,26 @@ class StatusGui(Node):
         cards.pack(fill=tk.X, pady=(0, 12))
         cards.columnconfigure((0, 1, 2, 3), weight=1)
 
-        self._sys_card   = self._status_card(cards, "SYSTEM",   "Stopped", col=0)
+        self._sys_card   = self._status_card(cards, "SYSTEM",   "—",       col=0)
         self._state_card = self._status_card(cards, "ROBOT",    "Idle",    col=1)
         self._obj_card   = self._status_card(cards, "OBJECT",   "—",       col=2)
         self._seq_card   = self._status_card(cards, "SEQUENCE", "—",       col=3)
 
         self._build_state_diagram(p)
+
+        # ── Camera feed — fills all remaining space ───────────────
+        self._section_label(p, "CAMERA FEED  (/camera/annotated)")
+
+        cam_wrap = tk.Frame(p, bg=C['card'], padx=4, pady=4)
+        cam_wrap.pack(fill=tk.BOTH, expand=True)
+
+        self._cam_canvas = tk.Canvas(cam_wrap, bg=C['card'], highlightthickness=0)
+        self._cam_canvas.pack(fill=tk.BOTH, expand=True)
+        self._cam_canvas.bind("<Configure>", lambda e: self._render_camera())
+        self._cam_pil = None
+
+    def _build_perception_panel(self, p):
+        """Right panel: event log, perception data, pick priority, bin poses."""
 
         # ── Log header ────────────────────────────────────────────
         lhdr = tk.Frame(p, bg=C['bg'])
@@ -193,7 +205,7 @@ class StatusGui(Node):
 
         # ── Log box ───────────────────────────────────────────────
         log_wrap = tk.Frame(p, bg=C['surface'], pady=2, padx=2)
-        log_wrap.pack(fill=tk.BOTH, expand=True)
+        log_wrap.pack(fill=tk.X, pady=(0, 12))
 
         self.log_box = tk.Text(
             log_wrap,
@@ -203,8 +215,9 @@ class StatusGui(Node):
             selectbackground=C['border'],
             relief="flat", borderwidth=0,
             state="disabled",
+            height=10,
         )
-        self.log_box.pack(fill=tk.BOTH, expand=True, padx=6, pady=4)
+        self.log_box.pack(fill=tk.X, padx=6, pady=4)
 
         self.log_box.tag_config("ts",     foreground=C['muted'])
         self.log_box.tag_config("ok",     foreground=C['green'])
@@ -213,65 +226,44 @@ class StatusGui(Node):
         self.log_box.tag_config("info",   foreground=C['blue'])
         self.log_box.tag_config("normal", foreground=C['text'])
 
-    def _build_perception_panel(self, p):
-        """Right panel: live feed from Rian's detection + grip pose nodes."""
+        self._section_label(p, "OBJECTS DETECTED  (/plastic_detections)")
 
-        self._section_label(p, "CAMERA FEED  (/camera/annotated)")
-
-        cam_wrap = tk.Frame(p, bg=C['card'], padx=4, pady=4)
-        cam_wrap.pack(fill=tk.X, pady=(0, 8))
-
-        self._camera_label = tk.Label(
-            cam_wrap,
-            text="Waiting for camera...",
-            font=("Courier", 9),
-            bg=C['card'], fg=C['muted'],
-            width=336, height=14,  # placeholder size before first frame
-        )
-        self._camera_label.pack()
-
-        self._section_label(p, "PERCEPTION  (Rian)")
-
-        # ── Detection count card ──────────────────────────────────
-        det_frame = tk.Frame(p, bg=C['card'], padx=14, pady=10)
-        det_frame.pack(fill=tk.X, pady=(0, 8))
-
-        det_hdr = tk.Frame(det_frame, bg=C['card'])
-        det_hdr.pack(fill=tk.X)
-        tk.Label(det_hdr, text="DETECTIONS",
-                 font=("Helvetica", 7, "bold"),
-                 bg=C['card'], fg=C['muted']).pack(side=tk.LEFT)
-        self._det_status_dot = tk.Label(det_hdr, text="●",
-                                        font=("Helvetica", 9),
-                                        bg=C['card'], fg=C['muted'])
+        # ── Count + live dot ──────────────────────────────────────
+        count_hdr = tk.Frame(p, bg=C['bg'])
+        count_hdr.pack(fill=tk.X, pady=(0, 6))
+        self._det_count_label = tk.Label(
+            count_hdr, text="0 objects",
+            font=("Helvetica", 14, "bold"),
+            bg=C['bg'], fg=C['muted'])
+        self._det_count_label.pack(side=tk.LEFT)
+        self._det_status_dot = tk.Label(
+            count_hdr, text="●",
+            font=("Helvetica", 10),
+            bg=C['bg'], fg=C['muted'])
         self._det_status_dot.pack(side=tk.RIGHT)
 
-        self._det_count_label = tk.Label(det_frame, text="0 objects",
-                                         font=("Helvetica", 12, "bold"),
-                                         bg=C['card'], fg=C['muted'])
-        self._det_count_label.pack(anchor="w", pady=(3, 0))
-
-        # ── Per-detection list ────────────────────────────────────
+        # ── Per-object table ──────────────────────────────────────
         list_wrap = tk.Frame(p, bg=C['surface'], padx=2, pady=2)
-        list_wrap.pack(fill=tk.X, pady=(0, 12))
-
-        tk.Label(list_wrap, text="Detected objects  (/plastic_detections)",
-                 font=("Helvetica", 8, "bold"),
-                 bg=C['surface'], fg=C['muted']).pack(anchor="w", padx=6, pady=(4, 2))
+        list_wrap.pack(fill=tk.X, pady=(0, 10))
 
         self._det_list_box = tk.Text(
             list_wrap,
-            font=("Courier", 8),
+            font=("Courier", 9),
             bg=C['surface'], fg=C['text'],
-            height=4,
+            height=8,
             relief="flat", borderwidth=0,
             state="disabled",
         )
-        self._det_list_box.pack(fill=tk.X, padx=6, pady=(0, 4))
+        self._det_list_box.pack(fill=tk.X, padx=6, pady=4)
         self._det_list_box.tag_config("cls",   foreground=C['orange'])
-        self._det_list_box.tag_config("pos",   foreground=C['cyan'])
+        self._det_list_box.tag_config("coord", foreground=C['cyan'])
         self._det_list_box.tag_config("dim",   foreground=C['purple'])
-        self._det_list_box.tag_config("muted", foreground=C['muted'])
+        self._det_list_box.tag_config("conf",  foreground=C['muted'])
+        self._det_list_box.tag_config("sep",   foreground=C['border'])
+        self._det_list_box.tag_config("none",  foreground=C['muted'])
+        # keep these so existing callback refs don't break
+        self._type_summary_box = self._det_list_box
+        self._det_list_box.tag_config("count", foreground=C['green'])
 
         # ── Pick Priority ─────────────────────────────────────────
         self._section_label(p, "PICK PRIORITY")
@@ -314,32 +306,44 @@ class StatusGui(Node):
         # ── Bin Poses ─────────────────────────────────────────────
         self._section_label(p, "BIN POSES")
 
-        tk.Label(p, text="Jog arm over drop bin, then click type to save.",
+        tk.Label(p, text="Jog arm over drop bin, then click Save Pose.",
                  font=("Helvetica", 8), bg=C['bg'], fg=C['muted'],
                  wraplength=330, justify=tk.LEFT).pack(anchor="w", pady=(0, 6))
 
-        bin_grid = tk.Frame(p, bg=C['bg'])
-        bin_grid.pack(fill=tk.X, pady=(0, 4))
-        bin_grid.columnconfigure((0, 1), weight=1)
-
         known_types = [
-            ("pet_bottle",  C['cyan']),
-            ("hdpe_bottle", C['orange']),
+            ("pet_bottle",  C['cyan'],   "PETG Bottle"),
+            ("hdpe_bottle", C['orange'], "HDPE Bottle"),
         ]
-        for i, (type_name, colour) in enumerate(known_types):
-            row, col = divmod(i, 2)
-            tk.Button(
-                bin_grid, text=type_name,
-                command=lambda t=type_name: self._save_bin(t),
-                bg=C['card'], fg=colour,
-                font=("Helvetica", 9, "bold"),
-                relief="flat", cursor="hand2", borderwidth=0,
-                activebackground=C['border'], activeforeground=colour,
-                pady=6,
-            ).grid(row=row, column=col, padx=3, pady=3, sticky="ew")
+        for type_name, colour, display_name in known_types:
+            card = tk.Frame(p, bg=C['card'], padx=10, pady=8)
+            card.pack(fill=tk.X, pady=(0, 5))
+
+            top_row = tk.Frame(card, bg=C['card'])
+            top_row.pack(fill=tk.X)
+
+            tk.Label(top_row, text=display_name,
+                     font=("Helvetica", 10, "bold"),
+                     bg=C['card'], fg=colour).pack(side=tk.LEFT)
+
+            tk.Button(top_row, text="Save Pose",
+                      command=lambda t=type_name: self._save_bin_with_feedback(t),
+                      bg=colour, fg=C['bg'],
+                      font=("Helvetica", 9, "bold"),
+                      relief="flat", cursor="hand2", borderwidth=0,
+                      activebackground=C['border'], activeforeground=C['bg'],
+                      padx=8, pady=2,
+                      ).pack(side=tk.RIGHT)
+
+            status_lbl = tk.Label(card, text=self._bin_pose_summary(type_name),
+                                  font=("Courier", 8),
+                                  bg=C['card'],
+                                  fg=C['green'] if type_name in self._bin_poses else C['muted'],
+                                  anchor="w")
+            status_lbl.pack(fill=tk.X, pady=(3, 0))
+            self._bin_status_labels[type_name] = status_lbl
 
         custom_row = tk.Frame(p, bg=C['bg'])
-        custom_row.pack(fill=tk.X, pady=(4, 2))
+        custom_row.pack(fill=tk.X, pady=(6, 2))
         self._bin_custom_var = tk.StringVar()
         tk.Entry(
             custom_row,
@@ -361,27 +365,8 @@ class StatusGui(Node):
 
         self._btn(p, "↺  Reload Bins", "LOAD_BINS",
                   bg=C['surface'], fg=C['muted'],
-                  width=28).pack(fill=tk.X, pady=(6, 0))
+                  width=28, command=self._reload_bins).pack(fill=tk.X, pady=(6, 0))
 
-        # ── Bilguun's pipeline note ────────────────────────────────
-        self._section_label(p, "MOTION SYSTEM  (Bilguun)")
-
-        info = tk.Frame(p, bg=C['card'], padx=14, pady=10)
-        info.pack(fill=tk.X)
-        tk.Label(info, text="Active pipeline",
-                 font=("Helvetica", 7, "bold"),
-                 bg=C['card'], fg=C['muted']).pack(anchor="w")
-        pipeline_text = (
-            "/plastic_detections\n"
-            "  → translator_node\n"
-            "  → /perception/objects\n"
-            "  → pick_n_place_node\n"
-            "  ← /motion_system/command"
-        )
-        tk.Label(info, text=pipeline_text,
-                 font=("Courier", 8),
-                 bg=C['card'], fg=C['muted'],
-                 justify=tk.LEFT).pack(anchor="w", pady=(4, 0))
 
     # ── State diagram ─────────────────────────────────────────────────────────
 
@@ -444,7 +429,7 @@ class StatusGui(Node):
         bar.pack_propagate(False)
 
         tk.Button(bar, text="  ⚠  E-STOP  ",
-                  command=lambda: self.send_command("estop"),
+                  command=self._do_estop,
                   bg=C['red'], fg='white',
                   font=("Helvetica", 13, "bold"),
                   relief="flat", cursor="hand2",
@@ -461,9 +446,14 @@ class StatusGui(Node):
                   borderwidth=0, width=10, height=2
                   ).pack(side=tk.LEFT, padx=4, pady=10)
 
-        tk.Label(bar, text="Emergency stop halts all motion immediately.",
+        info = tk.Frame(bar, bg=C['surface'])
+        info.pack(side=tk.LEFT, padx=14)
+        tk.Label(info, text="E-STOP  — halts all motion immediately.",
                  font=("Helvetica", 9), bg=C['surface'], fg=C['muted']
-                 ).pack(side=tk.LEFT, padx=14)
+                 ).pack(anchor="w")
+        tk.Label(info, text="Reset  — stops motion, clears stop flag, returns arm to home.",
+                 font=("Helvetica", 9), bg=C['surface'], fg=C['muted']
+                 ).pack(anchor="w")
 
     # ══════════════════════════════════════════════════════════════════════════
     # Widget helpers
@@ -502,6 +492,20 @@ class StatusGui(Node):
     # Commands & jogging
     # ══════════════════════════════════════════════════════════════════════════
 
+    def _do_start(self):
+        self.send_command("start")
+        self._sys_card.config(text="Starting", fg=C['green'])
+
+    def _do_stop(self):
+        self.send_command("stop")
+        self._sys_card.config(text="Stopped", fg=C['red'])
+
+    def _do_estop(self):
+        self.send_command("estop")
+        self._sys_card.config(text="E-STOP", fg=C['red'])
+        self._log("ESTOP — killing motion controller process", "err")
+        subprocess.Popen(["pkill", "-9", "-f", "motion_controller_reactive"])
+
     def send_command(self, command):
         msg = String()
         msg.data = command
@@ -513,6 +517,38 @@ class StatusGui(Node):
         self.send_command(f"TARGET_CLASS:{target}")
         label = target if target else "any"
         self._log(f"Pick priority → {label}", "info")
+
+    def _load_bin_poses_from_file(self):
+        try:
+            from ament_index_python.packages import get_package_share_directory
+            path = os.path.join(
+                get_package_share_directory('ur_gripper_demo'),
+                'config', 'bin_poses.json')
+            with open(path) as f:
+                self._bin_poses = json.load(f)
+        except Exception:
+            self._bin_poses = {}
+
+    def _bin_pose_summary(self, type_name: str) -> str:
+        p = self._bin_poses.get(type_name)
+        if not p:
+            return "  not saved"
+        pos = p.get("position", [0, 0, 0])
+        return f"  x={pos[0]:.3f}  y={pos[1]:.3f}  z={pos[2]:.3f}"
+
+    def _save_bin_with_feedback(self, type_name: str):
+        self._save_bin(type_name)
+        if type_name in self._bin_status_labels:
+            self._bin_status_labels[type_name].config(
+                text="  ✓ pose saved (reload to see coords)", fg=C['green'])
+
+    def _reload_bins(self):
+        self.send_command("LOAD_BINS")
+        self._load_bin_poses_from_file()
+        for type_name, lbl in self._bin_status_labels.items():
+            lbl.config(text=self._bin_pose_summary(type_name),
+                       fg=C['green'] if type_name in self._bin_poses else C['muted'])
+        self._log("Bin poses reloaded", "ok")
 
     def _save_bin(self, type_name: str):
         self.send_command(f"SAVE_BIN:{type_name}")
@@ -543,6 +579,43 @@ class StatusGui(Node):
                 C['green']  if "grip" in s.lower() else C['text']
         self._state_card.config(text=s, fg=color)
         self._update_state_diagram(s)
+
+        # SYSTEM card
+        if s == "IDLE":
+            self._sys_card.config(text="Idle", fg=C['muted'])
+        elif s == "DONE":
+            self._sys_card.config(text="Done", fg=C['green'])
+        elif s not in ("", "FAILED"):
+            self._sys_card.config(text="Running", fg=C['green'])
+
+        # SEQUENCE card — human-readable summary of current phase
+        _seq_map = {
+            "IDLE":         ("Idle",         C['muted']),
+            "HOMING":       ("Homing",       C['blue']),
+            "WAITING":      ("Waiting",      C['cyan']),
+            "PREGRASP":     ("Picking",      C['yellow']),
+            "GRASPING":     ("Grasping",     C['orange']),
+            "RAISING":      ("Raising",      C['yellow']),
+            "TRANSPORTING": ("Transporting", C['cyan']),
+            "DONE":         ("Complete",     C['green']),
+            "FAILED":       ("Retrying",     C['red']),
+        }
+        if s in _seq_map:
+            text, col = _seq_map[s]
+            self._seq_card.config(text=text, fg=col)
+
+        # OBJECT card — show closest detected object class when actively picking
+        _picking_states = {"PREGRASP", "GRASPING", "RAISING", "TRANSPORTING"}
+        if s in _picking_states and self._latest_detections:
+            closest = min(
+                self._latest_detections,
+                key=lambda d: (d.get("pose", {}).get("position", {}).get("x", 0) ** 2 +
+                               d.get("pose", {}).get("position", {}).get("y", 0) ** 2),
+            )
+            cls = closest.get("classification", {}).get("class", "?")
+            self._obj_card.config(text=cls, fg=C['orange'])
+        elif s in ("IDLE", "DONE", "HOMING", "WAITING"):
+            self._obj_card.config(text="—", fg=C['muted'])
 
     def _update_state_diagram(self, state: str):
         if state == "FAILED":
@@ -595,22 +668,36 @@ class StatusGui(Node):
         self._det_count_label.config(text=f"{n} {noun}", fg=color)
         self._det_status_dot.config(fg=C['green'] if n > 0 else C['muted'])
 
+        # Per-object table
         self._det_list_box.config(state="normal")
         self._det_list_box.delete("1.0", tk.END)
-        for det in detections:
-            cls  = det.get("classification", {}).get("class", "?")
-            conf = det.get("classification", {}).get("confidence", 0.0)
-            pos  = det.get("pose", {}).get("position", {})
-            dims = det.get("dimensions", {})
-            x  = pos.get("x", 0);  y  = pos.get("y", 0);  z  = pos.get("z", 0)
-            dx = dims.get("dx_mm", 0); dy = dims.get("dy_mm", 0)
+        if not detections:
+            self._det_list_box.insert(tk.END, "  no objects detected", "none")
+        else:
+            sep = "─" * 32 + "\n"
+            for i, det in enumerate(detections):
+                cls  = det.get("classification", {}).get("class", "?")
+                conf = det.get("classification", {}).get("confidence", 0.0)
+                pos  = det.get("pose", {}).get("position", {})
+                dims = det.get("dimensions", {})
+                x  = pos.get("x", 0)
+                y  = pos.get("y", 0)
+                z  = pos.get("z", 0)
+                dx = dims.get("dx_mm", 0)
+                dy = dims.get("dy_mm", 0)
 
-            self._det_list_box.insert(tk.END, f"  {cls}", "cls")
-            self._det_list_box.insert(tk.END, f"  ({conf:.2f})\n", "muted")
-            self._det_list_box.insert(tk.END,
-                f"    pos ({x:.0f}, {y:.0f}, {z:.0f}) mm\n", "pos")
-            self._det_list_box.insert(tk.END,
-                f"    dims {dx:.0f}×{dy:.0f} mm\n", "dim")
+                self._det_list_box.insert(tk.END, f"  {cls}", "cls")
+                self._det_list_box.insert(tk.END, f"  ({conf:.2f})\n", "conf")
+                self._det_list_box.insert(
+                    tk.END,
+                    f"    x: {x:.0f}mm  y: {y:.0f}mm  z: {z:.0f}mm\n",
+                    "coord")
+                self._det_list_box.insert(
+                    tk.END,
+                    f"    size: {dx:.0f}×{dy:.0f}mm\n",
+                    "dim")
+                if i < len(detections) - 1:
+                    self._det_list_box.insert(tk.END, sep, "sep")
         self._det_list_box.config(state="disabled")
 
         # Update confidence labels in PICK PRIORITY section
@@ -630,15 +717,27 @@ class StatusGui(Node):
         try:
             frame = np.frombuffer(msg.data, dtype=np.uint8).reshape(
                 msg.height, msg.width, 3)
-            # BGR → RGB
             frame_rgb = frame[:, :, ::-1]
-            pil_img = PILImage.fromarray(frame_rgb)
-            pil_img = pil_img.resize((336, 252), PILImage.LANCZOS)
-            photo = ImageTk.PhotoImage(pil_img)
-            self._camera_label.config(image=photo, text="", width=336, height=252)
-            self._camera_label.image = photo  # prevent GC
+            self._cam_pil = PILImage.fromarray(frame_rgb)
+            self._render_camera()
         except Exception as e:
             self.get_logger().warn(f'Camera frame decode error: {e}')
+
+    def _render_camera(self):
+        if self._cam_pil is None:
+            return
+        w = self._cam_canvas.winfo_width()
+        h = self._cam_canvas.winfo_height()
+        if w < 2 or h < 2:
+            return
+        img_w, img_h = self._cam_pil.size
+        scale = min(w / img_w, h / img_h)
+        new_w, new_h = int(img_w * scale), int(img_h * scale)
+        resized = self._cam_pil.resize((new_w, new_h), PILImage.LANCZOS)
+        photo = ImageTk.PhotoImage(resized)
+        self._cam_canvas.delete("all")
+        self._cam_canvas.create_image(w // 2, h // 2, anchor="center", image=photo)
+        self._cam_canvas.image = photo
 
     # ══════════════════════════════════════════════════════════════════════════
     # Log & lifecycle

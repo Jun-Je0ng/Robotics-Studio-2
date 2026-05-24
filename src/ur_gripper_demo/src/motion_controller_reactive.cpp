@@ -158,6 +158,7 @@ enum class PickResult {
     GRASP_FAILED, // arm reached object but fingers found nothing — retry with fresh perception
     SKIPPED,      // unknown classification, no bin defined
     DROPPED,      // grasped but object fell during transport
+    ABORTED,      // stop_requested fired mid-sequence; arm halted, safe to home
 };
 
 struct GraspGeometry
@@ -1013,17 +1014,22 @@ bool executeTopDownGrasp(
     moveit::planning_interface::PlanningSceneInterface& psi,
     const ResolvedObject& r,
     rclcpp::Node::SharedPtr node,
+    std::atomic<bool>& stop_requested,
     int max_attempts = 3)
 {
     for (int attempt = 1; attempt <= max_attempts; ++attempt)
     {
+        if (stop_requested.load()) return false;
+
         RCLCPP_INFO(LOGGER, "Grasp attempt %d/%d for '%s'", attempt, max_attempts, r.id.c_str());
         publishState("PREGRASP");
         if (!moveToPregrasp(arm, r))
         {
+            if (stop_requested.load()) return false;
             RCLCPP_WARN(LOGGER, "Pregrasp failed on attempt %d", attempt);
             continue;
         }
+        if (stop_requested.load()) return false;
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         // Descend
@@ -1038,15 +1044,18 @@ bool executeTopDownGrasp(
 
         if (!moveCartesian(arm, grasp_pose))
         {
+            if (stop_requested.load()) return false;
             RCLCPP_WARN(LOGGER, "Descend failed on attempt %d", attempt);
             continue;
         }
+        if (stop_requested.load()) return false;
 
         // Attach + close
         attachObject(arm, r.id);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         bool grasped = closeGripperForGrasp(gripper_client);
+        if (stop_requested.load()) { openGripper(gripper_client); detachObject(arm, r.id); return false; }
         if (!grasped)
         {
             publishState("FAILED");
@@ -1067,16 +1076,17 @@ bool executeTopDownGrasp(
         publishState("RAISING");
         if (!moveCartesian(arm, raise_pose))
         {
+            if (stop_requested.load()) return false;
             RCLCPP_WARN(LOGGER, "Raise failed on attempt %d — detaching", attempt);
             if (!moveToPose(arm, raise_pose))
-                {
-                    RCLCPP_WARN(LOGGER, "Raise failed on attempt %d — detaching", attempt);
-                    openGripper(gripper_client);
-                    detachObject(arm, r.id);
-                    continue;
-                }
+            {
+                RCLCPP_WARN(LOGGER, "Raise failed on attempt %d — detaching", attempt);
+                openGripper(gripper_client);
+                detachObject(arm, r.id);
+                continue;
+            }
         }
-
+        if (stop_requested.load()) return false;
 
         RCLCPP_INFO(LOGGER, "Grasp succeeded on attempt %d", attempt);
         return true;
@@ -1443,7 +1453,8 @@ PickResult processOneObject(
     moveit::planning_interface::PlanningSceneInterface& psi,
     const object_msgs::msg::Object& obj,
     int object_counter,
-    rclcpp::Node::SharedPtr node)
+    rclcpp::Node::SharedPtr node,
+    std::atomic<bool>& stop_requested)
 {
     if (BIN_MAP.find(obj.classification) == BIN_MAP.end())
     {
@@ -1462,13 +1473,15 @@ PickResult processOneObject(
 
     openGripper(gripper_client);
 
+    if (stop_requested.load()) { removeObject(psi, r.id); return PickResult::ABORTED; }
+
     // Spawn collision object immediately before grasping — pose is the freshest possible.
     spawnCollisionObject(psi, obj, r.id);
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
 
     bool grasped = false;
     if (r.grasp.strategy == GraspStrategy::TOP_DOWN)
-        grasped = executeTopDownGrasp(arm, gripper_client, psi, r, node);
+        grasped = executeTopDownGrasp(arm, gripper_client, psi, r, node, stop_requested);
     // else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL)
     //     grasped = executeSideHorizontalGrasp(arm, gripper_client, r, node);
     // else if (r.grasp.strategy == GraspStrategy::SIDE_VERTICAL)
@@ -1478,6 +1491,14 @@ PickResult processOneObject(
         RCLCPP_WARN(LOGGER, "Unknown strategy — skipping '%s'", r.id.c_str());
         removeObject(psi, r.id);
         return PickResult::SKIPPED;
+    }
+
+    if (stop_requested.load())
+    {
+        RCLCPP_WARN(LOGGER, "STOP received mid-grasp — aborting '%s'", r.id.c_str());
+        openGripper(gripper_client);
+        removeObject(psi, r.id);
+        return PickResult::ABORTED;
     }
 
     if (!grasped)
@@ -1490,23 +1511,17 @@ PickResult processOneObject(
     // ── Transport to bin with drop monitoring ─────────────────────────────────
     geometry_msgs::msg::Pose bin_pose = getDropOffPose(obj.classification);
 
-    // DropMonitor drop_monitor;
-    // if (!g_sim_mode) drop_monitor.start(gripper_client);
-
     publishState("TRANSPORTING");
     moveToPose(arm, bin_pose);
 
-    // drop_monitor.stop();
-
-    // if (drop_monitor.object_dropped.load())
-    // {
-    //     RCLCPP_WARN(LOGGER, "Object '%s' dropped during transport", r.id.c_str());
-    //     detachObject(arm, r.id);
-    //     removeObject(psi, r.id);
-    //     // The dropped object will appear in the next perception frame
-    //     // and be picked up naturally in the next loop iteration.
-    //     return PickResult::DROPPED;
-    // }
+    if (stop_requested.load())
+    {
+        RCLCPP_WARN(LOGGER, "STOP received during transport — releasing object '%s'", r.id.c_str());
+        openGripper(gripper_client);
+        detachObject(arm, r.id);
+        removeObject(psi, r.id);
+        return PickResult::ABORTED;
+    }
 
     // ── Normal release ────────────────────────────────────────────────────────
     openGripper(gripper_client);
@@ -1528,6 +1543,16 @@ void handleCommand(
     {
         returnHome(arm, gripper_client);
         RCLCPP_INFO(LOGGER, "CMD: HOME");
+    }
+    else if (cmd == "open_gripper")
+    {
+        openGripper(gripper_client);
+        RCLCPP_INFO(LOGGER, "CMD: open_gripper");
+    }
+    else if (cmd == "close_gripper")
+    {
+        closeGripperForGrasp(gripper_client);
+        RCLCPP_INFO(LOGGER, "CMD: close_gripper");
     }
     else if (cmd == "LOAD_BINS")
     {
@@ -1824,7 +1849,7 @@ int main(int argc, char** argv)
             publishState("WAITING");
             auto deadline = std::chrono::steady_clock::now()
                           + std::chrono::seconds(PERCEPTION_TIMEOUT_SEC);
-            while (!objects_fresh.load() && rclcpp::ok())
+            while (!objects_fresh.load() && rclcpp::ok() && !stop_requested.load())
             {
                 if (std::chrono::steady_clock::now() > deadline)
                 {
@@ -1835,6 +1860,7 @@ int main(int argc, char** argv)
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
+            if (stop_requested.load()) break;
 
             // Step 3 — snapshot the latest message
             object_msgs::msg::ObjectArray snap;
@@ -1922,7 +1948,7 @@ int main(int argc, char** argv)
 
             // Step 7 — process this object
             PickResult res = processOneObject(
-                arm, gripper_client, psi, *best, object_counter++, node);
+                arm, gripper_client, psi, *best, object_counter++, node, stop_requested);
 
             // Step 8 — handle result; always return home to restore camera view
             switch (res)
@@ -1957,6 +1983,13 @@ int main(int argc, char** argv)
                 case PickResult::SKIPPED:
                     // Unknown class — don't count as a failure
                     break;
+
+                case PickResult::ABORTED:
+                    RCLCPP_WARN(LOGGER, "Sequence aborted by STOP command");
+                    publishState("HOMING");
+                    returnHome(arm, gripper_client);
+                    publishState("IDLE");
+                    goto pick_loop_done;
             }
         }
 

@@ -921,7 +921,7 @@ def launch_setup(context, *args, **kwargs):
         ur_control_node,
         dashboard_client_node,
         robot_state_helper_node,
-        tool_communication_node,
+        # tool_communication_node,  # RG2 uses Modbus TCP — RS485 serial not needed
         controller_stopper_node,
         urscript_interface,
         robot_state_publisher_node,
