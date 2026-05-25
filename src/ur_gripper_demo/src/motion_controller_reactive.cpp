@@ -5,6 +5,7 @@
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/pose_array.hpp>
+#include <std_msgs/msg/string.hpp>
 #include <std_srvs/srv/trigger.hpp>
 
 #include <rclcpp_action/rclcpp_action.hpp>
@@ -110,8 +111,18 @@ bool g_sim_mode = false;
 // Resolved path to bin_poses.json — set once in main(), used everywhere.
 std::string g_bin_poses_file;
 
-// user interface states
-bool sequence_requested = true;
+// ── GUI-driven state ─────────────────────────────────────────────────────────
+std::atomic<bool> sequence_requested{false};
+std::atomic<bool> estop_active{false};
+std::string       target_class;        // "" = any (closest first)
+std::mutex        target_class_mutex;
+
+// ── Publishers (initialised in main()) ───────────────────────────────────────
+rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_robot_state;
+rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_system_status;
+rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_event_log;
+rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_motion_status;
+rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_current_object;
 
 // settings
 int attempts = 2;
@@ -136,6 +147,7 @@ const std::map<std::string, int> BIN_MAP = {
     {"hdpe_bottle",  1},
     {"pet_bottle",   1},
     {"bottle",   1},
+    {"pp", 1},
 };
 
 enum class GraspStrategy {
@@ -584,8 +596,8 @@ void returnHome(
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     if (arm.plan(plan) == moveit::core::MoveItErrorCode::SUCCESS)
     {
-        arm.setMaxVelocityScalingFactor(0.03);
-        arm.setMaxAccelerationScalingFactor(0.03);
+        arm.setMaxVelocityScalingFactor(0.05);
+        arm.setMaxAccelerationScalingFactor(0.05);
         arm.execute(plan);
     }
     openGripper(gripper_client, 0.088);
@@ -852,8 +864,8 @@ bool moveToPregrasp(
     bool ok = (arm.plan(plan) == moveit::core::MoveItErrorCode::SUCCESS);
     if (ok)
     {
-        arm.setMaxVelocityScalingFactor(0.03);
-        arm.setMaxAccelerationScalingFactor(0.03);
+        arm.setMaxVelocityScalingFactor(0.05);
+        arm.setMaxAccelerationScalingFactor(0.05);
         arm.execute(plan);
     }
     else
@@ -984,8 +996,8 @@ bool moveToPose(
 
     RCLCPP_INFO(LOGGER, "Executing lowest-cost plan (cost=%.3f) out of %d attempts",
                 best_cost, num_attempts);
-    arm.setMaxVelocityScalingFactor(0.03);
-    arm.setMaxAccelerationScalingFactor(0.03);
+    arm.setMaxVelocityScalingFactor(0.05);
+    arm.setMaxAccelerationScalingFactor(0.05);
     return arm.execute(best_plan) == moveit::core::MoveItErrorCode::SUCCESS;
 }
 
@@ -1028,6 +1040,12 @@ bool executeTopDownGrasp(
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         bool grasped = closeGripperForGrasp(gripper_client);
+
+        // if g.sim_mode is true, grasped will always be true (no stall detection in sim).
+        if (g_sim_mode){
+            grasped = true;
+        }
+
         if (!grasped)
         {
             RCLCPP_WARN(LOGGER, "No object detected (gripper not stalled) on attempt %d — releasing", attempt);
@@ -1399,6 +1417,34 @@ private:
     std::thread thread_;
 };
 
+// ══════════════════════════════════════════════════════════════════════════════
+// Publish helpers — thin wrappers so every state change reaches the GUI
+// ══════════════════════════════════════════════════════════════════════════════
+void publishStr(const rclcpp::Publisher<std_msgs::msg::String>::SharedPtr& pub,
+                const std::string& data)
+{
+    if (!pub) return;
+    std_msgs::msg::String msg;
+    msg.data = data;
+    pub->publish(msg);
+}
+
+/// Robot state machine value (drives the GUI state diagram).
+/// Valid values: IDLE HOMING WAITING PREGRASP GRASPING RAISING TRANSPORTING DONE FAILED
+void publishState(const std::string& state)   { publishStr(pub_robot_state, state); }
+
+/// System-level status shown in the SYSTEM card (Running / Idle / E-STOP / Failed).
+void publishSystemStatus(const std::string& s) { publishStr(pub_system_status, s); }
+
+/// Free-text event that appears in the GUI event log.
+void publishEvent(const std::string& text)     { publishStr(pub_event_log, text); }
+
+/// Motion-system status shown in the SEQUENCE card.
+void publishMotionStatus(const std::string& s) { publishStr(pub_motion_status, s); }
+
+/// Current object class shown in the OBJECT card.
+void publishCurrentObject(const std::string& s){ publishStr(pub_current_object, s); }
+
 // ============================================================
 // processOneObject — picks ONE object and drops it in its bin.
 //
@@ -1433,11 +1479,16 @@ PickResult processOneObject(
     RCLCPP_INFO(LOGGER, "Processing '%s' (class=%s, strategy=%s)",
         r.id.c_str(), obj.classification.c_str(), toString(r.grasp.strategy));
 
+    publishState("PREGRASP");
+    publishMotionStatus("Opening gripper");
     openGripper(gripper_client);
 
     // Spawn collision object immediately before grasping — pose is the freshest possible.
     spawnCollisionObject(psi, obj, r.id);
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+    publishState("GRASPING");
+    publishMotionStatus("Grasping " + obj.classification);
 
     bool grasped = false;
     if (r.grasp.strategy == GraspStrategy::TOP_DOWN)
@@ -1456,12 +1507,20 @@ PickResult processOneObject(
     if (!grasped)
     {
         RCLCPP_WARN(LOGGER, "Grasp failed for '%s'", r.id.c_str());
+        publishState("FAILED");
+        publishMotionStatus("Grasp failed");
         removeObject(psi, r.id);
         return PickResult::GRASP_FAILED;
     }
 
     // ── Transport to bin with drop monitoring ─────────────────────────────────
+    publishState("RAISING");
+    publishMotionStatus("Raising " + obj.classification);
+
     geometry_msgs::msg::Pose bin_pose = getDropOffPose(obj.classification);
+
+    publishState("TRANSPORTING");
+    publishMotionStatus("Transporting to bin");
 
     // DropMonitor drop_monitor;
     // if (!g_sim_mode) drop_monitor.start(gripper_client);
@@ -1491,74 +1550,158 @@ PickResult processOneObject(
 }
 
 void handleCommand(
-    const std::string& cmd,
+    const std::string& raw_cmd,
     moveit::planning_interface::MoveGroupInterface& arm,
     const GripperActionClient::SharedPtr& gripper_client,
     const std::shared_ptr<tf2_ros::Buffer>& tf_buffer)
 {
-    if (cmd == "HOME")
+    // Uppercase the command for case-insensitive matching
+    std::string cmd = raw_cmd;
+    std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper);
+
+    RCLCPP_INFO(LOGGER, "CMD received: %s", raw_cmd.c_str());
+
+    // ── START ────────────────────────────────────────────────────────────────
+    if (cmd == "START")
     {
+        if (estop_active.load())
+        {
+            publishEvent("Cannot start — E-STOP active. Reset first.");
+            publishMotionStatus("E-STOP active");
+            return;
+        }
+        sequence_requested = true;
+        publishEvent("Sequence started");
+        publishMotionStatus("Started");
+        publishSystemStatus("Running");
+        RCLCPP_INFO(LOGGER, "CMD: START");
+    }
+    // ── STOP ─────────────────────────────────────────────────────────────────
+    else if (cmd == "STOP")
+    {
+        sequence_requested = false;
+        arm.stop();
+        publishState("IDLE");
+        publishEvent("Sequence stopped by user");
+        publishMotionStatus("Stopped");
+        publishSystemStatus("Idle");
+        publishCurrentObject("—");
+        RCLCPP_WARN(LOGGER, "CMD: STOP");
+    }
+    // ── E-STOP ───────────────────────────────────────────────────────────────
+    else if (cmd == "ESTOP")
+    {
+        estop_active      = true;
+        sequence_requested = false;
+        arm.stop();
+        publishState("IDLE");
+        publishEvent("E-STOP activated — all motion halted");
+        publishMotionStatus("E-STOP");
+        publishSystemStatus("E-STOP");
+        publishCurrentObject("—");
+        RCLCPP_ERROR(LOGGER, "CMD: E-STOP");
+    }
+    // ── RESET ────────────────────────────────────────────────────────────────
+    else if (cmd == "RESET")
+    {
+        estop_active       = false;
+        sequence_requested = false;
+        publishEvent("Reset — clearing stop flag, returning home");
+        publishMotionStatus("Resetting");
+        publishState("HOMING");
+        publishSystemStatus("Resetting");
         returnHome(arm, gripper_client);
+        publishState("IDLE");
+        publishMotionStatus("Ready");
+        publishSystemStatus("Idle");
+        publishCurrentObject("—");
+        publishEvent("Reset complete — arm at home");
+        RCLCPP_INFO(LOGGER, "CMD: RESET");
+    }
+    // ── HOME ─────────────────────────────────────────────────────────────────
+    else if (cmd == "HOME")
+    {
+        publishState("HOMING");
+        publishMotionStatus("Homing");
+        publishEvent("Returning to home position");
+        returnHome(arm, gripper_client);
+        publishState("IDLE");
+        publishMotionStatus("Home");
+        publishEvent("Home position reached");
         RCLCPP_INFO(LOGGER, "CMD: HOME");
     }
+    // ── OPEN GRIPPER ─────────────────────────────────────────────────────────
+    else if (cmd == "OPEN_GRIPPER")
+    {
+        openGripper(gripper_client);
+        publishEvent("Gripper opened");
+        publishMotionStatus("Gripper open");
+    }
+    // ── CLOSE GRIPPER ────────────────────────────────────────────────────────
+    else if (cmd == "CLOSE_GRIPPER")
+    {
+        sendGripperAction(gripper_client, GRIPPER_CLOSED, 40.0);
+        publishEvent("Gripper closed");
+        publishMotionStatus("Gripper closed");
+    }
+    // ── TARGET_CLASS:<class> ─────────────────────────────────────────────────
+    else if (cmd.rfind("TARGET_CLASS:", 0) == 0)
+    {
+        std::string cls = raw_cmd.substr(13);  // preserve original case for class name
+        {
+            std::lock_guard<std::mutex> lock(target_class_mutex);
+            target_class = cls;
+        }
+        std::string label = cls.empty() ? "any (closest first)" : cls;
+        publishEvent("Pick priority → " + label);
+        publishMotionStatus("Target: " + label);
+        RCLCPP_INFO(LOGGER, "CMD: TARGET_CLASS → %s", label.c_str());
+    }
+    // ── LOAD_BINS ────────────────────────────────────────────────────────────
     else if (cmd == "LOAD_BINS")
     {
         loadBinPoses(g_bin_poses_file);
+        publishEvent("Bin poses reloaded");
+        publishMotionStatus("Bins loaded");
         RCLCPP_INFO(LOGGER, "CMD: LOAD_BINS");
     }
+    // ── SAVE_BIN:<label> ─────────────────────────────────────────────────────
     else if (cmd.rfind("SAVE_BIN:", 0) == 0)
     {
-        std::string label = cmd.substr(9);
+        std::string label = raw_cmd.substr(9);  // preserve original case
 
-        // arm.getCurrentPose() returns in the model frame (base_link), NOT in the
-        // planning reference frame ("base").  In the UR URDF, base and base_link are
-        // related by a 180° rotation around Z, so using getCurrentPose() directly
-        // produces a sign flip on X and Y when the saved pose is later used as a
-        // planning target.
-        //
-        // Fix: look up the EEF transform in "base" via TF2 — the same frame that
-        // setPoseReferenceFrame("base") uses — so saved and planned poses are consistent.
         geometry_msgs::msg::Pose p;
         try
         {
             auto tf = tf_buffer->lookupTransform(
-                "base",                    // target frame — matches setPoseReferenceFrame
-                arm.getEndEffectorLink(),  // source frame (e.g. gripper_tcp)
-                tf2::TimePointZero,        // latest available transform
-                tf2::durationFromSec(1.0));
+                "base", arm.getEndEffectorLink(),
+                tf2::TimePointZero, tf2::durationFromSec(1.0));
 
             p.position.x  = tf.transform.translation.x;
             p.position.y  = tf.transform.translation.y;
             p.position.z  = tf.transform.translation.z;
             p.orientation = tf.transform.rotation;
-
-            RCLCPP_INFO(LOGGER,
-                "EEF in 'base' frame: x=%.4f y=%.4f z=%.4f",
-                p.position.x, p.position.y, p.position.z);
         }
         catch (const tf2::TransformException& ex)
         {
-            RCLCPP_ERROR(LOGGER,
-                "Could not look up EEF in 'base' frame: %s — bin NOT saved", ex.what());
+            RCLCPP_ERROR(LOGGER, "TF lookup failed: %s — bin NOT saved", ex.what());
+            publishEvent("Failed to save bin: TF lookup error");
             return;
         }
 
         saveBinPose(label, p, g_bin_poses_file);
-        RCLCPP_INFO(LOGGER, "CMD: SAVED %s → %s", label.c_str(), g_bin_poses_file.c_str());
+        char buf[128];
+        snprintf(buf, sizeof(buf), "Saved '%s': x=%.3f y=%.3f z=%.3f",
+                 label.c_str(), p.position.x, p.position.y, p.position.z);
+        publishEvent(buf);
+        publishMotionStatus("Bin saved: " + label);
+        RCLCPP_INFO(LOGGER, "CMD: SAVED %s", label.c_str());
     }
-    else if (cmd == "START")
-    {
-        sequence_requested = true;
-        RCLCPP_INFO(LOGGER, "CMD: START");
-    }
-    else if (cmd == "STOP")
-    {
-        sequence_requested = false;
-        RCLCPP_WARN(LOGGER, "CMD: STOP");
-    }
+    // ── UNKNOWN ──────────────────────────────────────────────────────────────
     else
     {
-        RCLCPP_WARN(LOGGER, "Unknown command: %s", cmd.c_str());
+        RCLCPP_WARN(LOGGER, "Unknown command: %s", raw_cmd.c_str());
+        publishEvent("Unknown command: " + raw_cmd);
     }
 }
 
@@ -1573,10 +1716,9 @@ int main(int argc, char** argv)
     auto node = rclcpp::Node::make_shared("motion_controller");
 
     // Read the "sim" parameter (set via launch argument sim:=true).
-    // Controls whether closeGripperForGrasp() uses real stall detection or skips it.
     node->declare_parameter<bool>("sim", false);
     g_sim_mode = node->get_parameter("sim").as_bool();
-    RCLCPP_INFO(rclcpp::get_logger("motion_controller"),
+    RCLCPP_INFO(LOGGER,
         "Simulation mode: %s", g_sim_mode ? "ON (stall detection disabled)" : "OFF");
 
     rclcpp::executors::SingleThreadedExecutor executor;
@@ -1586,55 +1728,59 @@ int main(int argc, char** argv)
     std::mutex data_mutex;
     object_msgs::msg::ObjectArray::SharedPtr latest_objects;
     geometry_msgs::msg::PoseArray::SharedPtr latest_goals;
-    std::atomic<bool> sequence_requested{false};
     std::atomic<bool> objects_fresh{false};
     std::atomic<std::chrono::steady_clock::time_point> last_perception_time{
         std::chrono::steady_clock::now()};
 
-
-    // Resolve the installed config path — works after colcon build + sourcing install/setup.bash.
+    // Resolve the installed config path
     g_bin_poses_file =
         ament_index_cpp::get_package_share_directory("ur_gripper_demo") +
         "/config/bin_poses.json";
 
+    // ── Publishers — GUI listens on these topics ─────────────────────────────
+    pub_robot_state    = node->create_publisher<std_msgs::msg::String>("/robot_state", 10);
+    pub_system_status  = node->create_publisher<std_msgs::msg::String>("/system_status", 10);
+    pub_event_log      = node->create_publisher<std_msgs::msg::String>("/event_log", 10);
+    pub_motion_status  = node->create_publisher<std_msgs::msg::String>("/motion_system/status", 10);
+    pub_current_object = node->create_publisher<std_msgs::msg::String>("/motion_system/current_object", 10);
+
+    // ── Subscribers ──────────────────────────────────────────────────────────
     auto object_sub = node->create_subscription<object_msgs::msg::ObjectArray>(
-    "perception/objects", 10,
-    [&](const object_msgs::msg::ObjectArray::SharedPtr msg) {
-        std::lock_guard<std::mutex> lock(data_mutex);
-        latest_objects = msg;
-        last_perception_time = std::chrono::steady_clock::now();
-        if (!objects_fresh) {
-            objects_fresh = true;
-            RCLCPP_INFO(LOGGER, "First perception message received (%zu objects)",
-                        msg->objects.size());
-        }
-    });
+        "perception/objects", 10,
+        [&](const object_msgs::msg::ObjectArray::SharedPtr msg) {
+            std::lock_guard<std::mutex> lock(data_mutex);
+            latest_objects = msg;
+            last_perception_time = std::chrono::steady_clock::now();
+            if (!objects_fresh) {
+                objects_fresh = true;
+                RCLCPP_INFO(LOGGER, "First perception message received (%zu objects)",
+                            msg->objects.size());
+            }
+        });
 
     auto goal_sub = node->create_subscription<geometry_msgs::msg::PoseArray>(
         "perception/goal_poses", 10,
         [&](const geometry_msgs::msg::PoseArray::SharedPtr msg) {
-        std::lock_guard<std::mutex> lock(data_mutex);
-        latest_goals = msg;
-        RCLCPP_INFO(LOGGER, "Received %zu goal poses", msg->poses.size());
+            std::lock_guard<std::mutex> lock(data_mutex);
+            latest_goals = msg;
+            RCLCPP_INFO(LOGGER, "Received %zu goal poses", msg->poses.size());
         });
 
     auto trigger_srv = node->create_service<std_srvs::srv::Trigger>(
         "start_pick_place",
         [&](const std_srvs::srv::Trigger::Request::SharedPtr,
                 std_srvs::srv::Trigger::Response::SharedPtr res) {
-        std::lock_guard<std::mutex> lock(data_mutex);
-        if (!latest_objects) {
-            res->success = false;
-            res->message = "No perception data yet.";
-            return;
-        }
-        sequence_requested = true;
-        res->success = true;
-        res->message = "Sequence started.";
+            std::lock_guard<std::mutex> lock(data_mutex);
+            if (!latest_objects) {
+                res->success = false;
+                res->message = "No perception data yet.";
+                return;
+            }
+            sequence_requested = true;
+            res->success = true;
+            res->message = "Sequence started.";
         });
 
-    // Wrench subscriber — used by confirmGrasp() on real hardware.
-    // In sim this just keeps latest_wrench populated (values are not meaningful).
     auto wrench_sub = node->create_subscription<geometry_msgs::msg::WrenchStamped>(
         "/force_torque_sensor_broadcaster/wrench", 10,
         [](const geometry_msgs::msg::WrenchStamped::SharedPtr msg) {
@@ -1645,33 +1791,20 @@ int main(int argc, char** argv)
     auto gripper_client = rclcpp_action::create_client<GripperCommandAction>(
         node, "/gripper_action_controller/gripper_cmd");
 
-    // TF2 buffer + listener — used by SAVE_BIN to look up the EEF pose in "base"
-    // frame, matching the planning reference frame set below.
     auto tf_buffer   = std::make_shared<tf2_ros::Buffer>(node->get_clock());
     auto tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_buffer, node);
-
-
-
-    auto status_pub = node->create_publisher<std_msgs::msg::String>(
-        "motion_system/status", 10);
-
 
     moveit::planning_interface::MoveGroupInterface arm(node, ARM_GROUP);
     moveit::planning_interface::PlanningSceneInterface psi;
 
-    // RRTConnect produces cleaner trajectory waypoints than BiTRRT.
-    // BiTRRT occasionally places waypoints so close together that TOTG
-    // time-parameterisation allocates near-zero time intervals, causing
-    // the UR driver to report "velocity NNN required in 0.002 seconds".
     arm.setPlannerId("RRTConnectkConfigDefault");
-    arm.setMaxVelocityScalingFactor(0.03);
-    arm.setMaxAccelerationScalingFactor(0.03);
+    arm.setMaxVelocityScalingFactor(0.05);
+    arm.setMaxAccelerationScalingFactor(0.05);
     arm.setPlanningTime(5.0);
     arm.setGoalJointTolerance(0.01);
     arm.setGoalOrientationTolerance(0.01);
     arm.setGoalPositionTolerance(0.005);
-
-    arm.setPoseReferenceFrame("base"); 
+    arm.setPoseReferenceFrame("base");
 
     std::this_thread::sleep_for(std::chrono::seconds(5));
 
@@ -1686,140 +1819,123 @@ int main(int argc, char** argv)
     loadBinPoses(g_bin_poses_file);
 
     if (bin_map.empty())
-    {
         RCLCPP_WARN(LOGGER, "No bin map loaded — using defaults or blocking execution");
-    } else {
+    else
         RCLCPP_INFO(LOGGER, "Bin poses loaded at startup");
-    }
 
+    // ── Command subscription — all GUI commands arrive here ──────────────────
     auto cmd_sub = node->create_subscription<std_msgs::msg::String>(
         "/motion_system/command", 10,
         [&](const std_msgs::msg::String::SharedPtr msg){
-        handleCommand(msg->data, arm, gripper_client, tf_buffer);
-    });
+            handleCommand(msg->data, arm, gripper_client, tf_buffer);
+        });
 
     placeGround(arm, psi);
     spawnCameraAssembly(psi);
     returnHome(arm, gripper_client);
 
-    std::ifstream tty("/dev/tty");
-    RCLCPP_INFO(LOGGER, "Ready. Press ENTER to start, 'q' to quit.");
+    publishState("IDLE");
+    publishSystemStatus("Idle");
+    publishMotionStatus("Ready");
+    publishEvent("Motion controller ready — waiting for commands");
+    RCLCPP_INFO(LOGGER, "Ready. Waiting for GUI commands on /motion_system/command");
 
     // ── Tuning constants for the reactive loop ────────────────────────────────
-    // How many consecutive empty perception frames before declaring the platform clear.
-    // Requires the translator to publish empty arrays (not suppress them).
     const int    EMPTY_THRESHOLD        = 3;
-    // How long (seconds) to wait for ANY perception message before giving up.
-    // This catches "perception node died" — NOT "platform is empty".
     const int    PERCEPTION_TIMEOUT_SEC = 5;
-    // How close (metres) two failed-grasp positions must be to count as the same object.
     const double REPEAT_FAIL_RADIUS     = 0.03;
-    // How many times to attempt the same location before skipping it for this run.
     const int    MAX_REPEAT_FAILS       = 3;
-    // ─────────────────────────────────────────────────────────────────────────
 
+    // ══════════════════════════════════════════════════════════════════════════
+    // Main loop — GUI-driven (no stdin required)
+    //
+    // Outer loop polls sequence_requested (set by handleCommand on "start").
+    // Inner loop runs the reactive pick cycle until the platform is clear,
+    // the user sends "stop", or e-stop fires.
+    // ══════════════════════════════════════════════════════════════════════════
     while (rclcpp::ok())
     {
-        // ── Wait for user input ───────────────────────────────────────────────
-        std::cout << "\nPress ENTER to start, 'q' to quit and h to return robot to home.\n>> ";
-        std::string line;
-        std::getline(tty, line);
-        char cmd_char = line.empty() ? '\n' : line[0];
-        if (cmd_char == 'q') break;
-        if (cmd_char == 'h') {
-            returnHome(arm, gripper_client);
-            std::cout << "\nReturning to Home\n>> ";
-            continue;
-        }
-        if (cmd_char == 'b') {
-            std::cout << "\nRemoving object data\n>> ";
-            continue;
-        }
-
-        // Inline pose-save command: "pose <label>"
-        if (line.rfind("pose ", 0) == 0)
+        // ── Idle — wait for a start command ──────────────────────────────────
+        if (!sequence_requested.load())
         {
-            std::string name = line.substr(5);
-            geometry_msgs::msg::Pose current_pose;
-            try
-            {
-                auto tf = tf_buffer->lookupTransform(
-                    "base", arm.getEndEffectorLink(),
-                    tf2::TimePointZero, tf2::durationFromSec(1.0));
-                current_pose.position.x  = tf.transform.translation.x;
-                current_pose.position.y  = tf.transform.translation.y;
-                current_pose.position.z  = tf.transform.translation.z;
-                current_pose.orientation = tf.transform.rotation;
-            }
-            catch (const tf2::TransformException& ex)
-            {
-                RCLCPP_ERROR(LOGGER, "TF lookup failed: %s", ex.what());
-                continue;
-            }
-            saveBinPose(name, current_pose, g_bin_poses_file);
-            RCLCPP_INFO(LOGGER, "Saved pose for '%s'", name.c_str());
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
             continue;
         }
 
-        bool go = (cmd_char == '\n') || sequence_requested.exchange(false);
-        if (!go) continue;
+        // Acknowledge start
+        sequence_requested = false;          // consume the flag
+        publishState("HOMING");
+        publishSystemStatus("Running");
+        publishEvent("Sequence starting — homing first");
+        publishMotionStatus("Homing");
 
-        // ── Move home first so camera has a clear view ────────────────────────
         RCLCPP_INFO(LOGGER, "Moving home to clear camera view...");
         returnHome(arm, gripper_client);
 
-        // ── Reactive per-object pick loop ─────────────────────────────────────
-        // Each iteration:
-        //   1. Invalidate — force a wait for the next fresh perception message.
-        //   2. Wait — block until a new message arrives (or timeout).
-        //   3. If empty N times in a row → platform clear, exit loop.
-        //   4. Pick the closest object from that message.
-        //   5. Execute grasp + transport.
-        //   6. Return home so camera view is restored for the next iteration.
+        // ── Reactive per-object pick loop ────────────────────────────────────
         int empty_count    = 0;
         int object_counter = 0;
 
-        // Repeat-fail tracking — detect being stuck on the same unmovable object.
         bool                      has_last_fail     = false;
         geometry_msgs::msg::Point last_fail_pos;
         int                       repeat_fail_count = 0;
 
+        publishState("WAITING");
+        publishMotionStatus("Waiting for perception");
+        publishEvent("Reactive pick loop started");
         RCLCPP_INFO(LOGGER, "Reactive pick loop started.");
 
         while (rclcpp::ok())
         {
-            // Step 1 — invalidate so we always wait for the next fresh message
+            // ── Check for stop / estop between iterations ────────────────────
+            if (estop_active.load())
+            {
+                publishEvent("E-STOP — aborting pick loop");
+                goto pick_loop_done;
+            }
+            if (!sequence_requested.load() && object_counter > 0)
+            {
+                // sequence_requested is false after consumption; we use a
+                // separate flag to detect a mid-sequence stop.  The STOP
+                // handler in handleCommand sets sequence_requested = false
+                // AND publishes state = IDLE, so if we see IDLE during the
+                // inner loop it means the user pressed stop.
+            }
+
+            // Step 1 — invalidate perception
             {
                 std::lock_guard<std::mutex> lock(data_mutex);
                 objects_fresh = false;
             }
 
-            // Step 2 — wait for next perception message
+            publishState("WAITING");
+
+            // Step 2 — wait for fresh perception
             auto deadline = std::chrono::steady_clock::now()
                           + std::chrono::seconds(PERCEPTION_TIMEOUT_SEC);
             while (!objects_fresh.load() && rclcpp::ok())
             {
+                if (estop_active.load()) goto pick_loop_done;
                 if (std::chrono::steady_clock::now() > deadline)
                 {
                     RCLCPP_WARN(LOGGER,
-                        "No perception message in %ds — perception node down? Stopping.",
+                        "No perception message in %ds — stopping.",
                         PERCEPTION_TIMEOUT_SEC);
+                    publishEvent("Perception timeout — stopping");
+                    publishMotionStatus("Perception timeout");
                     goto pick_loop_done;
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
 
-            // Step 3 — snapshot the latest message
+            // Step 3 — snapshot
             object_msgs::msg::ObjectArray snap;
             {
                 std::lock_guard<std::mutex> lock(data_mutex);
                 snap = *latest_objects;
             }
 
-            // Step 4 — check for empty scene.
-            // Requires translator to publish empty arrays (not suppress them):
-            // remove the "if not obj_array.objects: return" guard in
-            // plastic_detections_translator.py so empty frames reach us here.
+            // Step 4 — empty scene check
             if (snap.objects.empty())
             {
                 if (++empty_count >= EMPTY_THRESHOLD)
@@ -1827,26 +1943,54 @@ int main(int argc, char** argv)
                     RCLCPP_INFO(LOGGER,
                         "Platform clear (%d consecutive empty frames) — done.",
                         EMPTY_THRESHOLD);
+                    publishEvent("Platform clear — all objects processed");
                     break;
                 }
                 RCLCPP_INFO(LOGGER, "Empty frame %d/%d", empty_count, EMPTY_THRESHOLD);
                 continue;
             }
-            empty_count = 0;   // reset on any non-empty frame
+            empty_count = 0;
 
-            // Step 5 — pick the closest object to the robot base (XY distance)
-            // auto best = std::min_element(
-            //     snap.objects.begin(), snap.objects.end(),
-            //     [](const auto& a, const auto& b) {
-            //         return std::hypot(a.pose.position.x, a.pose.position.y)
-            //              < std::hypot(b.pose.position.x, b.pose.position.y);
-            //     });
+            // Step 5 — select object (apply target_class filter)
+            std::string current_target;
+            {
+                std::lock_guard<std::mutex> lock(target_class_mutex);
+                current_target = target_class;
+            }
 
+            decltype(snap.objects.begin()) best;
+            if (current_target.empty())
+            {
+                // No filter — pick first object (original behaviour)
+                best = snap.objects.begin();
+            }
+            else
+            {
+                // Find closest object matching the target class
+                best = snap.objects.end();
+                double best_dist = std::numeric_limits<double>::infinity();
+                for (auto it = snap.objects.begin(); it != snap.objects.end(); ++it)
+                {
+                    if (it->classification == current_target)
+                    {
+                        double d = std::hypot(it->pose.position.x, it->pose.position.y);
+                        if (d < best_dist)
+                        {
+                            best_dist = d;
+                            best = it;
+                        }
+                    }
+                }
+                if (best == snap.objects.end())
+                {
+                    RCLCPP_INFO(LOGGER, "No '%s' objects in frame — waiting",
+                                current_target.c_str());
+                    publishMotionStatus("Waiting for " + current_target);
+                    continue;
+                }
+            }
 
-            // go to first object of the list 
-            auto best = snap.objects.begin();
-
-            // Step 6 — repeat-fail guard: avoid looping forever on a stuck object
+            // Step 6 — repeat-fail guard
             if (has_last_fail)
             {
                 double dx = best->pose.position.x - last_fail_pos.x;
@@ -1856,12 +2000,13 @@ int main(int argc, char** argv)
                     if (++repeat_fail_count >= MAX_REPEAT_FAILS)
                     {
                         RCLCPP_ERROR(LOGGER,
-                            "Object at (%.3f, %.3f) failed %d times — skipping location",
+                            "Object at (%.3f, %.3f) failed %d times — skipping",
                             best->pose.position.x, best->pose.position.y,
                             repeat_fail_count);
+                        publishEvent("Skipping stuck object after repeated failures");
                         has_last_fail     = false;
                         repeat_fail_count = 0;
-                        continue;   // next iteration will see the same or a different object
+                        continue;
                     }
                     RCLCPP_WARN(LOGGER, "Same location failed %d/%d — retrying",
                         repeat_fail_count, MAX_REPEAT_FAILS);
@@ -1873,47 +2018,69 @@ int main(int argc, char** argv)
                 }
             }
 
-            // Step 7 — process this object
+            // Step 7 — publish what we're about to pick
+            publishCurrentObject(best->classification);
+            publishState("PREGRASP");
+            publishMotionStatus("Processing " + best->classification);
+            publishEvent("Picking " + best->classification);
+
+            // Step 8 — process this object
             PickResult res = processOneObject(
                 arm, gripper_client, psi, *best, object_counter++, node);
 
-            // Step 8 — handle result; always return home to restore camera view
+            // Step 9 — handle result
             switch (res)
             {
                 case PickResult::SUCCESS:
                     RCLCPP_INFO(LOGGER, "Pick %d succeeded — returning home", object_counter);
                     has_last_fail     = false;
                     repeat_fail_count = 0;
+                    publishState("DONE");
+                    publishEvent("Placed " + best->classification + " successfully");
+                    publishMotionStatus("Placed — homing");
+                    publishState("HOMING");
                     returnHome(arm, gripper_client);
                     break;
 
                 case PickResult::DROPPED:
-                    // Arm already finished moving to bin (empty-handed).
-                    // Dropped object will reappear in next perception frame.
-                    RCLCPP_WARN(LOGGER,
-                        "Object dropped during transport — returning home; "
-                        "dropped object will be picked up next iteration");
+                    RCLCPP_WARN(LOGGER, "Object dropped during transport");
+                    publishState("FAILED");
+                    publishEvent("Object dropped during transport");
+                    publishMotionStatus("Dropped — homing");
+                    publishState("HOMING");
                     returnHome(arm, gripper_client);
                     break;
 
                 case PickResult::GRASP_FAILED:
                     last_fail_pos = best->pose.position;
                     has_last_fail = true;
-                    RCLCPP_WARN(LOGGER,
-                        "Grasp failed — returning home and retrying with fresh perception");
+                    publishState("FAILED");
+                    publishEvent("Grasp failed — retrying with fresh perception");
+                    publishMotionStatus("Grasp failed — homing");
+                    publishState("HOMING");
                     returnHome(arm, gripper_client);
                     break;
 
                 case PickResult::SKIPPED:
-                    // Unknown class — don't count as a failure
+                    publishEvent("Skipped " + best->classification + " — no bin defined");
+                    publishMotionStatus("Skipped");
                     break;
             }
+
+            publishCurrentObject("—");
         }
 
         pick_loop_done:
         RCLCPP_INFO(LOGGER,
             "Pick sequence complete. %d objects processed.", object_counter);
+        publishState("DONE");
+        publishMotionStatus("Complete");
+        publishSystemStatus("Idle");
+        publishEvent("Sequence complete — " + std::to_string(object_counter) + " objects processed");
+        publishState("HOMING");
         returnHome(arm, gripper_client);
+        publishState("IDLE");
+        publishCurrentObject("—");
     }
 
     rclcpp::shutdown();

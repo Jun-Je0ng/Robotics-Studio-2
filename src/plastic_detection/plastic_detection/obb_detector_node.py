@@ -19,6 +19,7 @@ Visual:
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
+from sensor_msgs.msg import Image as RosImage
 import json
 import numpy as np
 import pyrealsense2 as rs
@@ -158,6 +159,7 @@ class OBBDetectorNode(Node):
         super().__init__('obb_detector_node')
 
         self.publisher_ = self.create_publisher(String, 'plastic_detections', 10)
+        self.camera_pub = self.create_publisher(RosImage, '/camera/annotated', 1)
         self.timer = self.create_timer(0.1, self.timer_callback)
 
         # Shared frame for display thread
@@ -529,6 +531,21 @@ class OBBDetectorNode(Node):
 
             with self.frame_lock:
                 self.display_frame = display
+
+        # ── Publish annotated frame to /camera/annotated for the GUI ──────────
+        try:
+            img_msg = RosImage()
+            img_msg.header.stamp = self.get_clock().now().to_msg()
+            img_msg.header.frame_id = 'camera_color_optical_frame'
+            img_msg.height = display.shape[0]
+            img_msg.width  = display.shape[1]
+            img_msg.encoding = 'bgr8'
+            img_msg.is_bigendian = False
+            img_msg.step = display.shape[1] * 3
+            img_msg.data = display.tobytes()
+            self.camera_pub.publish(img_msg)
+        except Exception as e:
+            self.get_logger().warn(f'Failed to publish camera frame: {e}')
 
         # Update consecutive frame counts per track key
         all_keys = set(self.detection_counts.keys()) | seen_this_frame
