@@ -27,6 +27,7 @@ setup(
             'obb_detector_unified_plane = plastic_detection.obb_detector_unified_plane:main',
             'obb_detector_homography = plastic_detection.obb_detector_homography:main',
             'obb_detector_improved = plastic_detection.obb_detector_improved:main',
+            'workspace_planner_node = plastic_detection.workspace_planner_node:main',
         ],
     },
 )
