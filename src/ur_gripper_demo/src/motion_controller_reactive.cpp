@@ -144,7 +144,8 @@ const std::map<std::string, int> BIN_MAP = {
     {"fabric",       2},
     {"hdpe_bottle",  1},
     {"pet_bottle",   1},
-    {"bottle",   1},
+    {"pp_container", 2},
+    {"bottle",       1},
 };
 
 enum class GraspStrategy {
@@ -709,17 +710,17 @@ GraspGeometry computeGraspGeometry(const object_msgs::msg::Object& obj)
     double xy_max = std::max(d[0], d[1]);
     double height = d[2];
 
+    // PP containers are squat/flat — allow a taller top-down limit for them only
+    double effective_max_height = TOP_DOWN_MAX_HEIGHT;
+    if (obj.classification == "pp_container")
+        effective_max_height = 0.100;  // 100mm
+
     // Strategy selection based on object dimensions
-    bool fits_topdown = (xy_min < TOP_DOWN_MAX_SPAN) && (height <= TOP_DOWN_MAX_HEIGHT);
-    bool is_tall      = height > TOP_DOWN_MAX_HEIGHT;   // likely upright bottle
+    bool fits_topdown = (xy_min < TOP_DOWN_MAX_SPAN) && (height <= effective_max_height);
+    bool is_tall      = height > effective_max_height;   // likely upright bottle
     bool is_thin      = xy_min < 0.03;                  // thin profile → slide-under more reliable
 
-    if (fits_topdown)
-        g.strategy = GraspStrategy::TOP_DOWN;
-    else if (is_tall && !is_thin)
-        g.strategy = GraspStrategy::SIDE_HORIZONTAL;    // upright bottle, grip from sides
-    else
-        g.strategy = GraspStrategy::SIDE_VERTICAL;      // wide flat object, slide under
+    g.strategy = GraspStrategy::TOP_DOWN;
 
     if (!g_sim_mode)
     {
@@ -1482,6 +1483,7 @@ PickResult processOneObject(
     bool grasped = false;
     if (r.grasp.strategy == GraspStrategy::TOP_DOWN)
         grasped = executeTopDownGrasp(arm, gripper_client, psi, r, node, stop_requested);
+    // SIDE_HORIZONTAL and SIDE_VERTICAL disabled
     // else if (r.grasp.strategy == GraspStrategy::SIDE_HORIZONTAL)
     //     grasped = executeSideHorizontalGrasp(arm, gripper_client, r, node);
     // else if (r.grasp.strategy == GraspStrategy::SIDE_VERTICAL)
@@ -1508,11 +1510,31 @@ PickResult processOneObject(
         return PickResult::GRASP_FAILED;
     }
 
-    // ── Transport to bin with drop monitoring ─────────────────────────────────
+    publishState("TRANSPORTING");
+
+    if (stop_requested.load())
+    {
+        RCLCPP_WARN(LOGGER, "STOP received during transit — releasing object '%s'", r.id.c_str());
+        openGripper(gripper_client);
+        detachObject(arm, r.id);
+        removeObject(psi, r.id);
+        return PickResult::ABORTED;
+    }
+
+    // ── Move to bin pose ──────────────────────────────────────────────────────
     geometry_msgs::msg::Pose bin_pose = getDropOffPose(obj.classification);
 
-    publishState("TRANSPORTING");
-    moveToPose(arm, bin_pose);
+    RCLCPP_INFO(LOGGER,
+        "Moving to '%s' bin pose: (%.3f, %.3f, %.3f)",
+        obj.classification.c_str(),
+        bin_pose.position.x, bin_pose.position.y, bin_pose.position.z);
+
+    if (!moveToPose(arm, bin_pose))
+    {
+        RCLCPP_ERROR(LOGGER,
+            "Transport to bin failed for '%s' (class='%s') — releasing in place",
+            r.id.c_str(), obj.classification.c_str());
+    }
 
     if (stop_requested.load())
     {
@@ -1779,6 +1801,14 @@ int main(int argc, char** argv)
 
     placeGround(arm, psi);
     spawnCameraAssembly(psi);
+
+    if (!g_sim_mode)
+    {
+        RCLCPP_INFO(LOGGER, "Waiting for gripper action server...");
+        while (!gripper_client->wait_for_action_server(std::chrono::seconds(1)))
+            RCLCPP_INFO(LOGGER, "  gripper bridge not ready yet — retrying...");
+        RCLCPP_INFO(LOGGER, "Gripper action server ready.");
+    }
     returnHome(arm, gripper_client);
 
     RCLCPP_INFO(LOGGER, "Ready. Send START via GUI or /motion_system/command topic.");
@@ -1814,10 +1844,7 @@ int main(int argc, char** argv)
         sequence_requested = false;
         stop_requested     = false;
 
-        // ── Move home first so camera has a clear view ────────────────────────
-        RCLCPP_INFO(LOGGER, "Moving home to clear camera view...");
-        publishState("HOMING");
-        returnHome(arm, gripper_client);
+        publishState("WAITING");
 
         // ── Reactive per-object pick loop ─────────────────────────────────────
         // Each iteration:
@@ -1954,30 +1981,23 @@ int main(int argc, char** argv)
             switch (res)
             {
                 case PickResult::SUCCESS:
-                    RCLCPP_INFO(LOGGER, "Pick %d succeeded — returning home", object_counter);
+                    RCLCPP_INFO(LOGGER, "Pick %d succeeded", object_counter);
                     has_last_fail     = false;
                     repeat_fail_count = 0;
-                    publishState("HOMING");
-                    returnHome(arm, gripper_client);
+                    publishState("WAITING");
                     break;
 
                 case PickResult::DROPPED:
-                    // Arm already finished moving to bin (empty-handed).
-                    // Dropped object will reappear in next perception frame.
                     RCLCPP_WARN(LOGGER,
-                        "Object dropped during transport — returning home; "
-                        "dropped object will be picked up next iteration");
-                    publishState("HOMING");
-                    returnHome(arm, gripper_client);
+                        "Object dropped during transport — retrying with fresh perception");
+                    publishState("WAITING");
                     break;
 
                 case PickResult::GRASP_FAILED:
                     last_fail_pos = best->pose.position;
                     has_last_fail = true;
-                    RCLCPP_WARN(LOGGER,
-                        "Grasp failed — returning home and retrying with fresh perception");
-                    publishState("HOMING");
-                    returnHome(arm, gripper_client);
+                    RCLCPP_WARN(LOGGER, "Grasp failed — retrying with fresh perception");
+                    publishState("WAITING");
                     break;
 
                 case PickResult::SKIPPED:
@@ -1997,8 +2017,6 @@ int main(int argc, char** argv)
         RCLCPP_INFO(LOGGER,
             "Pick sequence complete. %d objects processed.", object_counter);
         publishState("DONE");
-        publishState("HOMING");
-        returnHome(arm, gripper_client);
         publishState("IDLE");
     }
 
