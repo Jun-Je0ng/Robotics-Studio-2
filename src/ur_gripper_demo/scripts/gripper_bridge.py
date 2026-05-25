@@ -43,9 +43,9 @@ import time
 
 # ── tunables ──────────────────────────────────────────────────────────────────
 GRASP_SETTLE_S = 2.0    # s  – wait after command before holding
-                         #      RG2 reaches stall well within 3 s from fully open
 POLL_INTERVAL  = 0.05   # s  – joint state poll interval
 GRIPPER_JOINT  = "finger_width"
+GRASP_CLOSED_THRESH = 0.010
 # ──────────────────────────────────────────────────────────────────────────────
 
 
@@ -141,19 +141,41 @@ class GripperBridge(Node):
                 feedback.reached_goal = False
                 goal_handle.publish_feedback(feedback)
 
+        # Settle complete — hold at current width so controller stops fighting  # safe/no verification 
+        # cur = self._get_pos()
+        # hold_pos = cur if cur is not None else target
+        # self.get_logger().info(
+        #     f"Settle complete — holding at {hold_pos:.4f} m"
+        # )
+        # self._send_command(hold_pos)
+
+        # result = GripperCommand.Result()
+        # result.stalled      = True
+        # result.reached_goal = False
+        # result.position     = hold_pos
+        # result.effort       = effort
+        # goal_handle.succeed()
+        # return result
+
+
         # Settle complete — hold at current width so controller stops fighting
-        cur = self._get_pos()
+        cur      = self._get_pos()
         hold_pos = cur if cur is not None else target
+        
+        is_close_command = target < GRASP_CLOSED_THRESH
+        grasped          = hold_pos > GRASP_CLOSED_THRESH
+
         self.get_logger().info(
-            f"Settle complete — holding at {hold_pos:.4f} m"
+            f"Settle complete — hold={hold_pos:.4f} m  "
+            f"close_cmd={is_close_command}  grasped={grasped}"
         )
         self._send_command(hold_pos)
 
-        result = GripperCommand.Result()
-        result.stalled      = True
-        result.reached_goal = False
+        result              = GripperCommand.Result()
         result.position     = hold_pos
         result.effort       = effort
+        result.stalled      = grasped if is_close_command else False
+        result.reached_goal = (not grasped) if is_close_command else True
         goal_handle.succeed()
         return result
 
