@@ -1,0 +1,5 @@
+{
+  "velocity_scale": 0.05,
+  "accel_scale": 0.05,
+  "priority_mode": "distance"
+}

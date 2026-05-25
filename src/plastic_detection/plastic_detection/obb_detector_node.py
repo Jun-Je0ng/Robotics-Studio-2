@@ -34,8 +34,8 @@ import threading
 # CONFIG
 # ──────────────────────────────────────────────────────────────────────────────
 
-MODEL_PATH       = "/home/jun/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/best.pt"
-CALIBRATION_FILE = "/home/jun/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/camera_to_robot_calibration.json"
+MODEL_PATH       = "/home/billy/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/best.pt"
+CALIBRATION_FILE = "/home/billy/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/camera_to_robot_calibration.json"
 
 DEPTH_KERNEL_SIZE    = 11
 SMOOTHING_WINDOW     = 5
@@ -44,6 +44,7 @@ CONF_THRESHOLD       = 0.7
 STABILITY_FRAMES     = 5
 GRIP_OFFSET          = 50
 APPROACH_OFFSET      = 150
+MATCH_RADIUS_PX      = 60   # pixel radius to match a detection to an existing track
 
 SHOW_DISPLAY = True  # ← comment this out to disable the camera feed window
 
@@ -225,6 +226,7 @@ class OBBDetectorNode(Node):
         self.prev_depths       = {}
         self.detection_counts  = {}
         self.stable_detections = {}
+        self.track_positions   = {}  # track_key -> (cx_px, cy_px), last seen pixel position
 
         # Start display thread
         if SHOW_DISPLAY:
@@ -236,6 +238,33 @@ class OBBDetectorNode(Node):
             f'OBB Detector Node ready — publishing to /plastic_detections '
             f'(conf>={CONF_THRESHOLD}, stable>={STABILITY_FRAMES} frames)'
         )
+
+    def _get_track_key(self, cls_name: str, cx: int, cy: int, already_assigned: dict) -> str:
+        """
+        Match this detection to the nearest existing track of the same class within
+        MATCH_RADIUS_PX pixels. Returns a key like 'pet_bottle_0' or 'pet_bottle_1'.
+        already_assigned maps track_keys already used in the current frame so two
+        detections of the same class cannot steal each other's identity.
+        """
+        prefix    = cls_name + '_'
+        best_key  = None
+        best_dist = float('inf')
+        for key, (kx, ky) in self.track_positions.items():
+            if not key.startswith(prefix):
+                continue
+            if key in already_assigned:
+                continue
+            dist = np.hypot(cx - kx, cy - ky)
+            if dist < MATCH_RADIUS_PX and dist < best_dist:
+                best_dist = dist
+                best_key  = key
+        if best_key is None:
+            idx = 0
+            while (f"{prefix}{idx}" in self.track_positions or
+                   f"{prefix}{idx}" in already_assigned):
+                idx += 1
+            best_key = f"{prefix}{idx}"
+        return best_key
 
     def display_loop(self):
         """Runs in separate thread — handles cv2 window."""
@@ -272,6 +301,7 @@ class OBBDetectorNode(Node):
 
         seen_this_frame    = set()
         current_detections = {}
+        new_track_positions = {}  # track_key -> (cx, cy) assigned this frame
 
         if results.obb is not None:
             for obb_box in results.obb:
@@ -289,16 +319,20 @@ class OBBDetectorNode(Node):
                 angle_rad = float(xywhr[4])
                 angle_deg = float(np.degrees(angle_rad))
 
+                # Assign a stable per-instance track key (e.g. 'pet_bottle_0', 'pet_bottle_1')
+                track_key = self._get_track_key(cls_name, cx, cy, new_track_positions)
+                new_track_positions[track_key] = (cx, cy)
+
                 depth_m = get_median_depth(depth_frame, cx, cy)
                 if depth_m is None or depth_m <= 0.01 or depth_m > 3.0:
                     continue
 
                 # Spike filter
-                prev = self.prev_depths.get(cls_name)
+                prev = self.prev_depths.get(track_key)
                 if prev is not None and \
                         abs(depth_m - prev) > DEPTH_JUMP_THRESHOLD:
                     depth_m = prev
-                self.prev_depths[cls_name] = depth_m
+                self.prev_depths[track_key] = depth_m
 
                 # Camera → robot XY via homography (pixel → robot mm)
                 # Homography is numerically stable for the 4-coplanar-point
@@ -322,10 +356,10 @@ class OBBDetectorNode(Node):
                         raw_robot = {"x": xy[0], "y": xy[1], "z": self.table_z_m}
 
                 # Temporal smoothing
-                if cls_name not in self.pose_histories:
-                    self.pose_histories[cls_name] = deque(maxlen=SMOOTHING_WINDOW)
-                self.pose_histories[cls_name].append(raw_robot)
-                hist = self.pose_histories[cls_name]
+                if track_key not in self.pose_histories:
+                    self.pose_histories[track_key] = deque(maxlen=SMOOTHING_WINDOW)
+                self.pose_histories[track_key].append(raw_robot)
+                hist = self.pose_histories[track_key]
 
                 x_smooth = float(np.mean([p["x"] for p in hist])) * 1000
                 y_smooth = float(np.mean([p["y"] for p in hist])) * 1000
@@ -350,7 +384,7 @@ class OBBDetectorNode(Node):
                 quaternion = angle_to_quaternion(angle_rad)
 
                 # Stability indicator
-                count      = self.detection_counts.get(cls_name, 0)
+                count      = self.detection_counts.get(track_key, 0)
                 stable_str = "STABLE" if count >= STABILITY_FRAMES \
                     else f"stabilising {count}/{STABILITY_FRAMES}"
                 colour = (0, 255, 0) if count >= STABILITY_FRAMES \
@@ -358,9 +392,9 @@ class OBBDetectorNode(Node):
 
                 # Overlay info on display frame
                 if SHOW_DISPLAY:
-                    # Class + stability
+                    # Instance track key + stability (e.g. "pet_bottle_1 | STABLE")
                     cv2.putText(display,
-                                f"{cls_name} | {stable_str}",
+                                f"{track_key} | {stable_str}",
                                 (cx - 80, cy - 52),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, colour, 2)
                     # Raw camera-frame XY (before transform) — for comparison
@@ -396,8 +430,8 @@ class OBBDetectorNode(Node):
                 if dz_mm is not None:
                     dimensions["dz_mm"] = dz_mm
 
-                seen_this_frame.add(cls_name)
-                current_detections[cls_name] = {
+                seen_this_frame.add(track_key)
+                current_detections[track_key] = {
                     "pose": {
                         "position": {
                             "x": round(x_smooth, 1),
@@ -420,6 +454,10 @@ class OBBDetectorNode(Node):
                         "dz_source":     dz_source,
                     }
                 }
+
+        # Commit this frame's track positions
+        for k, pos in new_track_positions.items():
+            self.track_positions[k] = pos
 
         # HUD
         if SHOW_DISPLAY:
@@ -492,22 +530,24 @@ class OBBDetectorNode(Node):
             with self.frame_lock:
                 self.display_frame = display
 
-        # Update consecutive frame counts
-        all_classes = set(self.detection_counts.keys()) | seen_this_frame
-        for cls_name in all_classes:
-            if cls_name in seen_this_frame:
-                self.detection_counts[cls_name] = \
-                    self.detection_counts.get(cls_name, 0) + 1
+        # Update consecutive frame counts per track key
+        all_keys = set(self.detection_counts.keys()) | seen_this_frame
+        for key in all_keys:
+            if key in seen_this_frame:
+                self.detection_counts[key] = self.detection_counts.get(key, 0) + 1
             else:
-                self.detection_counts[cls_name] = 0
-                self.stable_detections.pop(cls_name, None)
+                self.detection_counts[key] = 0
+                self.stable_detections.pop(key, None)
+                self.track_positions.pop(key, None)
+                self.pose_histories.pop(key, None)
+                self.prev_depths.pop(key, None)
 
         # Only publish stable detections
         stable = []
-        for cls_name, count in self.detection_counts.items():
-            if count >= STABILITY_FRAMES and cls_name in current_detections:
-                self.stable_detections[cls_name] = current_detections[cls_name]
-                stable.append(self.stable_detections[cls_name])
+        for key, count in self.detection_counts.items():
+            if count >= STABILITY_FRAMES and key in current_detections:
+                self.stable_detections[key] = current_detections[key]
+                stable.append(self.stable_detections[key])
 
         if stable:
             msg = String()

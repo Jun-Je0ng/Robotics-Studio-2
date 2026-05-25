@@ -440,6 +440,13 @@ def launch_setup(context, *args, **kwargs):
         ),
     )
 
+    workspace_planner = Node(
+        package='plastic_detection',
+        executable='workspace_planner_node',
+        name='workspace_planner_node',
+        output='screen',
+    )
+
     # nodes_to_start = [move_group_node, rviz_node, servo_node, demo_node]
     nodes_to_start = [
         move_group_node,
@@ -452,6 +459,7 @@ def launch_setup(context, *args, **kwargs):
         reactive_controller_node,
         Perception_info_translator,
         gripper_bridge_node,
+        workspace_planner,
     ]
 
     return nodes_to_start

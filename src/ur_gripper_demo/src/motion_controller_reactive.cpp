@@ -1835,12 +1835,16 @@ int main(int argc, char** argv)
             empty_count = 0;   // reset on any non-empty frame
 
             // Step 5 — pick the closest object to the robot base (XY distance)
-            auto best = std::min_element(
-                snap.objects.begin(), snap.objects.end(),
-                [](const auto& a, const auto& b) {
-                    return std::hypot(a.pose.position.x, a.pose.position.y)
-                         < std::hypot(b.pose.position.x, b.pose.position.y);
-                });
+            // auto best = std::min_element(
+            //     snap.objects.begin(), snap.objects.end(),
+            //     [](const auto& a, const auto& b) {
+            //         return std::hypot(a.pose.position.x, a.pose.position.y)
+            //              < std::hypot(b.pose.position.x, b.pose.position.y);
+            //     });
+
+
+            // go to first object of the list 
+            auto best = snap.objects.begin();
 
             // Step 6 — repeat-fail guard: avoid looping forever on a stuck object
             if (has_last_fail)

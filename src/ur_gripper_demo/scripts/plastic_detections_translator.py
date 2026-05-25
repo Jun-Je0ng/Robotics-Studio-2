@@ -66,7 +66,7 @@ class PlasticDetectionsTranslator(Node):
 
         self.sub = self.create_subscription(
             String,
-            'plastic_detections',
+            'pick_queue',
             self._callback,
             10
         )
@@ -78,7 +78,7 @@ class PlasticDetectionsTranslator(Node):
         )
 
         self.get_logger().info(
-            'Translator ready: /plastic_detections → /perception/objects'
+            'Translator ready: /pick_queue → /perception/objects'
         )
 
     def _callback(self, msg: String):
