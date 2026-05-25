@@ -9,10 +9,31 @@ import tkinter as tk
 import numpy as np
 from PIL import Image as PILImage, ImageTk
 
+import math
+
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from sensor_msgs.msg import Image as RosImage
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
+from tf2_ros import (Buffer, TransformListener,
+                     LookupException, ConnectivityException,
+                     ExtrapolationException)
+from rclpy.action import ActionClient
+from control_msgs.action import GripperCommand
+
+BIN_POSES_PATH = (
+    '/home/jarrel/ros2_ws/Robotics-Studio-2/src/'
+    'ur_gripper_demo/config/bin_poses.json'
+)
+# Motion controller reads from the installed copy — write there too so changes
+# take effect immediately without a colcon build.
+BIN_POSES_INSTALL_PATH = (
+    '/home/jarrel/ros2_ws/Robotics-Studio-2/install/'
+    'ur_gripper_demo/share/ur_gripper_demo/config/bin_poses.json'
+)
+_BASE_FRAME = 'base'
+_EEF_FRAME  = 'gripper_tcp'
 
 # ── Colour palette ────────────────────────────────────────────────────────────
 C = {
@@ -56,6 +77,11 @@ class StatusGui(Node):
         self._bin_status_labels = {}
         self._load_bin_poses_from_file()
 
+        self._tf_buffer   = Buffer()
+        self._tf_listener = TransformListener(self._tf_buffer, self)
+        self._gripper_client = ActionClient(
+            self, GripperCommand, '/gripper_action_controller/gripper_cmd')
+
         self.cmd_pub = self.create_publisher(String, "/motion_system/command", 10)
 
         # ── existing topics ──────────────────────────────────────────────────
@@ -73,8 +99,13 @@ class StatusGui(Node):
         # ── Rian's perception topics ──────────────────────────────────────────
         self.create_subscription(String, "/plastic_detections",
                                  self._cb_plastic_detections, 10)
+        _img_qos = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1,
+        )
         self.create_subscription(RosImage, "/camera/annotated",
-                                 self._cb_camera_frame,        1)
+                                 self._cb_camera_frame, _img_qos)
 
         self._build()
 
@@ -157,9 +188,11 @@ class StatusGui(Node):
         row2 = tk.Frame(p, bg=C['bg'])
         row2.pack(fill=tk.X, pady=(0, 4))
         self._btn(row2, "◁▷  Open", "open_gripper",
-                  bg=C['blue'], fg=C['bg'], width=12).pack(side=tk.LEFT, padx=(0, 6))
+                  bg=C['blue'], fg=C['bg'], width=12,
+                  command=self._do_open_gripper).pack(side=tk.LEFT, padx=(0, 6))
         self._btn(row2, "▷◁  Close", "close_gripper",
-                  bg=C['card'], fg=C['text'], width=12).pack(side=tk.LEFT)
+                  bg=C['card'], fg=C['text'], width=12,
+                  command=self._do_close_gripper).pack(side=tk.LEFT)
 
 
 
@@ -271,9 +304,10 @@ class StatusGui(Node):
         self._target_var = tk.StringVar(value="")
 
         priority_types = [
-            ("",            "Any  (closest first)", C['text']),
-            ("pet_bottle",  "pet_bottle",           C['cyan']),
-            ("hdpe_bottle", "hdpe_bottle",           C['orange']),
+            ("",             "Any  (closest first)", C['text']),
+            ("pet_bottle",   "pet_bottle",           C['cyan']),
+            ("hdpe_bottle",  "hdpe_bottle",          C['orange']),
+            ("pp_container", "pp_container",         C['purple']),
         ]
         self._priority_conf_labels = {}
 
@@ -311,8 +345,9 @@ class StatusGui(Node):
                  wraplength=330, justify=tk.LEFT).pack(anchor="w", pady=(0, 6))
 
         known_types = [
-            ("pet_bottle",  C['cyan'],   "PETG Bottle"),
-            ("hdpe_bottle", C['orange'], "HDPE Bottle"),
+            ("pet_bottle",   C['cyan'],   "PET Bottle"),
+            ("hdpe_bottle",  C['orange'], "HDPE Bottle"),
+            ("pp_container", C['purple'], "PP Container"),
         ]
         for type_name, colour, display_name in known_types:
             card = tk.Frame(p, bg=C['card'], padx=10, pady=8)
@@ -500,6 +535,23 @@ class StatusGui(Node):
         self.send_command("stop")
         self._sys_card.config(text="Stopped", fg=C['red'])
 
+    def _do_open_gripper(self):
+        self._send_gripper_goal(0.110)
+        self._log("Opening gripper", "info")
+
+    def _do_close_gripper(self):
+        self._send_gripper_goal(0.0)
+        self._log("Closing gripper", "info")
+
+    def _send_gripper_goal(self, position: float):
+        if not self._gripper_client.wait_for_server(timeout_sec=0.0):
+            self._log("Gripper action server not available", "warn")
+            return
+        goal = GripperCommand.Goal()
+        goal.command.position   = position
+        goal.command.max_effort = 40.0
+        self._gripper_client.send_goal_async(goal)
+
     def _do_estop(self):
         self.send_command("estop")
         self._sys_card.config(text="E-STOP", fg=C['red'])
@@ -520,11 +572,7 @@ class StatusGui(Node):
 
     def _load_bin_poses_from_file(self):
         try:
-            from ament_index_python.packages import get_package_share_directory
-            path = os.path.join(
-                get_package_share_directory('ur_gripper_demo'),
-                'config', 'bin_poses.json')
-            with open(path) as f:
+            with open(BIN_POSES_PATH) as f:
                 self._bin_poses = json.load(f)
         except Exception:
             self._bin_poses = {}
@@ -537,10 +585,15 @@ class StatusGui(Node):
         return f"  x={pos[0]:.3f}  y={pos[1]:.3f}  z={pos[2]:.3f}"
 
     def _save_bin_with_feedback(self, type_name: str):
+        # Tell the motion controller to save the current EEF pose (updates in-memory bin_map)
+        self.send_command(f"SAVE_BIN:{type_name}")
+        # Also write to both JSON paths via TF2 so the GUI display updates immediately
         self._save_bin(type_name)
+        # Reload so status label shows the new coords immediately
+        self._load_bin_poses_from_file()
         if type_name in self._bin_status_labels:
             self._bin_status_labels[type_name].config(
-                text="  ✓ pose saved (reload to see coords)", fg=C['green'])
+                text=self._bin_pose_summary(type_name), fg=C['green'])
 
     def _reload_bins(self):
         self.send_command("LOAD_BINS")
@@ -550,15 +603,71 @@ class StatusGui(Node):
                        fg=C['green'] if type_name in self._bin_poses else C['muted'])
         self._log("Bin poses reloaded", "ok")
 
+    def _get_eef_pose(self):
+        """Return (position, rpy) by TF2 lookup of gripper_tcp in base frame.
+
+        Orientation is returned as [roll, pitch, yaw] to match what the
+        motion controller expects: q.setRPY(r, p, y) in loadBinPoses().
+        """
+        tf = self._tf_buffer.lookup_transform(
+            _BASE_FRAME, _EEF_FRAME,
+            rclpy.time.Time(),
+            timeout=rclpy.duration.Duration(seconds=1.0))
+        t = tf.transform.translation
+        q = tf.transform.rotation
+        position = [t.x, t.y, t.z]
+        # quaternion → RPY (matches q.setRPY in the C++ motion controller)
+        qx, qy, qz, qw = q.x, q.y, q.z, q.w
+        roll  = math.atan2(2*(qw*qx + qy*qz), 1 - 2*(qx*qx + qy*qy))
+        sinp  = 2*(qw*qy - qz*qx)
+        pitch = math.asin(max(-1.0, min(1.0, sinp)))
+        yaw   = math.atan2(2*(qw*qz + qx*qy), 1 - 2*(qy*qy + qz*qz))
+        return position, [roll, pitch, yaw]
+
     def _save_bin(self, type_name: str):
-        self.send_command(f"SAVE_BIN:{type_name}")
-        self._log(f"Bin saved for '{type_name}'", "ok")
+        try:
+            position, orientation = self._get_eef_pose()
+        except (LookupException, ConnectivityException,
+                ExtrapolationException, RuntimeError) as e:
+            self._log(f"TF2 lookup failed: {e}", "err")
+            return
+
+        # Load existing file (if present), update, and write back
+        try:
+            if os.path.exists(BIN_POSES_PATH):
+                with open(BIN_POSES_PATH) as f:
+                    data = json.load(f)
+            else:
+                data = {}
+        except Exception:
+            data = {}
+
+        data[type_name] = {"position": position, "orientation": orientation}
+
+        failed = []
+        for path in (BIN_POSES_PATH, BIN_POSES_INSTALL_PATH):
+            try:
+                with open(path, 'w') as f:
+                    json.dump(data, f, indent=4)
+            except Exception as e:
+                failed.append(f"{path}: {e}")
+
+        if failed:
+            self._log(f"Write error(s): {'; '.join(failed)}", "err")
+            return
+
+        self._log(
+            f"Saved '{type_name}': "
+            f"x={position[0]:.3f} y={position[1]:.3f} z={position[2]:.3f}",
+            "ok"
+        )
 
     def _save_bin_custom(self):
         name = self._bin_custom_var.get().strip()
         if not name:
             self._log("Enter a type name before saving", "warn")
             return
+        self.send_command(f"SAVE_BIN:{name}")
         self._save_bin(name)
         self._bin_custom_var.set("")
 
@@ -715,13 +824,18 @@ class StatusGui(Node):
 
     def _cb_camera_frame(self, msg: RosImage):
         try:
+            channels = len(msg.data) // (msg.height * msg.width)
             frame = np.frombuffer(msg.data, dtype=np.uint8).reshape(
-                msg.height, msg.width, 3)
-            frame_rgb = frame[:, :, ::-1]
+                msg.height, msg.width, channels)
+            if channels == 4:
+                frame_rgb = frame[:, :, [2, 1, 0]]   # BGRA → RGB
+            else:
+                frame_rgb = frame[:, :, ::-1]         # BGR → RGB
             self._cam_pil = PILImage.fromarray(frame_rgb)
             self._render_camera()
         except Exception as e:
             self.get_logger().warn(f'Camera frame decode error: {e}')
+            self._log(f'Camera decode error: {e}', 'err')
 
     def _render_camera(self):
         if self._cam_pil is None:
@@ -739,7 +853,7 @@ class StatusGui(Node):
         self._cam_canvas.create_image(w // 2, h // 2, anchor="center", image=photo)
         self._cam_canvas.image = photo
 
-    # ══════════════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════════════════
     # Log & lifecycle
     # ══════════════════════════════════════════════════════════════════════════
 
