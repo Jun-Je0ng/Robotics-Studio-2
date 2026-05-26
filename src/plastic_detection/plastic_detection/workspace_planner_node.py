@@ -8,8 +8,9 @@ Uses K-Means clustering to group objects spatially.
 Logic:
 - Determine k by counting natural groups via pairwise distance threshold
   (objects within CLUSTER_DISTANCE_MM of each other → same group)
-- Run K-Means with that k so nearby objects end up in the same cluster
-- Robot clears nearest cluster first, within each cluster picks nearest object
+- Run K-Means on raw mm coordinates with that k
+- Robot clears least isolated cluster first (tightest group), most isolated objects last
+- Within each cluster, picks least-isolated objects first
 - Publishes prioritised list to /pick_queue
 """
 
@@ -18,8 +19,6 @@ from rclpy.node import Node
 from std_msgs.msg import String
 import json
 import numpy as np
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
 
 # Objects within this distance (mm) are considered the same natural group
 CLUSTER_DISTANCE_MM = 200
@@ -47,24 +46,25 @@ class WorkspacePlannerNode(Node):
             f'publishing to /pick_queue'
         )
 
-    def _natural_cluster_count(self, positions: np.ndarray) -> int:
-        """Count spatial groups via connected components at CLUSTER_DISTANCE_MM."""
+    def _cluster_by_distance(self, positions: np.ndarray):
+        """Assign cluster labels via connected components at CLUSTER_DISTANCE_MM.
+        Objects within the threshold of each other are guaranteed the same label."""
         n = len(positions)
-        visited = [False] * n
-        k = 0
+        labels = [-1] * n
+        cid = 0
         for start in range(n):
-            if not visited[start]:
-                k += 1
+            if labels[start] == -1:
                 stack = [start]
                 while stack:
                     node = stack.pop()
-                    if not visited[node]:
-                        visited[node] = True
+                    if labels[node] == -1:
+                        labels[node] = cid
                         for nb in range(n):
-                            if not visited[nb] and \
+                            if labels[nb] == -1 and \
                                np.linalg.norm(positions[node] - positions[nb]) < CLUSTER_DISTANCE_MM:
                                 stack.append(nb)
-        return max(1, k)
+                cid += 1
+        return np.array(labels), cid
 
     def detection_callback(self, msg):
         try:
@@ -91,11 +91,7 @@ class WorkspacePlannerNode(Node):
                 for d in detections
             ])
 
-            # Determine k from spatial grouping, then run K-Means
-            k          = self._natural_cluster_count(positions)
-            scaler     = StandardScaler()
-            pos_scaled = scaler.fit_transform(positions)
-            labels     = KMeans(n_clusters=k, random_state=42, n_init=10).fit_predict(pos_scaled)
+            labels, k = self._cluster_by_distance(positions)
 
             # Isolation score = normalised mean distance to all other objects
             isolation_scores = []
@@ -111,30 +107,39 @@ class WorkspacePlannerNode(Node):
                 d['cluster_id']      = int(labels[i])
                 d['isolation_score'] = round(isolation_scores[i], 3)
 
-            # Order clusters by distance of their centroid from robot origin (nearest first)
-            cluster_centroids = {}
-            for i, d in enumerate(detections):
-                cid = d['cluster_id']
-                cluster_centroids.setdefault(cid, []).append(positions[i])
+            # Order clusters by mean isolation score ascending (least isolated cluster first)
+            cluster_iso = {}
+            for d in detections:
+                cluster_iso.setdefault(d['cluster_id'], []).append(d['isolation_score'])
             cluster_order = sorted(
-                cluster_centroids.keys(),
-                key=lambda cid: np.linalg.norm(np.mean(cluster_centroids[cid], axis=0))
+                cluster_iso.keys(),
+                key=lambda cid: np.mean(cluster_iso[cid])
             )
 
-            # Sort: cluster order first, then nearest object within each cluster
+            # Sort: least isolated cluster first, then within each cluster by
+            # isolation_score ascending (most surrounded by other objects = first)
             detections = sorted(
                 detections,
                 key=lambda d: (
                     cluster_order.index(d['cluster_id']),
-                    np.linalg.norm([d['pose']['position']['x'], d['pose']['position']['y']])
+                    d['isolation_score']
                 )
             )
             for i, d in enumerate(detections):
                 d['pick_order'] = i + 1
 
+            # Log cluster summary
             self.get_logger().info(
                 f'Clusters: {k} (distance threshold {CLUSTER_DISTANCE_MM}mm)'
             )
+            for cid in cluster_order:
+                members = [d for d in detections if d['cluster_id'] == cid]
+                names   = ', '.join(
+                    d.get('instance_id', d['classification']['class']) for d in members
+                )
+                self.get_logger().info(
+                    f'  Cluster {cid} ({len(members)} objects): [{names}]'
+                )
 
         out_msg = String()
         out_msg.data = json.dumps(detections)
