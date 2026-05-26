@@ -99,6 +99,8 @@ class StatusGui(Node):
         # ── Rian's perception topics ──────────────────────────────────────────
         self.create_subscription(String, "/plastic_detections",
                                  self._cb_plastic_detections, 10)
+        self.create_subscription(String, "/pick_queue",
+                                 self._cb_pick_queue, 10)
         _img_qos = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
             history=HistoryPolicy.KEEP_LAST,
@@ -259,7 +261,7 @@ class StatusGui(Node):
         self.log_box.tag_config("info",   foreground=C['blue'])
         self.log_box.tag_config("normal", foreground=C['text'])
 
-        self._section_label(p, "OBJECTS DETECTED  (/plastic_detections)")
+        self._section_label(p, "PICK QUEUE  (/pick_queue)")
 
         # ── Count + live dot ──────────────────────────────────────
         count_hdr = tk.Frame(p, bg=C['bg'])
@@ -770,14 +772,46 @@ class StatusGui(Node):
             return
 
         self._latest_detections = detections
-        n = len(detections)
 
+        # Update confidence labels in PICK PRIORITY section
+        best_conf = {}
+        for det in detections:
+            cls  = det.get("classification", {}).get("class", "?")
+            conf = det.get("classification", {}).get("confidence", 0.0)
+            if cls not in best_conf or conf > best_conf[cls]:
+                best_conf[cls] = conf
+        for cls, lbl in self._priority_conf_labels.items():
+            if cls in best_conf:
+                lbl.config(text=f"{best_conf[cls]:.2f}", fg=C['green'])
+            else:
+                lbl.config(text="—", fg=C['muted'])
+
+        # If pick_queue hasn't published yet, show raw detections as fallback
+        if not hasattr(self, '_pick_queue_active') or not self._pick_queue_active:
+            self._render_detection_list(detections, enriched=False)
+
+    def _cb_pick_queue(self, msg):
+        try:
+            queue = json.loads(msg.data)
+        except json.JSONDecodeError:
+            return
+
+        self._pick_queue_active = True
+        n = len(queue)
         color = C['green'] if n > 0 else C['muted']
         noun = "object" if n == 1 else "objects"
         self._det_count_label.config(text=f"{n} {noun}", fg=color)
         self._det_status_dot.config(fg=C['green'] if n > 0 else C['muted'])
+        self._render_detection_list(queue, enriched=True)
 
-        # Per-object table
+    def _render_detection_list(self, detections, enriched=False):
+        if not enriched:
+            n = len(detections)
+            color = C['green'] if n > 0 else C['muted']
+            noun = "object" if n == 1 else "objects"
+            self._det_count_label.config(text=f"{n} {noun}", fg=color)
+            self._det_status_dot.config(fg=C['green'] if n > 0 else C['muted'])
+
         self._det_list_box.config(state="normal")
         self._det_list_box.delete("1.0", tk.END)
         if not detections:
@@ -795,32 +829,34 @@ class StatusGui(Node):
                 dx = dims.get("dx_mm", 0)
                 dy = dims.get("dy_mm", 0)
 
-                self._det_list_box.insert(tk.END, f"  {cls}", "cls")
-                self._det_list_box.insert(tk.END, f"  ({conf:.2f})\n", "conf")
-                self._det_list_box.insert(
-                    tk.END,
-                    f"    x: {x:.0f}mm  y: {y:.0f}mm  z: {z:.0f}mm\n",
-                    "coord")
-                self._det_list_box.insert(
-                    tk.END,
-                    f"    size: {dx:.0f}×{dy:.0f}mm\n",
-                    "dim")
+                if enriched:
+                    order = det.get("pick_order", i + 1)
+                    iso   = det.get("isolation_score", 0.0)
+                    self._det_list_box.insert(tk.END, f"  #{order} ", "count")
+                    self._det_list_box.insert(tk.END, f"{cls}", "cls")
+                    self._det_list_box.insert(tk.END, f"  ({conf:.2f})\n", "conf")
+                    self._det_list_box.insert(
+                        tk.END,
+                        f"    x: {x:.0f}mm  y: {y:.0f}mm  z: {z:.0f}mm\n",
+                        "coord")
+                    self._det_list_box.insert(
+                        tk.END,
+                        f"    size: {dx:.0f}×{dy:.0f}mm  iso: {iso:.2f}\n",
+                        "dim")
+                else:
+                    self._det_list_box.insert(tk.END, f"  {cls}", "cls")
+                    self._det_list_box.insert(tk.END, f"  ({conf:.2f})\n", "conf")
+                    self._det_list_box.insert(
+                        tk.END,
+                        f"    x: {x:.0f}mm  y: {y:.0f}mm  z: {z:.0f}mm\n",
+                        "coord")
+                    self._det_list_box.insert(
+                        tk.END,
+                        f"    size: {dx:.0f}×{dy:.0f}mm\n",
+                        "dim")
                 if i < len(detections) - 1:
                     self._det_list_box.insert(tk.END, sep, "sep")
         self._det_list_box.config(state="disabled")
-
-        # Update confidence labels in PICK PRIORITY section
-        best_conf = {}  # cls -> highest confidence seen this message
-        for det in detections:
-            cls  = det.get("classification", {}).get("class", "?")
-            conf = det.get("classification", {}).get("confidence", 0.0)
-            if cls not in best_conf or conf > best_conf[cls]:
-                best_conf[cls] = conf
-        for cls, lbl in self._priority_conf_labels.items():
-            if cls in best_conf:
-                lbl.config(text=f"{best_conf[cls]:.2f}", fg=C['green'])
-            else:
-                lbl.config(text="—", fg=C['muted'])
 
     def _cb_camera_frame(self, msg: RosImage):
         try:
