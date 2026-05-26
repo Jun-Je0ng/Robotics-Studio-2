@@ -441,6 +441,7 @@ class OBBDetectorNode(Node):
 
                 seen_this_frame.add(track_key)
                 current_detections[track_key] = {
+                    "instance_id": track_key,
                     "pose": {
                         "position": {
                             "x": round(x_smooth, 1),

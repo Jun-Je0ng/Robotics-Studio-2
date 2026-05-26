@@ -90,9 +90,21 @@ class PlasticDetectionsTranslator(Node):
 
         stamp     = self.get_clock().now().to_msg()
         obj_array = ObjectArray()
-        # obj_array.header.frame_id = 'base_link'
         obj_array.header.frame_id = ROBOT_FRAME
         obj_array.header.stamp    = stamp
+
+        # ── Cluster-first filtering ───────────────────────────────────────────
+        # Only forward objects from the active cluster (the one containing
+        # pick_order=1). When that cluster is fully picked the workspace planner
+        # reassigns pick_order=1 to the next cluster and we follow automatically.
+        if detections and 'cluster_id' in detections[0]:
+            first = min(detections, key=lambda d: d.get('pick_order', 0))
+            active_cluster = first['cluster_id']
+            detections = [d for d in detections if d['cluster_id'] == active_cluster]
+            self.get_logger().debug(
+                f'Active cluster: {active_cluster} — '
+                f'forwarding {len(detections)} object(s)'
+            )
 
         for i, det in enumerate(detections):
             try:
