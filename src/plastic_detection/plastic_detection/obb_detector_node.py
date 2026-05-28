@@ -42,16 +42,24 @@ import threading
 # CONFIG
 # ──────────────────────────────────────────────────────────────────────────────
 
-MODEL_PATH       = "/home/jarrel/ros2_ws/Robotics-Studio-2/src/plastic_detection/plastic_detection/best.pt"
-CALIBRATION_FILE = "/home/jarrel/ros2_ws/Robotics-Studio-2/src/plastic_detection/plastic_detection/camera_to_robot_calibration.json"
+MODEL_PATH       = "/home/jun/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/best.pt"
+CALIBRATION_FILE = "/home/jun/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/camera_to_robot_calibration.json"
 
 DEPTH_KERNEL_SIZE    = 11
 SMOOTHING_WINDOW     = 5
 DEPTH_JUMP_THRESHOLD = 0.05
 CONF_THRESHOLD       = 0.7
 STABILITY_FRAMES     = 5
-GRIP_OFFSET          = 50
+GRIP_OFFSET          = 50   # default: mm above table surface to grip
 APPROACH_OFFSET      = 150
+
+# Per-class grip heights (mm above table). Shorter objects need a smaller offset
+# so the gripper descends far enough to contact them.
+CLASS_GRIP_OFFSETS = {
+    'hdpe_bottle':  10,   # short/squat bottle — grip close to table
+    'pp_container': 20,   # medium-height container
+    'pet_bottle':   50,   # tall upright bottle
+}
 MATCH_RADIUS_PX      = 60   # pixel radius to match a detection to an existing track
 
 SHOW_DISPLAY = True  # ← comment this out to disable the camera feed window
@@ -376,7 +384,8 @@ class OBBDetectorNode(Node):
                 # Work plane Z
                 z_table    = get_table_z(x_smooth, y_smooth)
                 z_approach = z_table + APPROACH_OFFSET
-                z_grip     = z_table + GRIP_OFFSET
+                grip_offset = CLASS_GRIP_OFFSETS.get(cls_name, GRIP_OFFSET)
+                z_grip     = z_table + grip_offset
 
                 # Convert px → mm
                 fx    = self.intrinsics.fx

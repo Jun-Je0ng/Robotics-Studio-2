@@ -9,7 +9,7 @@ Launches four subsystems in order:
   4. Status GUI                      (ur_gripper_demo / status_gui)
 
 Usage (real robot):
-    ros2 launch ur_gripper_demo bringup.launch.py robot_ip:=192.168.0.194
+    ros2 launch ur_gripper_demo bringup.launch.py robot_ip:=192.168.0.197
 
 Usage (simulation / fake hardware):
     ros2 launch ur_gripper_demo bringup.launch.py sim:=true
@@ -38,7 +38,7 @@ def generate_launch_description():
     declared_arguments = [
         DeclareLaunchArgument(
             "robot_ip",
-            default_value="192.168.0.194",
+            default_value="192.168.0.197",
             description="IP address of the UR robot.",
         ),
         DeclareLaunchArgument(
