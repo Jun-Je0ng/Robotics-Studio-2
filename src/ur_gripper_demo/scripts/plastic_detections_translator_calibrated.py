@@ -76,7 +76,7 @@ ROBOT_FRAME    = 'base'
 EEF_FRAME      = 'gripper_tcp'   # TF2 frame for end-effector
 MM_TO_M        = 1e-3
 
-GRIPPER_TCP_OFFSET_M = 0.190
+GRIPPER_TCP_OFFSET_M = 0.180
 
 TRAY_X_MIN =  -0.220
 TRAY_X_MAX =   0.220
@@ -274,6 +274,7 @@ class CalibratedTranslator(Node):
         pose.position.x = raw_x
         pose.position.y = raw_y
         pose.position.z = mm_to_m(pos['z']) + GRIPPER_TCP_OFFSET_M
+
 
         pose.orientation.x = -ori['qx']
         pose.orientation.y =  ori['qy']
