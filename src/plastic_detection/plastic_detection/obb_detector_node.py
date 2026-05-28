@@ -187,7 +187,7 @@ class OBBDetectorNode(Node):
         self.model = YOLO(MODEL_PATH)
         self.get_logger().info(f'Model loaded — classes: {self.model.names}')
 
-        # Load calibration
+        # Load  calibration
         if not os.path.exists(CALIBRATION_FILE):
             self.get_logger().error(
                 f'Calibration file not found: {CALIBRATION_FILE}')
