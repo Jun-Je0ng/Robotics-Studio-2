@@ -71,6 +71,11 @@
       transition: color 0.2s, background 0.2s;
     }
     .nav-links a:hover { color: var(--text); background: var(--adim); }
+    .nav-links a.nav-cta {
+      background: var(--adim); color: var(--accent);
+      border: 1px solid var(--border-h);
+    }
+    .nav-links a.nav-cta:hover { background: var(--accent); color: #040d1e; }
 
     /* ── Hero ────────────────────────────────────────────────── */
     #hero {
@@ -357,8 +362,10 @@
       <li><a href="#perception">Perception</a></li>
       <li><a href="#motion">Motion</a></li>
       <li><a href="#interaction">Execution</a></li>
+      <li><a href="#workspace">Workspace</a></li>
       <li><a href="#stack">Stack</a></li>
       <li><a href="#team">Team</a></li>
+      <li><a href="getting-started.html" class="nav-cta">Setup guide ↗</a></li>
     </ul>
   </div>
 </nav>
@@ -642,8 +649,62 @@
   </div>
 </section>
 
+<!-- WORKSPACE -->
+<section id="workspace" class="sec sec-alt">
+  <div class="container">
+    <div class="split reveal">
+
+      <!-- WORKSPACE IMAGE
+           Add a top-down or angled photo of the workspace.
+           1. Save as: assets/images/workspace.jpg
+           2. Replace the img-frame below:
+              <div class="img-frame"><img src="assets/images/workspace.jpg" alt="Sort-O workspace"></div>
+      -->
+      <figure>
+        <div class="img-frame" style="aspect-ratio:4/3;">
+          <div class="ph">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            Workspace photo<br>
+            <span style="font-size:0.68rem">assets/images/workspace.jpg</span>
+          </div>
+        </div>
+        <p class="img-caption">The Sort-O workspace — black board, ArUco markers, bin assembly</p>
+      </figure>
+
+      <div>
+        <span class="eyebrow">The workspace</span>
+        <h2 class="sec-title">A purpose-built <span style="color:var(--accent);">sorting surface</span></h2>
+        <p class="sec-body">
+          Everything Sort-O sees and touches is contained within a 500 × 320 mm black board mounted on the trolley. The dark surface gives the camera clean contrast against plastic objects and keeps them from sliding around during picks.
+        </p>
+        <p class="sec-body" style="margin-top:14px;">
+          Four ArUco markers — one at each corner, numbered 1 to 4 — act as the calibration reference. When the camera-to-robot homography is computed, these markers define exactly where the robot coordinate frame maps onto the image plane. A custom plywood bin assembly clips onto the trolley handle with three square openings, one per plastic type.
+        </p>
+        <div class="detail-row" style="margin-top:24px;">
+          <div class="detail">
+            <div class="detail-title">Board</div>
+            <div class="detail-desc">500 × 320 mm black surface on the trolley. Constrains the pick zone and gives depth camera contrast.</div>
+          </div>
+          <div class="detail">
+            <div class="detail-title">ArUco markers</div>
+            <div class="detail-desc">4 markers at board corners (IDs 1–4). Used once to calibrate the camera-to-robot homography matrix.</div>
+          </div>
+          <div class="detail">
+            <div class="detail-title">Camera mount</div>
+            <div class="detail-desc">Tripod positioned to look straight down at the board. Fixed height — moving it requires recalibration.</div>
+          </div>
+          <div class="detail">
+            <div class="detail-title">Bin assembly</div>
+            <div class="detail-desc">3-slot plywood frame clipped to the trolley handle. Each slot is a named drop-off point for one plastic class.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- TECH STACK -->
-<section id="stack" class="sec sec-alt">
+<section id="stack" class="sec">
   <div class="container reveal">
     <span class="eyebrow">Built with</span>
     <h2 class="sec-title">The stack</h2>
@@ -682,27 +743,22 @@
       <div class="team-card">
         <div class="avatar"><span>J</span></div>
         <div class="team-name">Jun Jeong</div>
-        <div class="team-role">Perception & integration</div>
+        <div class="team-role">Perception</div>
       </div>
       <div class="team-card">
         <div class="avatar"><span>J</span></div>
         <div class="team-name">Jarrel</div>
-        <div class="team-role">Motion planning & control</div>
+        <div class="team-role">Interaction & Execution</div>
       </div>
       <div class="team-card">
         <div class="avatar"><span>B</span></div>
         <div class="team-name">Bilguun</div>
-        <div class="team-role">Clustering & pick ordering</div>
-      </div>
-      <div class="team-card">
-        <div class="avatar"><span>T</span></div>
-        <div class="team-name">Tony</div>
-        <div class="team-role">Gripper module</div>
+        <div class="team-role">Motion Planning & Control</div>
       </div>
       <div class="team-card">
         <div class="avatar"><span>R</span></div>
         <div class="team-name">Rian</div>
-        <div class="team-role">OBB detection</div>
+        <div class="team-role">Machine Learning</div>
       </div>
     </div>
   </div>
