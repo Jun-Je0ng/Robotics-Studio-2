@@ -589,7 +589,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "robot_ip",
-            default_value="192.168.0.194",
+            default_value="192.168.0.197",
             description="IP address of the UR robot (or URSim VM).",
         )
     )

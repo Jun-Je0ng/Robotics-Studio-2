@@ -23,13 +23,13 @@ from rclpy.action import ActionClient
 from control_msgs.action import GripperCommand
 
 BIN_POSES_PATH = (
-    '/home/jarrel/ros2_ws/Robotics-Studio-2/src/'
+    '/home/jun/git/Robotics-Studio-2/src/'
     'ur_gripper_demo/config/bin_poses.json'
 )
 # Motion controller reads from the installed copy — write there too so changes
 # take effect immediately without a colcon build.
 BIN_POSES_INSTALL_PATH = (
-    '/home/jarrel/ros2_ws/Robotics-Studio-2/install/'
+    '/home/jun/git/Robotics-Studio-2/install/'
     'ur_gripper_demo/share/ur_gripper_demo/config/bin_poses.json'
 )
 _BASE_FRAME = 'base'
