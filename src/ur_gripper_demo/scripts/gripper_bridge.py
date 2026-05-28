@@ -42,7 +42,7 @@ import threading
 import time
 
 # ── tunables ──────────────────────────────────────────────────────────────────
-GRASP_SETTLE_S = 2.0    # s  – wait after command before holding
+GRASP_SETTLE_S = 4.5    # s  – wait after command before holding
 POLL_INTERVAL  = 0.05   # s  – joint state poll interval
 GRIPPER_JOINT  = "finger_width"
 GRASP_CLOSED_THRESH = 0.010

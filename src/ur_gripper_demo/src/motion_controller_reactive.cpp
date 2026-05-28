@@ -595,8 +595,8 @@ void returnHome(
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     if (arm.plan(plan) == moveit::core::MoveItErrorCode::SUCCESS)
     {
-        arm.setMaxVelocityScalingFactor(0.03);
-        arm.setMaxAccelerationScalingFactor(0.03);
+        arm.setMaxVelocityScalingFactor(0.07);
+        arm.setMaxAccelerationScalingFactor(0.05);
         arm.execute(plan);
     }
     openGripper(gripper_client, 0.088);
@@ -863,8 +863,8 @@ bool moveToPregrasp(
     bool ok = (arm.plan(plan) == moveit::core::MoveItErrorCode::SUCCESS);
     if (ok)
     {
-        arm.setMaxVelocityScalingFactor(0.03);
-        arm.setMaxAccelerationScalingFactor(0.03);
+        arm.setMaxVelocityScalingFactor(0.07);
+        arm.setMaxAccelerationScalingFactor(0.05);
         arm.execute(plan);
     }
     else
@@ -942,13 +942,13 @@ bool moveCartesian(
     robot_trajectory::RobotTrajectory rt(arm.getRobotModel(), arm.getName());
     rt.setRobotTrajectoryMsg(*arm.getCurrentState(), traj);
     trajectory_processing::IterativeParabolicTimeParameterization iptp;
-    iptp.computeTimeStamps(rt, 0.03, 0.03);
+    iptp.computeTimeStamps(rt, 0.05, 0.05);
     rt.getRobotTrajectoryMsg(traj);
 
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     plan.trajectory_ = traj;
-    arm.setMaxVelocityScalingFactor(0.03);
-    arm.setMaxAccelerationScalingFactor(0.03);
+    arm.setMaxVelocityScalingFactor(0.07);
+    arm.setMaxAccelerationScalingFactor(0.05);
     return arm.execute(plan) == moveit::core::MoveItErrorCode::SUCCESS;
 }
 
@@ -1003,8 +1003,8 @@ bool moveToPose(
 
     RCLCPP_INFO(LOGGER, "Executing lowest-cost plan (cost=%.3f) out of %d attempts",
                 best_cost, num_attempts);
-    arm.setMaxVelocityScalingFactor(0.03);
-    arm.setMaxAccelerationScalingFactor(0.03);
+    arm.setMaxVelocityScalingFactor(0.07);
+    arm.setMaxAccelerationScalingFactor(0.05);
     return arm.execute(best_plan) == moveit::core::MoveItErrorCode::SUCCESS;
 }
 
@@ -1732,8 +1732,8 @@ int main(int argc, char** argv)
     // time-parameterisation allocates near-zero time intervals, causing
     // the UR driver to report "velocity NNN required in 0.002 seconds".
     arm.setPlannerId("RRTConnectkConfigDefault");
-    arm.setMaxVelocityScalingFactor(0.03);
-    arm.setMaxAccelerationScalingFactor(0.03);
+    arm.setMaxVelocityScalingFactor(0.07);
+    arm.setMaxAccelerationScalingFactor(0.05);
     arm.setPlanningTime(10.0);
     arm.setGoalJointTolerance(0.01);
     arm.setGoalOrientationTolerance(0.01);
