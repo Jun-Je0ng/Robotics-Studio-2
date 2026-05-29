@@ -9,7 +9,6 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-
     :root {
       --bg:         #040d1e;
       --bg-card:    #08152b;
@@ -25,307 +24,98 @@
       --border:     rgba(0,212,255,0.09);
       --border-h:   rgba(0,212,255,0.28);
     }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      line-height: 1.75;
-      overflow-x: hidden;
-    }
-
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.75; overflow-x: hidden; }
     .container { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
-
-    /* scroll reveal */
     .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
     .reveal.in { opacity: 1; transform: none; }
-
-    /* ── Nav ─────────────────────────────────────────────────── */
-    nav {
-      position: fixed; inset: 0 0 auto;
-      z-index: 99; padding: 14px 0;
-      background: rgba(4,13,30,0.80);
-      backdrop-filter: blur(18px);
-      border-bottom: 1px solid var(--border);
-    }
-    nav .wrap {
-      max-width: 1080px; margin: 0 auto; padding: 0 28px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-
-    /* ── LOGO ── creative SVG mark + wordmark */
+    nav { position: fixed; inset: 0 0 auto; z-index: 99; padding: 14px 0; background: rgba(4,13,30,0.80); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); }
+    nav .wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; }
     .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
     .logo-mark svg { display: block; }
-    .logo-word {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em;
-      background: linear-gradient(120deg, #00d4ff 30%, #7c3aed 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-
+    .logo-word { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; background: linear-gradient(120deg, #00d4ff 30%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .nav-links { display: flex; gap: 4px; list-style: none; }
-    .nav-links a {
-      color: var(--muted); text-decoration: none;
-      font-size: 0.83rem; font-weight: 500;
-      padding: 5px 11px; border-radius: 6px;
-      transition: color 0.2s, background 0.2s;
-    }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.83rem; font-weight: 500; padding: 5px 11px; border-radius: 6px; transition: color 0.2s, background 0.2s; }
     .nav-links a:hover { color: var(--text); background: var(--adim); }
-    .nav-links a.nav-cta {
-      background: var(--adim); color: var(--accent);
-      border: 1px solid var(--border-h);
-    }
+    .nav-links a.nav-cta { background: var(--adim); color: var(--accent); border: 1px solid var(--border-h); }
     .nav-links a.nav-cta:hover { background: var(--accent); color: #040d1e; }
-
-    /* ── Hero ────────────────────────────────────────────────── */
-    #hero {
-      position: relative; min-height: 100vh;
-      display: flex; align-items: center; padding-top: 80px;
-      overflow: hidden;
-    }
-    .hero-bg {
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 70% 55% at 50% 0%, rgba(0,212,255,0.06) 0%, transparent 70%),
-        radial-gradient(ellipse 45% 35% at 85% 85%, rgba(124,58,237,0.05) 0%, transparent 60%);
-    }
-    .hero-grid {
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(0,212,255,0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,212,255,0.035) 1px, transparent 1px);
-      background-size: 56px 56px;
-      mask-image: radial-gradient(ellipse 75% 65% at 50% 25%, black, transparent);
-    }
-    .hero-inner {
-      position: relative; z-index: 1;
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 48px; align-items: center; width: 100%;
-    }
+    #hero { position: relative; min-height: 100vh; display: flex; align-items: center; padding-top: 80px; overflow: hidden; }
+    .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(0,212,255,0.06) 0%, transparent 70%), radial-gradient(ellipse 45% 35% at 85% 85%, rgba(124,58,237,0.05) 0%, transparent 60%); }
+    .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,212,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.035) 1px, transparent 1px); background-size: 56px 56px; mask-image: radial-gradient(ellipse 75% 65% at 50% 25%, black, transparent); }
+    .hero-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; width: 100%; }
     @media (max-width: 760px) { .hero-inner { grid-template-columns: 1fr; } }
-
-    .hero-tag {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 5px 12px; border-radius: 100px;
-      border: 1px solid var(--border-h); background: var(--adim);
-      font-size: 0.72rem; font-weight: 600; color: var(--accent);
-      letter-spacing: 0.08em; text-transform: uppercase;
-      margin-bottom: 24px;
-      animation: up 0.7s ease both;
-    }
-    .hero-tag i {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--accent);
-      animation: blink 2s ease-in-out infinite;
-    }
-    .hero-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(2.8rem, 7vw, 5.2rem);
-      font-weight: 700; line-height: 1.0; letter-spacing: -0.03em;
-      margin-bottom: 18px;
-      animation: up 0.7s 0.1s ease both;
-    }
-    .hero-title .grad {
-      background: linear-gradient(120deg, #00d4ff 0%, #7c3aed 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .hero-p {
-      font-size: 1.05rem; color: var(--muted); line-height: 1.75;
-      max-width: 480px; margin-bottom: 36px;
-      animation: up 0.7s 0.2s ease both;
-    }
+    .hero-tag { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 100px; border: 1px solid var(--border-h); background: var(--adim); font-size: 0.72rem; font-weight: 600; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 24px; animation: up 0.7s ease both; }
+    .hero-tag i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 2s ease-in-out infinite; }
+    .hero-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(2.8rem, 7vw, 5.2rem); font-weight: 700; line-height: 1.0; letter-spacing: -0.03em; margin-bottom: 18px; animation: up 0.7s 0.1s ease both; }
+    .hero-title .grad { background: linear-gradient(120deg, #00d4ff 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-p { font-size: 1.05rem; color: var(--muted); line-height: 1.75; max-width: 480px; margin-bottom: 36px; animation: up 0.7s 0.2s ease both; }
     .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; animation: up 0.7s 0.3s ease both; }
-    .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 12px 24px; border-radius: 8px;
-      font-size: 0.88rem; font-weight: 600; text-decoration: none;
-      transition: all 0.2s;
-    }
-    .btn-cyan {
-      background: var(--accent); color: #040d1e;
-      box-shadow: 0 0 20px var(--aglow);
-    }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+    .btn-cyan { background: var(--accent); color: #040d1e; box-shadow: 0 0 20px var(--aglow); }
     .btn-cyan:hover { background: #33ddff; box-shadow: 0 0 36px var(--aglow); transform: translateY(-2px); }
     .btn-ghost { border: 1px solid var(--border-h); color: var(--text); }
     .btn-ghost:hover { background: var(--adim); border-color: var(--accent); transform: translateY(-2px); }
-
-    .hero-stats {
-      display: flex; gap: 28px; flex-wrap: wrap;
-      margin-top: 48px; padding-top: 32px;
-      border-top: 1px solid var(--border);
-      animation: up 0.7s 0.4s ease both;
-    }
-    .stat-n {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.8rem; font-weight: 700; color: var(--accent); line-height: 1;
-    }
+    .hero-stats { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); animation: up 0.7s 0.4s ease both; }
+    .stat-n { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--accent); line-height: 1; }
     .stat-l { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
-
-    /* hero image slot */
-    .hero-visual {
-      position: relative; border-radius: 16px; overflow: hidden;
-      border: 1px solid var(--border);
-      background: var(--bg-card);
-      aspect-ratio: 4/3;
-      animation: up 0.7s 0.15s ease both;
-    }
+    .hero-visual { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: var(--bg-card); aspect-ratio: 4/3; animation: up 0.7s 0.15s ease both; }
     .hero-visual img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .hero-visual .placeholder {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 10px; color: var(--muted); font-size: 0.82rem;
-    }
+    .hero-visual .placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--muted); font-size: 0.82rem; }
     .hero-visual .placeholder svg { opacity: 0.3; }
-
-    /* ── Pipeline (How it works) ─────────────────────────────── */
     #how { padding: 100px 0; }
-    .how-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 1px; margin-top: 52px;
-      border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
-    }
+    .how-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 52px; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
     @media (max-width: 700px) { .how-grid { grid-template-columns: 1fr 1fr; } }
-    .how-card {
-      padding: 32px 24px; background: var(--bg-card);
-      transition: background 0.25s;
-      border-right: 1px solid var(--border);
-    }
+    .how-card { padding: 32px 24px; background: var(--bg-card); transition: background 0.25s; border-right: 1px solid var(--border); }
     .how-card:last-child { border-right: none; }
     .how-card:hover { background: var(--bg-card-h); }
-    .how-n {
-      font-size: 2.4rem; font-weight: 700;
-      font-family: 'Space Grotesk', sans-serif;
-      color: rgba(0,212,255,0.18); line-height: 1;
-      margin-bottom: 12px;
-    }
+    .how-n { font-size: 2.4rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; color: rgba(0,212,255,0.18); line-height: 1; margin-bottom: 12px; }
     .how-icon { font-size: 1.6rem; margin-bottom: 10px; }
     .how-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; }
     .how-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
-
-    /* ── Section shared ──────────────────────────────────────── */
     .sec { padding: 100px 0; }
     .sec-alt { background: var(--bg-card); }
-    .eyebrow {
-      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--accent);
-      margin-bottom: 10px; display: block;
-    }
-    .sec-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-      font-weight: 700; line-height: 1.15; margin-bottom: 14px;
-    }
+    .eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; display: block; }
+    .sec-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.6rem, 3.5vw, 2.2rem); font-weight: 700; line-height: 1.15; margin-bottom: 14px; }
     .sec-body { font-size: 0.95rem; color: var(--muted); line-height: 1.8; }
-
-    /* split layout */
     .split { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
     @media (max-width: 768px) { .split { grid-template-columns: 1fr; gap: 36px; } }
-
-    /* image frame */
-    .img-frame {
-      border-radius: 12px; overflow: hidden;
-      border: 1px solid var(--border); background: var(--bg-card);
-      aspect-ratio: 16/10; position: relative;
-    }
+    .img-frame { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: var(--bg-card); aspect-ratio: 16/10; position: relative; }
     .img-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .img-frame .ph {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 8px; color: var(--muted); font-size: 0.78rem; text-align: center; padding: 20px;
-    }
+    .img-frame .ph { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--muted); font-size: 0.78rem; text-align: center; padding: 20px; }
     .img-frame .ph svg { opacity: 0.25; }
-    .img-caption {
-      font-size: 0.72rem; color: var(--muted);
-      margin-top: 8px; text-align: center; font-style: italic;
-    }
-
-    /* tags row */
+    .img-caption { font-size: 0.72rem; color: var(--muted); margin-top: 8px; text-align: center; font-style: italic; }
     .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
-    .tag {
-      padding: 4px 10px; border-radius: 6px;
-      font-size: 0.72rem; font-weight: 600;
-      background: var(--adim); color: var(--accent);
-      border: 1px solid var(--border-h);
-      font-family: 'Courier New', monospace;
-    }
+    .tag { padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; background: var(--adim); color: var(--accent); border: 1px solid var(--border-h); font-family: 'Courier New', monospace; }
     .tag.purple { background: rgba(124,58,237,0.10); color: #a78bfa; border-color: rgba(124,58,237,0.25); }
     .tag.green  { background: rgba(16,185,129,0.10); color: #34d399; border-color: rgba(16,185,129,0.25); }
     .tag.amber  { background: rgba(245,158,11,0.10); color: #fbbf24; border-color: rgba(245,158,11,0.25); }
-
-    /* detail cards — smaller, inline */
     .detail-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px; }
     @media (max-width: 480px) { .detail-row { grid-template-columns: 1fr; } }
-    .detail {
-      padding: 16px 18px;
-      background: var(--bg);
-      border: 1px solid var(--border); border-radius: 10px;
-      transition: border-color 0.2s;
-    }
+    .detail { padding: 16px 18px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; transition: border-color 0.2s; }
     .detail:hover { border-color: var(--border-h); }
     .detail-title { font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; }
     .detail-desc { font-size: 0.76rem; color: var(--muted); line-height: 1.5; }
-
-    /* ── Tech stack ──────────────────────────────────────────── */
     #stack { padding: 100px 0; }
-    .stack-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px,1fr));
-      gap: 12px; margin-top: 44px;
-    }
-    .stack-card {
-      padding: 20px 14px; text-align: center;
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
-      transition: border-color 0.2s, transform 0.2s;
-    }
+    .stack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 12px; margin-top: 44px; }
+    .stack-card { padding: 20px 14px; text-align: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; transition: border-color 0.2s, transform 0.2s; }
     .stack-card:hover { border-color: var(--border-h); transform: translateY(-3px); }
     .stack-card .ico { font-size: 1.7rem; margin-bottom: 7px; }
     .stack-card .name { font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; font-weight: 600; }
     .stack-card .sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
-
-    /* ── Team ────────────────────────────────────────────────── */
     #team { padding: 100px 0; background: var(--bg-card); }
-    .team-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
-      gap: 16px; margin-top: 44px;
-    }
-    .team-card {
-      padding: 28px 20px; text-align: center;
-      background: var(--bg); border: 1px solid var(--border); border-radius: 14px;
-      transition: border-color 0.25s, transform 0.25s;
-    }
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 16px; margin-top: 44px; }
+    .team-card { padding: 28px 20px; text-align: center; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; transition: border-color 0.25s, transform 0.25s; }
     .team-card:hover { border-color: var(--border-h); transform: translateY(-4px); }
-    .avatar {
-      width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 14px;
-      overflow: hidden; border: 2px solid var(--border-h);
-      background: linear-gradient(135deg, var(--adim), rgba(124,58,237,0.12));
-      display: flex; align-items: center; justify-content: center;
-    }
+    .avatar { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 14px; overflow: hidden; border: 2px solid var(--border-h); background: linear-gradient(135deg, var(--adim), rgba(124,58,237,0.12)); display: flex; align-items: center; justify-content: center; }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .avatar span {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.4rem; font-weight: 700; color: var(--accent);
-    }
+    .avatar span { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--accent); }
     .team-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 600; }
     .team-role { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
-
-    /* ── Footer ──────────────────────────────────────────────── */
-    footer {
-      padding: 36px 0; border-top: 1px solid var(--border);
-      text-align: center; font-size: 0.8rem; color: var(--muted);
-    }
+    footer { padding: 36px 0; border-top: 1px solid var(--border); text-align: center; font-size: 0.8rem; color: var(--muted); }
     footer a { color: var(--accent); text-decoration: none; }
     footer a:hover { text-decoration: underline; }
-
-    /* ── Animations ──────────────────────────────────────────── */
     @keyframes up    { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
     @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-
-    @media (max-width: 640px) {
-      .nav-links { display: none; }
-      .how-grid { grid-template-columns: 1fr 1fr; }
-    }
+    @media (max-width: 640px) { .nav-links { display: none; } .how-grid { grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
 <body>
@@ -333,32 +123,25 @@
 <!-- NAV -->
 <nav>
   <div class="wrap">
-
-    <!-- LOGO: robotic arm gripper mark + wordmark -->
     <a class="logo" href="#hero">
       <div class="logo-mark">
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- sorting cycle arc -->
           <path d="M16 4 A12 12 0 0 1 28 16" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/>
           <path d="M28 16 A12 12 0 0 1 16 28" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
           <path d="M16 28 A12 12 0 0 1 4 16" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
-          <!-- robot arm stub -->
           <line x1="16" y1="16" x2="22" y2="10" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/>
-          <!-- gripper fingers -->
           <line x1="22" y1="10" x2="25" y2="8"  stroke="#00d4ff" stroke-width="1.8" stroke-linecap="round"/>
           <line x1="22" y1="10" x2="24" y2="13" stroke="#00d4ff" stroke-width="1.8" stroke-linecap="round"/>
-          <!-- centre dot -->
           <circle cx="16" cy="16" r="2.5" fill="#00d4ff" opacity="0.8"/>
-          <!-- arrow head on cycle -->
           <polyline points="27,13 28,16 25,16" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
       </div>
       <span class="logo-word">Sort-O</span>
     </a>
-
     <ul class="nav-links">
       <li><a href="#how">How it works</a></li>
       <li><a href="#ml">ML</a></li>
+      <li><a href="#kmeans">K-Means</a></li>
       <li><a href="#perception">Perception</a></li>
       <li><a href="#motion">Motion</a></li>
       <li><a href="#interaction">Execution</a></li>
@@ -378,12 +161,8 @@
     <div class="hero-inner">
       <div>
         <div class="hero-tag"><i></i> Robotics Studio 2 &nbsp;·&nbsp; 2026</div>
-        <h1 class="hero-title">
-          Meet<br><span class="grad">Sort-O</span>
-        </h1>
-        <p class="hero-p">
-          A robot that watches, thinks, and sorts. Sort-O uses a depth camera and a trained vision model to find plastic waste, then picks and bins each piece — all on its own.
-        </p>
+        <h1 class="hero-title">Meet<br><span class="grad">Sort-O</span></h1>
+        <p class="hero-p">A robot that watches, thinks, and sorts. Sort-O uses a depth camera and a trained vision model to find plastic waste, then picks and bins each piece — all on its own.</p>
         <div class="hero-btns">
           <a href="#how" class="btn btn-cyan">See how it works</a>
           <a href="https://github.com/Jun-Je0ng/Robotics-Studio-2" target="_blank" class="btn btn-ghost">
@@ -398,19 +177,10 @@
           <div><div class="stat-n">500 Hz</div><div class="stat-l">control loop</div></div>
         </div>
       </div>
-
-      <!-- HERO IMAGE
-           Put a photo of the full robot setup here.
-           1. Create a folder: /assets/images/
-           2. Add your photo as: /assets/images/robot-setup.jpg
-           3. Replace the placeholder div below with:
-              <img src="assets/images/robot-setup.jpg" alt="Sort-O robot setup">
-      -->
       <div class="hero-visual">
         <div class="placeholder">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-          Add a photo here<br>
-          <span style="font-size:0.7rem">assets/images/robot-setup.jpg</span>
+          Add a photo here<br><span style="font-size:0.7rem">assets/images/robot-setup.jpg</span>
         </div>
       </div>
     </div>
@@ -426,30 +196,10 @@
       <p class="sec-body" style="max-width:560px;">Four stages, running continuously. The arm returns to its home position between each pick so the camera always has a clear view for the next one.</p>
     </div>
     <div class="how-grid reveal">
-      <div class="how-card">
-        <div class="how-n">01</div>
-        <div class="how-icon">👁️</div>
-        <div class="how-title">Detect</div>
-        <div class="how-desc">YOLO OBB identifies and classifies each piece of plastic. Only objects seen in 5 consecutive frames make it through.</div>
-      </div>
-      <div class="how-card">
-        <div class="how-n">02</div>
-        <div class="how-icon">📍</div>
-        <div class="how-title">Localise</div>
-        <div class="how-desc">Depth data and a calibrated homography matrix convert pixel positions into millimetre-accurate robot-frame coordinates.</div>
-      </div>
-      <div class="how-card">
-        <div class="how-n">03</div>
-        <div class="how-icon">🧭</div>
-        <div class="how-title">Plan</div>
-        <div class="how-desc">MoveIt2 plans a collision-free path. It tries eight variations and picks whichever one moves the joints the least.</div>
-      </div>
-      <div class="how-card">
-        <div class="how-n">04</div>
-        <div class="how-icon">📦</div>
-        <div class="how-title">Sort</div>
-        <div class="how-desc">The gripper descends, closes on the object, and lifts. Stall detection confirms a real grasp. The arm drops the piece in the right bin.</div>
-      </div>
+      <div class="how-card"><div class="how-n">01</div><div class="how-icon">👁️</div><div class="how-title">Detect</div><div class="how-desc">YOLO OBB identifies and classifies each piece of plastic. Only objects seen in 5 consecutive frames make it through.</div></div>
+      <div class="how-card"><div class="how-n">02</div><div class="how-icon">📍</div><div class="how-title">Localise</div><div class="how-desc">Depth data and a calibrated homography matrix convert pixel positions into millimetre-accurate robot-frame coordinates.</div></div>
+      <div class="how-card"><div class="how-n">03</div><div class="how-icon">🧭</div><div class="how-title">Plan</div><div class="how-desc">MoveIt2 plans a collision-free path. It tries eight variations and picks whichever one moves the joints the least.</div></div>
+      <div class="how-card"><div class="how-n">04</div><div class="how-icon">📦</div><div class="how-title">Sort</div><div class="how-desc">The gripper descends, closes on the object, and lifts. Stall detection confirms a real grasp. The arm drops the piece in the right bin.</div></div>
     </div>
   </div>
 </section>
@@ -461,12 +211,8 @@
       <div>
         <span class="eyebrow" style="color:#a78bfa;">Machine Learning</span>
         <h2 class="sec-title">Trained to see <span style="color:#a78bfa;">rotated objects</span></h2>
-        <p class="sec-body">
-          Standard object detectors give you a rectangle. That's not enough when you need to know which way to rotate the gripper. We use an Oriented Bounding Box model that returns the object's angle alongside its class — so the arm always approaches aligned with the long axis.
-        </p>
-        <p class="sec-body" style="margin-top:14px;">
-          The model was trained on three classes found in typical household recycling: HDPE bottles, PET bottles, and PP containers. Before any detection reaches the motion planner it has to appear stably in five frames in a row — cutting out flickers and reflections.
-        </p>
+        <p class="sec-body">Standard object detectors give you a rectangle. That's not enough when you need to know which way to rotate the gripper. We use an Oriented Bounding Box model that returns the object's angle alongside its class — so the arm always approaches aligned with the long axis.</p>
+        <p class="sec-body" style="margin-top:14px;">The model was trained on three classes found in typical household recycling: HDPE bottles, PET bottles, and PP containers. Before any detection reaches the motion planner it has to appear stably in five frames in a row — cutting out flickers and reflections.</p>
         <div class="tags" style="margin-top:20px;">
           <span class="tag purple">hdpe_bottle</span>
           <span class="tag purple">pet_bottle</span>
@@ -475,22 +221,11 @@
           <span class="tag purple">5-frame stability</span>
         </div>
       </div>
-
-      <!-- ML IMAGE
-           Good choice: screenshot of the OpenCV detection window showing OBB boxes drawn on bottles.
-           1. Save screenshot as: assets/images/obb-detection.jpg
-           2. Replace the img-frame below with:
-              <figure>
-                <div class="img-frame"><img src="assets/images/obb-detection.jpg" alt="YOLO OBB detection output"></div>
-                <p class="img-caption">Live OBB detection — rotated boxes + class labels + confidence</p>
-              </figure>
-      -->
       <figure>
         <div class="img-frame">
           <div class="ph">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 9 6 6M15 9l-6 6"/></svg>
-            OBB detection screenshot<br>
-            <span style="font-size:0.68rem">assets/images/obb-detection.jpg</span>
+            OBB detection screenshot<br><span style="font-size:0.68rem">assets/images/obb-detection.jpg</span>
           </div>
         </div>
         <p class="img-caption">YOLO OBB output — rotated boxes, class labels, confidence</p>
@@ -499,54 +234,161 @@
   </div>
 </section>
 
-<!-- PERCEPTION -->
-<section id="perception" class="sec">
+<!-- K-MEANS WORKSPACE PLANNER -->
+<section id="kmeans" class="sec">
   <div class="container">
     <div class="split reveal">
+      <div>
+        <span class="eyebrow" style="color:#a78bfa;">Machine Learning — Part 2</span>
+        <h2 class="sec-title">Deciding <span style="color:#a78bfa;">what to pick first</span></h2>
+        <p class="sec-body">Detecting objects is only half the problem. When multiple bottles are in the workspace the robot needs to decide which one to pick first. We solve this with a second AI component — a K-Means workspace planner running as its own ROS2 node.</p>
+        <p class="sec-body" style="margin-top:14px;">K-Means clusters all detected objects into spatial zones based on their XY position in robot frame. Each cluster's centre is ranked by distance to the robot base — the nearest zone gets cleared first. Within each zone, objects are ordered by their individual distance to the robot. This is zone-based picking: the arm stays in one area, clears it, then moves on. Fewer large sweeps, higher throughput.</p>
 
-      <!-- PERCEPTION IMAGE
-           Good choice: the OpenCV annotated window showing calibration corners, ArUco overlays, and [pub] coordinates.
-           1. Save as: assets/images/perception-feed.jpg
-           2. Replace the img-frame:
-              <div class="img-frame"><img src="assets/images/perception-feed.jpg" alt="Perception feed"></div>
-      -->
+        <div style="margin-top:28px; display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <div style="min-width:28px; height:28px; border-radius:50%; background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.35); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:0.72rem; font-weight:700; color:#a78bfa; flex-shrink:0;">1</div>
+            <div><div style="font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:2px;">Subscribe to /plastic_detections</div><div style="font-size:0.78rem; color:var(--muted); line-height:1.55;">Receives the stable detection array from the OBB detector node every frame.</div></div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <div style="min-width:28px; height:28px; border-radius:50%; background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.35); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:0.72rem; font-weight:700; color:#a78bfa; flex-shrink:0;">2</div>
+            <div><div style="font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:2px;">K-Means clustering on XY positions</div><div style="font-size:0.78rem; color:var(--muted); line-height:1.55;">Groups objects into spatial zones. Number of clusters capped at the number of detected objects, max 3.</div></div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <div style="min-width:28px; height:28px; border-radius:50%; background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.35); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:0.72rem; font-weight:700; color:#a78bfa; flex-shrink:0;">3</div>
+            <div><div style="font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:2px;">Rank clusters by distance to robot base</div><div style="font-size:0.78rem; color:var(--muted); line-height:1.55;">Cluster centres compared against (0, 0) in robot frame. Nearest cluster gets priority 1.</div></div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <div style="min-width:28px; height:28px; border-radius:50%; background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.35); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:0.72rem; font-weight:700; color:#a78bfa; flex-shrink:0;">4</div>
+            <div><div style="font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:2px;">Publish prioritised /pick_queue</div><div style="font-size:0.78rem; color:var(--muted); line-height:1.55;">Each detection gets pick_order, cluster_id, cluster_priority and dist_to_robot_mm added before publishing.</div></div>
+          </div>
+        </div>
+
+        <div class="tags" style="margin-top:24px;">
+          <span class="tag purple">K-Means</span>
+          <span class="tag purple">zone-based picking</span>
+          <span class="tag purple">/pick_queue</span>
+          <span class="tag purple">scikit-learn</span>
+          <span class="tag purple">unsupervised ML</span>
+        </div>
+      </div>
+
+      <!-- Right: SVG diagram -->
+      <figure>
+        <div style="border-radius:12px; overflow:hidden; border:1px solid var(--border); background:var(--bg-card); padding:28px;">
+          <svg width="100%" viewBox="0 0 340 280" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+            <defs>
+              <marker id="arrowP" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M1 1L7 4L1 7" fill="none" stroke="#a78bfa" stroke-width="1.2" stroke-linecap="round"/>
+              </marker>
+              <marker id="arrowC" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M1 1L7 4L1 7" fill="none" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"/>
+              </marker>
+              <marker id="arrowG" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M1 1L7 4L1 7" fill="none" stroke="#64748b" stroke-width="1.2" stroke-linecap="round"/>
+              </marker>
+            </defs>
+            <!-- workspace -->
+            <rect x="20" y="20" width="300" height="200" rx="10" fill="rgba(124,58,237,0.04)" stroke="rgba(124,58,237,0.2)" stroke-width="1"/>
+            <text x="170" y="14" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="9" fill="#64748b" letter-spacing="0.1em">WORKSPACE (robot frame mm)</text>
+            <!-- Zone A — LEFT, close to robot base -->
+            <ellipse cx="105" cy="175" rx="72" ry="45" fill="rgba(124,58,237,0.1)" stroke="rgba(124,58,237,0.5)" stroke-width="1" stroke-dasharray="5 3"/>
+            <text x="105" y="135" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="8" fill="#a78bfa" font-weight="600" letter-spacing="0.05em">ZONE A  (priority 1)</text>
+            <!-- Zone B — RIGHT, far from robot base -->
+            <ellipse cx="255" cy="90" rx="65" ry="55" fill="rgba(0,212,255,0.05)" stroke="rgba(0,212,255,0.25)" stroke-width="1" stroke-dasharray="5 3"/>
+            <text x="255" y="38" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="8" fill="#00d4ff" font-weight="600" letter-spacing="0.05em">ZONE B  (priority 2)</text>
+            <!-- Bottle A1 — closer to base within Zone A -->
+            <rect x="78" y="168" width="18" height="28" rx="4" fill="rgba(124,58,237,0.35)" stroke="#a78bfa" stroke-width="1.5"/>
+            <text x="87" y="206" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#a78bfa">#1</text>
+            <!-- Bottle A2 — slightly further within Zone A -->
+            <rect x="112" y="158" width="18" height="28" rx="4" fill="rgba(124,58,237,0.2)" stroke="#a78bfa" stroke-width="1.5"/>
+            <text x="121" y="196" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#a78bfa">#2</text>
+            <!-- Bottle B1 — in Zone B, far from base -->
+            <rect x="228" y="72" width="18" height="28" rx="4" fill="rgba(0,212,255,0.2)" stroke="#00d4ff" stroke-width="1.5"/>
+            <text x="237" y="110" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#00d4ff">#3</text>
+            <!-- Bottle B2 — in Zone B, far from base -->
+            <rect x="262" y="82" width="18" height="28" rx="4" fill="rgba(0,212,255,0.15)" stroke="#00d4ff" stroke-width="1.5"/>
+            <text x="271" y="120" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#00d4ff">#4</text>
+            <!-- Robot base — bottom centre -->
+            <circle cx="170" cy="232" r="13" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="1.5"/>
+            <text x="170" y="236" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7" fill="#10b981" font-weight="700">BASE</text>
+            <!-- Distance line to Zone A — short -->
+            <line x1="162" y1="222" x2="118" y2="205" stroke="rgba(124,58,237,0.6)" stroke-width="1.5" stroke-dasharray="4 2"/>
+            <text x="128" y="220" font-family="'Space Grotesk',sans-serif" font-size="7" fill="#a78bfa">near</text>
+            <!-- Distance line to Zone B — long -->
+            <line x1="178" y1="220" x2="248" y2="145" stroke="rgba(0,212,255,0.3)" stroke-width="1" stroke-dasharray="4 2"/>
+            <text x="222" y="192" font-family="'Space Grotesk',sans-serif" font-size="7" fill="#00d4ff">far</text>
+            <!-- Cluster centres -->
+            <circle cx="105" cy="175" r="3" fill="#a78bfa" opacity="0.8"/>
+            <circle cx="255" cy="90" r="3" fill="#00d4ff" opacity="0.7"/>
+            <!-- Pick order arrow within Zone A: #1 -> #2 -->
+            <path d="M96 172 Q90 158 112 162" fill="none" stroke="#a78bfa" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#arrowP)"/>
+            <!-- Pick order arrow Zone A to Zone B -->
+            <path d="M130 162 Q185 120 228 86" fill="none" stroke="rgba(100,116,139,0.5)" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#arrowG)"/>
+            <!-- Pick order arrow within Zone B: #3 -> #4 -->
+            <path d="M246 80 Q252 68 262 76" fill="none" stroke="#00d4ff" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#arrowC)"/>
+          </svg>
+          <!-- Legend -->
+          <div style="display:flex; gap:20px; justify-content:center; margin-top:12px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:6px;"><div style="width:10px;height:10px;border-radius:2px;background:rgba(124,58,237,0.3);border:1px solid #a78bfa;"></div><span style="font-size:0.7rem;color:var(--muted);">Zone A — nearest</span></div>
+            <div style="display:flex; align-items:center; gap:6px;"><div style="width:10px;height:10px;border-radius:2px;background:rgba(0,212,255,0.2);border:1px solid #00d4ff;"></div><span style="font-size:0.7rem;color:var(--muted);">Zone B — further</span></div>
+            <div style="display:flex; align-items:center; gap:6px;"><div style="width:10px;height:10px;border-radius:50%;background:rgba(16,185,129,0.15);border:1px solid #10b981;"></div><span style="font-size:0.7rem;color:var(--muted);">Robot base</span></div>
+          </div>
+        </div>
+        <p class="img-caption">Zone-based pick ordering — nearest cluster first, closest object within each zone first</p>
+      </figure>
+    </div>
+
+    <!-- /pick_queue output preview -->
+    <div class="reveal" style="margin-top:52px;">
+      <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+        <div style="padding:10px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
+          <span style="font-size:0.72rem; font-weight:700; color:#a78bfa; letter-spacing:0.1em; text-transform:uppercase; font-family:'Space Grotesk',sans-serif;">/pick_queue</span>
+          <span style="font-size:0.7rem; color:var(--muted);">— published by workspace_planner_node</span>
+        </div>
+        <pre style="padding:20px; margin:0; overflow-x:auto; font-size:0.76rem; line-height:1.7; color:#94a3b8; font-family:'Courier New',monospace; background:transparent;"><span style="color:#64748b;">// Each detection gets four new fields added:</span>
+[
+  {
+    <span style="color:#a78bfa;">"pick_order"</span>: <span style="color:#00d4ff;">1</span>,              <span style="color:#64748b;">// pick this one first</span>
+    <span style="color:#a78bfa;">"cluster_id"</span>: <span style="color:#00d4ff;">0</span>,              <span style="color:#64748b;">// belongs to cluster 0 (Zone A)</span>
+    <span style="color:#a78bfa;">"cluster_priority"</span>: <span style="color:#00d4ff;">1</span>,        <span style="color:#64748b;">// Zone A is closest to robot base</span>
+    <span style="color:#a78bfa;">"dist_to_robot_mm"</span>: <span style="color:#00d4ff;">187.4</span>,     <span style="color:#64748b;">// mm from robot base</span>
+    <span style="color:#94a3b8;">"classification"</span>: { <span style="color:#94a3b8;">"class"</span>: <span style="color:#10b981;">"pet_bottle"</span>, <span style="color:#94a3b8;">"confidence"</span>: <span style="color:#00d4ff;">0.971</span> },
+    <span style="color:#94a3b8;">"pose"</span>: { <span style="color:#94a3b8;">"position"</span>: { <span style="color:#94a3b8;">"x"</span>: <span style="color:#00d4ff;">142.1</span>, <span style="color:#94a3b8;">"y"</span>: <span style="color:#00d4ff;">-88.3</span>, <span style="color:#94a3b8;">"z"</span>: <span style="color:#00d4ff;">-142.6</span> } }
+  },
+  {
+    <span style="color:#a78bfa;">"pick_order"</span>: <span style="color:#00d4ff;">2</span>, <span style="color:#a78bfa;">"cluster_id"</span>: <span style="color:#00d4ff;">0</span>, <span style="color:#a78bfa;">"cluster_priority"</span>: <span style="color:#00d4ff;">1</span>, <span style="color:#a78bfa;">"dist_to_robot_mm"</span>: <span style="color:#00d4ff;">210.8</span>,
+    <span style="color:#94a3b8;">"classification"</span>: { <span style="color:#94a3b8;">"class"</span>: <span style="color:#10b981;">"hdpe_bottle"</span>, <span style="color:#94a3b8;">"confidence"</span>: <span style="color:#00d4ff;">0.988</span> }
+  }
+]</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PERCEPTION -->
+<section id="perception" class="sec sec-alt">
+  <div class="container">
+    <div class="split reveal">
       <figure>
         <div class="img-frame">
           <div class="ph">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="3"/><path d="M3 12c0-4.97 4.03-9 9-9s9 4.03 9 9-4.03 9-9 9-9-4.03-9-9z"/><path d="M12 5v2M12 17v2M5 12H3M21 12h-2"/></svg>
-            Perception feed screenshot<br>
-            <span style="font-size:0.68rem">assets/images/perception-feed.jpg</span>
+            Perception feed screenshot<br><span style="font-size:0.68rem">assets/images/perception-feed.jpg</span>
           </div>
         </div>
         <p class="img-caption">Annotated feed — ArUco overlays, 3D coordinates, calibration corners</p>
       </figure>
-
       <div>
         <span class="eyebrow">Perception</span>
         <h2 class="sec-title">Pixels to <span style="color:var(--accent);">millimetres</span></h2>
-        <p class="sec-body">
-          A RealSense D435 gives us aligned colour and depth at 30 fps. The depth alone isn't enough — camera-to-robot calibration is what makes the numbers trustworthy.
-        </p>
-        <p class="sec-body" style="margin-top:14px;">
-          We place ArUco markers at known positions on the table and solve for a homography matrix that maps any pixel directly to a robot XY coordinate. Depth adds the Z. A fitting-plane equation — calibrated over the whole work surface — corrects for any tilt so every pick lands where expected.
-        </p>
+        <p class="sec-body">A RealSense D435 gives us aligned colour and depth at 30 fps. The depth alone isn't enough — camera-to-robot calibration is what makes the numbers trustworthy.</p>
+        <p class="sec-body" style="margin-top:14px;">We place ArUco markers at known positions on the table and solve for a homography matrix that maps any pixel directly to a robot XY coordinate. Depth adds the Z. A fitting-plane equation — calibrated over the whole work surface — corrects for any tilt so every pick lands where expected.</p>
         <div class="detail-row" style="margin-top:24px;">
-          <div class="detail">
-            <div class="detail-title">11×11 median kernel</div>
-            <div class="detail-desc">Depth is sampled from 121 pixels around the centroid and median-filtered to reject noise and specular spikes.</div>
-          </div>
-          <div class="detail">
-            <div class="detail-title">5-frame smoother</div>
-            <div class="detail-desc">XY position is averaged across the last five readings so the commanded pick location doesn't jitter.</div>
-          </div>
-          <div class="detail">
-            <div class="detail-title">Homography fallback</div>
-            <div class="detail-desc">If homography fails, a 3D ray is cast through the pixel and intersected with the table plane.</div>
-          </div>
-          <div class="detail">
-            <div class="detail-title">ROS bridge</div>
-            <div class="detail-desc">Annotated frames are published on <code style="font-size:0.72rem;color:var(--accent);">/camera/annotated</code> so the GUI shows a live feed.</div>
-          </div>
+          <div class="detail"><div class="detail-title">11×11 median kernel</div><div class="detail-desc">Depth is sampled from 121 pixels around the centroid and median-filtered to reject noise and specular spikes.</div></div>
+          <div class="detail"><div class="detail-title">5-frame smoother</div><div class="detail-desc">XY position is averaged across the last five readings so the commanded pick location doesn't jitter.</div></div>
+          <div class="detail"><div class="detail-title">Homography fallback</div><div class="detail-desc">If homography fails, a 3D ray is cast through the pixel and intersected with the table plane.</div></div>
+          <div class="detail"><div class="detail-title">ROS bridge</div><div class="detail-desc">Annotated frames are published on <code style="font-size:0.72rem;color:var(--accent);">/camera/annotated</code> so the GUI shows a live feed.</div></div>
         </div>
       </div>
     </div>
@@ -554,18 +396,14 @@
 </section>
 
 <!-- MOTION PLANNING -->
-<section id="motion" class="sec sec-alt">
+<section id="motion" class="sec">
   <div class="container">
     <div class="split reveal">
       <div>
         <span class="eyebrow" style="color:#34d399;">Motion Planning & Control</span>
         <h2 class="sec-title">Getting there <span style="color:#34d399;">without hitting anything</span></h2>
-        <p class="sec-body">
-          MoveIt2 handles the hard part: finding a path from the current joint configuration to the grasp pose that doesn't clip the table, the camera tripod, or the object being picked. The planner tries eight different solutions and runs with whichever takes the smallest total joint movement — avoiding the annoying 270° shoulder swings that technically reach the same point.
-        </p>
-        <p class="sec-body" style="margin-top:14px;">
-          The final descent and raise are Cartesian — the gripper moves in a straight vertical line so it doesn't knock adjacent objects. A background thread watches the gripper during transport and flags a drop if the fingers close all the way unexpectedly.
-        </p>
+        <p class="sec-body">MoveIt2 handles the hard part: finding a path from the current joint configuration to the grasp pose that doesn't clip the table, the camera tripod, or the object being picked. The planner tries eight different solutions and runs with whichever takes the smallest total joint movement.</p>
+        <p class="sec-body" style="margin-top:14px;">The final descent and raise are Cartesian — the gripper moves in a straight vertical line so it doesn't knock adjacent objects. A background thread watches the gripper during transport and flags a drop if the fingers close all the way unexpectedly.</p>
         <div class="tags" style="margin-top:20px;">
           <span class="tag green">RRTConnect</span>
           <span class="tag green">Cartesian descent</span>
@@ -574,19 +412,11 @@
           <span class="tag green">3× retry</span>
         </div>
       </div>
-
-      <!-- MOTION IMAGE
-           Good choice: RViz screenshot showing the robot arm with a planned trajectory visualised, collision objects visible.
-           1. Save as: assets/images/rviz-planning.jpg
-           2. Replace the img-frame:
-              <div class="img-frame"><img src="assets/images/rviz-planning.jpg" alt="MoveIt2 planning in RViz"></div>
-      -->
       <figure>
         <div class="img-frame">
           <div class="ph">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/><circle cx="12" cy="12" r="4"/></svg>
-            RViz motion planning screenshot<br>
-            <span style="font-size:0.68rem">assets/images/rviz-planning.jpg</span>
+            RViz motion planning screenshot<br><span style="font-size:0.68rem">assets/images/rviz-planning.jpg</span>
           </div>
         </div>
         <p class="img-caption">MoveIt2 in RViz — planned trajectory with collision objects</p>
@@ -596,53 +426,28 @@
 </section>
 
 <!-- INTERACTION & EXECUTION -->
-<section id="interaction" class="sec">
+<section id="interaction" class="sec sec-alt">
   <div class="container">
     <div class="split reveal">
-
-      <!-- GUI IMAGE
-           Good choice: screenshot of the status_gui.py tkinter window showing the camera feed, object list, and buttons.
-           1. Save as: assets/images/gui-screenshot.jpg
-           2. Replace the img-frame:
-              <div class="img-frame"><img src="assets/images/gui-screenshot.jpg" alt="Status GUI"></div>
-      -->
       <figure>
         <div class="img-frame" style="aspect-ratio:4/3;">
           <div class="ph">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 4v16M2 9h6"/></svg>
-            GUI screenshot<br>
-            <span style="font-size:0.68rem">assets/images/gui-screenshot.jpg</span>
+            GUI screenshot<br><span style="font-size:0.68rem">assets/images/gui-screenshot.jpg</span>
           </div>
         </div>
         <p class="img-caption">The operator GUI — live camera feed, status panel, controls</p>
       </figure>
-
       <div>
         <span class="eyebrow" style="color:#fbbf24;">Interaction & Execution</span>
         <h2 class="sec-title">One screen, <span style="color:#fbbf24;">full control</span></h2>
-        <p class="sec-body">
-          The GUI gives the operator everything in one place: a live annotated camera feed, what objects are currently detected and where, the robot's current state, and the controls to start, stop, or intervene at any moment.
-        </p>
-        <p class="sec-body" style="margin-top:14px;">
-          Every button publishes a plain string to a ROS topic — keeping the interface completely decoupled from the motion logic. ESTOP halts the arm mid-trajectory. Bin poses are taught by jogging the arm and pressing Save rather than typing coordinates.
-        </p>
+        <p class="sec-body">The GUI gives the operator everything in one place: a live annotated camera feed, what objects are currently detected and where, the robot's current state, and the controls to start, stop, or intervene at any moment.</p>
+        <p class="sec-body" style="margin-top:14px;">Every button publishes a plain string to a ROS topic — keeping the interface completely decoupled from the motion logic. ESTOP halts the arm mid-trajectory. Bin poses are taught by jogging the arm and pressing Save rather than typing coordinates.</p>
         <div class="detail-row" style="margin-top:24px;">
-          <div class="detail">
-            <div class="detail-title">State machine</div>
-            <div class="detail-desc">IDLE → WAITING → PREGRASP → GRASPING → TRANSPORTING → DONE, shown live in the GUI.</div>
-          </div>
-          <div class="detail">
-            <div class="detail-title">Bin teaching</div>
-            <div class="detail-desc">Jog the arm to any bin position, press Save — coordinates written to bin_poses.json immediately.</div>
-          </div>
-          <div class="detail">
-            <div class="detail-title">Class filter</div>
-            <div class="detail-desc">Pick a plastic type in the GUI and the robot clears all of that class before moving to others.</div>
-          </div>
-          <div class="detail">
-            <div class="detail-title">Sim mode</div>
-            <div class="detail-desc">Launch with sim:=true to run the full sequence without a physical object — gripper skips stall detection.</div>
-          </div>
+          <div class="detail"><div class="detail-title">State machine</div><div class="detail-desc">IDLE → WAITING → PREGRASP → GRASPING → TRANSPORTING → DONE, shown live in the GUI.</div></div>
+          <div class="detail"><div class="detail-title">Bin teaching</div><div class="detail-desc">Jog the arm to any bin position, press Save — coordinates written to bin_poses.json immediately.</div></div>
+          <div class="detail"><div class="detail-title">Class filter</div><div class="detail-desc">Pick a plastic type in the GUI and the robot clears all of that class before moving to others.</div></div>
+          <div class="detail"><div class="detail-title">Sim mode</div><div class="detail-desc">Launch with sim:=true to run the full sequence without a physical object — gripper skips stall detection.</div></div>
         </div>
       </div>
     </div>
@@ -650,53 +455,28 @@
 </section>
 
 <!-- WORKSPACE -->
-<section id="workspace" class="sec sec-alt">
+<section id="workspace" class="sec">
   <div class="container">
     <div class="split reveal">
-
-      <!-- WORKSPACE IMAGE
-           Add a top-down or angled photo of the workspace.
-           1. Save as: assets/images/workspace.jpg
-           2. Replace the img-frame below:
-              <div class="img-frame"><img src="assets/images/workspace.jpg" alt="Sort-O workspace"></div>
-      -->
       <figure>
         <div class="img-frame" style="aspect-ratio:4/3;">
           <div class="ph">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-            Workspace photo<br>
-            <span style="font-size:0.68rem">assets/images/workspace.jpg</span>
+            Workspace photo<br><span style="font-size:0.68rem">assets/images/workspace.jpg</span>
           </div>
         </div>
         <p class="img-caption">The Sort-O workspace — black board, ArUco markers, bin assembly</p>
       </figure>
-
       <div>
         <span class="eyebrow">The workspace</span>
         <h2 class="sec-title">A purpose-built <span style="color:var(--accent);">sorting surface</span></h2>
-        <p class="sec-body">
-          Everything Sort-O sees and touches is contained within a 500 × 320 mm black board mounted on the trolley. The dark surface gives the camera clean contrast against plastic objects and keeps them from sliding around during picks.
-        </p>
-        <p class="sec-body" style="margin-top:14px;">
-          Four ArUco markers — one at each corner, numbered 1 to 4 — act as the calibration reference. When the camera-to-robot homography is computed, these markers define exactly where the robot coordinate frame maps onto the image plane. A custom plywood bin assembly clips onto the trolley handle with three square openings, one per plastic type.
-        </p>
+        <p class="sec-body">Everything Sort-O sees and touches is contained within a 500 × 320 mm black board mounted on the trolley. The dark surface gives the camera clean contrast against plastic objects and keeps them from sliding around during picks.</p>
+        <p class="sec-body" style="margin-top:14px;">Four ArUco markers — one at each corner, numbered 1 to 4 — act as the calibration reference. When the camera-to-robot homography is computed, these markers define exactly where the robot coordinate frame maps onto the image plane. A custom plywood bin assembly clips onto the trolley handle with three square openings, one per plastic type.</p>
         <div class="detail-row" style="margin-top:24px;">
-          <div class="detail">
-            <div class="detail-title">Board</div>
-            <div class="detail-desc">500 × 320 mm black surface on the trolley. Constrains the pick zone and gives depth camera contrast.</div>
-          </div>
-          <div class="detail">
-            <div class="detail-title">ArUco markers</div>
-            <div class="detail-desc">4 markers at board corners (IDs 1–4). Used once to calibrate the camera-to-robot homography matrix.</div>
-          </div>
-          <div class="detail">
-            <div class="detail-title">Camera mount</div>
-            <div class="detail-desc">Tripod positioned to look straight down at the board. Fixed height — moving it requires recalibration.</div>
-          </div>
-          <div class="detail">
-            <div class="detail-title">Bin assembly</div>
-            <div class="detail-desc">3-slot plywood frame clipped to the trolley handle. Each slot is a named drop-off point for one plastic class.</div>
-          </div>
+          <div class="detail"><div class="detail-title">Board</div><div class="detail-desc">500 × 320 mm black surface on the trolley. Constrains the pick zone and gives depth camera contrast.</div></div>
+          <div class="detail"><div class="detail-title">ArUco markers</div><div class="detail-desc">4 markers at board corners (IDs 1–4). Used once to calibrate the camera-to-robot homography matrix.</div></div>
+          <div class="detail"><div class="detail-title">Camera mount</div><div class="detail-desc">Tripod positioned to look straight down at the board. Fixed height — moving it requires recalibration.</div></div>
+          <div class="detail"><div class="detail-title">Bin assembly</div><div class="detail-desc">3-slot plywood frame clipped to the trolley handle. Each slot is a named drop-off point for one plastic class.</div></div>
         </div>
       </div>
     </div>
@@ -704,7 +484,7 @@
 </section>
 
 <!-- TECH STACK -->
-<section id="stack" class="sec">
+<section id="stack" class="sec sec-alt">
   <div class="container reveal">
     <span class="eyebrow">Built with</span>
     <h2 class="sec-title">The stack</h2>
@@ -733,33 +513,10 @@
       <h2 class="sec-title">Meet the <span style="color:var(--accent);">team</span></h2>
     </div>
     <div class="team-grid reveal">
-
-      <!-- TEAM PHOTOS
-           For each person:
-           1. Add their photo as: assets/images/team/jun.jpg  (etc.)
-           2. Replace the <span>J</span> inside .avatar with:
-              <img src="assets/images/team/jun.jpg" alt="Jun Jeong">
-      -->
-      <div class="team-card">
-        <div class="avatar"><span>J</span></div>
-        <div class="team-name">Jun Jeong</div>
-        <div class="team-role">Perception</div>
-      </div>
-      <div class="team-card">
-        <div class="avatar"><span>J</span></div>
-        <div class="team-name">Jarrel</div>
-        <div class="team-role">Interaction & Execution</div>
-      </div>
-      <div class="team-card">
-        <div class="avatar"><span>B</span></div>
-        <div class="team-name">Bilguun</div>
-        <div class="team-role">Motion Planning & Control</div>
-      </div>
-      <div class="team-card">
-        <div class="avatar"><span>R</span></div>
-        <div class="team-name">Rian</div>
-        <div class="team-role">Machine Learning</div>
-      </div>
+      <div class="team-card"><div class="avatar"><span>J</span></div><div class="team-name">Jun Jeong</div><div class="team-role">Perception</div></div>
+      <div class="team-card"><div class="avatar"><span>J</span></div><div class="team-name">Jarrel</div><div class="team-role">Interaction & Execution</div></div>
+      <div class="team-card"><div class="avatar"><span>B</span></div><div class="team-name">Bilguun</div><div class="team-role">Motion Planning & Control</div></div>
+      <div class="team-card"><div class="avatar"><span>R</span></div><div class="team-name">Rian</div><div class="team-role">Machine Learning</div></div>
     </div>
   </div>
 </section>
@@ -767,9 +524,7 @@
 <!-- FOOTER -->
 <footer>
   <div class="container">
-    <p>Sort-O &nbsp;·&nbsp; Robotics Studio 2 &nbsp;·&nbsp; 2026 &nbsp;·&nbsp;
-      <a href="https://github.com/Jun-Je0ng/Robotics-Studio-2" target="_blank">GitHub</a>
-    </p>
+    <p>Sort-O &nbsp;·&nbsp; Robotics Studio 2 &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; <a href="https://github.com/Jun-Je0ng/Robotics-Studio-2" target="_blank">GitHub</a></p>
   </div>
 </footer>
 
@@ -779,8 +534,6 @@
     { threshold: 0.1 }
   );
   document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-
-  // stagger children inside grids
   const stagger = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (!e.isIntersecting) return;
@@ -793,8 +546,6 @@
     });
   }, { threshold: 0.08 });
   document.querySelectorAll('.how-grid, .stack-grid, .team-grid, .detail-row').forEach(el => stagger.observe(el));
-
-  // active nav link
   const secs = document.querySelectorAll('section[id]');
   const links = document.querySelectorAll('.nav-links a');
   window.addEventListener('scroll', () => {
