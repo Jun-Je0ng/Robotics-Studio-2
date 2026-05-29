@@ -241,7 +241,7 @@
       <div>
         <span class="eyebrow" style="color:#a78bfa;">Machine Learning - K-Means Clustering</span>
         <h2 class="sec-title">Deciding <span style="color:#a78bfa;">what to pick first</span></h2>
-        <p class="sec-body">Detecting objects is only half the problem. When multiple bottles are in the workspace the robot needs to decide which one to pick first. We solve this with a second AI component: a K-Means workspace planner running as its own ROS2 node.</p>
+        <p class="sec-body">Detecting objects is only half the problem. When multiple objects are in the workspace the robot needs to decide which one to pick first. We solve this with a second AI component: a K-Means workspace planner running as its own ROS2 node.</p>
         <p class="sec-body" style="margin-top:14px;">K-Means clusters all detected objects into spatial zones based on their XY position in robot frame. Each cluster's centre is ranked by distance to the robot base: the nearest zone gets cleared first. Within each zone, objects are ordered by their individual distance to the robot. This is zone-based picking: the arm stays in one area, clears it, then moves on. Fewer large sweeps, higher throughput.</p>
 
         <div style="margin-top:28px; display:flex; flex-direction:column; gap:12px;">
@@ -303,11 +303,11 @@
             <rect x="112" y="158" width="18" height="28" rx="4" fill="rgba(124,58,237,0.2)" stroke="#a78bfa" stroke-width="1.5"/>
             <text x="121" y="196" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#a78bfa">#2</text>
             <!-- Bottle B1: in Zone B, far from base -->
-            <rect x="228" y="72" width="18" height="28" rx="4" fill="rgba(0,212,255,0.2)" stroke="#00d4ff" stroke-width="1.5"/>
-            <text x="237" y="110" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#00d4ff">#3</text>
+            <rect x="228" y="95" width="18" height="28" rx="4" fill="rgba(0,212,255,0.2)" stroke="#00d4ff" stroke-width="1.5"/>
+            <text x="237" y="133" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#00d4ff">#3</text>
             <!-- Bottle B2: in Zone B, far from base -->
-            <rect x="262" y="82" width="18" height="28" rx="4" fill="rgba(0,212,255,0.15)" stroke="#00d4ff" stroke-width="1.5"/>
-            <text x="271" y="120" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#00d4ff">#4</text>
+            <rect x="262" y="55" width="18" height="28" rx="4" fill="rgba(0,212,255,0.15)" stroke="#00d4ff" stroke-width="1.5"/>
+            <text x="271" y="93" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#00d4ff">#4</text>
             <!-- Robot base: bottom centre -->
             <circle cx="170" cy="232" r="13" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="1.5"/>
             <text x="170" y="236" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7" fill="#10b981" font-weight="700">BASE</text>
@@ -325,7 +325,7 @@
             <!-- Pick order arrow Zone A to Zone B -->
             <path d="M130 162 Q185 120 228 86" fill="none" stroke="rgba(100,116,139,0.5)" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#arrowG)"/>
             <!-- Pick order arrow within Zone B: #3 -> #4 -->
-            <path d="M246 80 Q252 68 262 76" fill="none" stroke="#00d4ff" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#arrowC)"/>
+            <path d="M246 109 Q252 88 262 69" fill="none" stroke="#00d4ff" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#arrowC)"/>
           </svg>
           <!-- Legend -->
           <div style="display:flex; gap:20px; justify-content:center; margin-top:12px; flex-wrap:wrap;">
