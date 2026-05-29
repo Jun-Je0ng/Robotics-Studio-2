@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sort-O — Autonomous Plastic Sorting Robot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ───────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    :root {
+      --bg:          #040d1e;
+      --bg-card:     #08152b;
+      --bg-card-h:   #0d1f3e;
+      --accent:      #00d4ff;
+      --accent-dim:  rgba(0,212,255,0.12);
+      --accent-glow: rgba(0,212,255,0.35);
+      --purple:      #7c3aed;
+      --purple-dim:  rgba(124,58,237,0.12);
+      --green:       #10b981;
+      --green-dim:   rgba(16,185,129,0.12);
+      --amber:       #f59e0b;
+      --amber-dim:   rgba(245,158,11,0.12);
+      --text:        #e2e8f0;
+      --text-muted:  #64748b;
+      --border:      rgba(0,212,255,0.10);
+      --border-h:    rgba(0,212,255,0.30);
+      --r:           12px;
+      --r-lg:        20px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ─── Utility ────────────────────────────────────────────────────────── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .section    { padding: 100px 0; }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-label::before {
+      content: ''; display: block; width: 20px; height: 2px;
+      background: var(--accent); border-radius: 2px;
+    }
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 700; line-height: 1.15; margin-bottom: 16px;
+      color: var(--text);
+    }
+    .section-title span { color: var(--accent); }
+    .section-desc { font-size: 1.05rem; color: var(--text-muted); max-width: 620px; line-height: 1.8; }
+
+    /* gradient text helper */
+    .grad {
+      background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* scroll-reveal */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ─── Nav ────────────────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 16px 0;
+      background: rgba(4,13,30,0.75);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+    nav .inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+    }
+    .nav-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.3rem; font-weight: 700;
+      text-decoration: none;
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .nav-links { display: flex; gap: 8px; list-style: none; }
+    .nav-links a {
+      color: var(--text-muted); text-decoration: none;
+      font-size: 0.85rem; font-weight: 500;
+      padding: 6px 12px; border-radius: 6px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); background: var(--accent-dim); }
+
+    /* ─── Hero ───────────────────────────────────────────────────────────── */
+    #hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center;
+      overflow: hidden; padding-top: 80px;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,212,255,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(124,58,237,0.06) 0%, transparent 60%);
+    }
+    /* animated grid */
+    .hero-grid {
+      position: absolute; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black, transparent);
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 780px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 100px;
+      border: 1px solid var(--border-h);
+      background: var(--accent-dim);
+      font-size: 0.78rem; font-weight: 600; color: var(--accent);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 28px;
+      animation: fadeDown 0.8s ease both;
+    }
+    .hero-badge::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .hero-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 700; line-height: 1.0; letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      animation: fadeUp 0.8s 0.15s ease both;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--text-muted); max-width: 560px;
+      margin-bottom: 40px; line-height: 1.7;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+    .hero-ctas {
+      display: flex; flex-wrap: wrap; gap: 14px;
+      animation: fadeUp 0.8s 0.45s ease both;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 26px; border-radius: 8px;
+      font-weight: 600; font-size: 0.9rem; text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent); color: #040d1e;
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+    .btn-primary:hover {
+      background: #33ddff;
+      box-shadow: 0 0 40px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      border: 1px solid var(--border-h); color: var(--text);
+    }
+    .btn-outline:hover {
+      background: var(--accent-dim); border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    /* stats row */
+    .hero-stats {
+      display: flex; flex-wrap: wrap; gap: 32px;
+      margin-top: 60px; padding-top: 40px;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.8s 0.6s ease both;
+    }
+    .stat-item {}
+    .stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.9rem; font-weight: 700; color: var(--accent);
+      line-height: 1;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ─── How It Works ───────────────────────────────────────────────────── */
+    .steps {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2px; margin-top: 56px; position: relative;
+    }
+    .step {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 32px 28px;
+      position: relative;
+      transition: border-color 0.3s, background 0.3s, transform 0.3s;
+    }
+    .step:hover {
+      border-color: var(--accent); background: var(--bg-card-h);
+      transform: translateY(-6px);
+    }
+    .step-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em;
+      color: var(--accent); margin-bottom: 16px;
+    }
+    .step-icon {
+      font-size: 2rem; margin-bottom: 14px;
+      display: block;
+    }
+    .step-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem; font-weight: 600; margin-bottom: 10px;
+    }
+    .step-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.65; }
+
+    /* connector arrow between steps */
+    .step:not(:last-child)::after {
+      content: '→';
+      position: absolute; right: -18px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent); font-size: 1.2rem; z-index: 2;
+      display: none;
+    }
+    @media (min-width: 900px) { .step:not(:last-child)::after { display: block; } }
+
+    /* ─── Tech section card ──────────────────────────────────────────────── */
+    .tech-section { padding: 100px 0; }
+    .tech-section:nth-child(odd) { background: var(--bg-card); }
+    .tech-section-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: start;
+    }
+    @media (max-width: 768px) { .tech-section-inner { grid-template-columns: 1fr; gap: 40px; } }
+    .feature-list { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-top: 28px; }
+    .feature-list li {
+      display: flex; align-items: flex-start; gap: 12px;
+      font-size: 0.92rem; line-height: 1.6;
+    }
+    .feature-list li::before {
+      content: ''; flex-shrink: 0;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); margin-top: 8px;
+    }
+    .feature-list li span { color: var(--text-muted); }
+
+    /* info cards grid */
+    .info-cards {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .info-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .info-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .info-card-icon { font-size: 1.5rem; margin-bottom: 10px; }
+    .info-card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.88rem; font-weight: 600; margin-bottom: 6px;
+    }
+    .info-card-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; }
+
+    /* accent variants */
+    .accent-purple .feature-list li::before { background: var(--purple); }
+    .accent-purple .section-label { color: var(--purple); }
+    .accent-purple .section-label::before { background: var(--purple); }
+    .accent-purple .section-title span { color: var(--purple); }
+    .accent-purple .info-card:hover { border-color: var(--purple); }
+
+    .accent-green .feature-list li::before { background: var(--green); }
+    .accent-green .section-label { color: var(--green); }
+    .accent-green .section-label::before { background: var(--green); }
+    .accent-green .section-title span { color: var(--green); }
+    .accent-green .info-card:hover { border-color: var(--green); }
+
+    .accent-amber .feature-list li::before { background: var(--amber); }
+    .accent-amber .section-label { color: var(--amber); }
+    .accent-amber .section-label::before { background: var(--amber); }
+    .accent-amber .section-title span { color: var(--amber); }
+    .accent-amber .info-card:hover { border-color: var(--amber); }
+
+    /* code badge */
+    .code-badge {
+      display: inline-block;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      color: var(--accent);
+    }
+
+    /* pipeline flow */
+    .pipeline {
+      display: flex; flex-direction: column; gap: 0;
+      border: 1px solid var(--border); border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+    .pipeline-step {
+      display: flex; align-items: center; gap: 16px;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .pipeline-step:last-child { border-bottom: none; }
+    .pipeline-step:hover { background: var(--accent-dim); }
+    .pipeline-num {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      background: var(--accent-dim); border: 1px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 700; color: var(--accent);
+    }
+    .pipeline-label { font-size: 0.88rem; font-weight: 500; }
+    .pipeline-sub { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* ─── Tech Stack ─────────────────────────────────────────────────────── */
+    #tech-stack { padding: 100px 0; }
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 14px; margin-top: 48px;
+    }
+    .tech-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px 16px;
+      text-align: center;
+      transition: border-color 0.25s, transform 0.25s, background 0.25s;
+      cursor: default;
+    }
+    .tech-card:hover {
+      border-color: var(--accent); background: var(--bg-card-h);
+      transform: translateY(-4px);
+    }
+    .tech-card-icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .tech-card-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem; font-weight: 600;
+    }
+    .tech-card-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* ─── Team ───────────────────────────────────────────────────────────── */
+    #team { padding: 100px 0; background: var(--bg-card); }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px; margin-top: 48px;
+    }
+    .team-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 28px 20px;
+      text-align: center;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .team-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+    .team-avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-dim), var(--purple-dim));
+      border: 2px solid var(--border-h);
+      margin: 0 auto 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.6rem; font-weight: 700; color: var(--accent);
+    }
+    .team-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 600; margin-bottom: 4px;
+    }
+    .team-role { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* ─── Footer ─────────────────────────────────────────────────────────── */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    footer p { font-size: 0.82rem; color: var(--text-muted); }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ─── Animations ─────────────────────────────────────────────────────── */
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:none; } }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+      50%      { box-shadow: 0 0 0 6px transparent; }
+    }
+
+    /* ─── Responsive ─────────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .info-cards { grid-template-columns: 1fr; }
+      .hero-stats { gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ NAV ════════════════════════════════════════ -->
+<nav>
+  <div class="inner">
+    <a class="nav-logo" href="#hero">Sort-O</a>
+    <ul class="nav-links">
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#machine-learning">ML</a></li>
+      <li><a href="#perception">Perception</a></li>
+      <li><a href="#motion">Motion</a></li>
+      <li><a href="#interaction">Execution</a></li>
+      <li><a href="#tech-stack">Stack</a></li>
+      <li><a href="#team">Team</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════ HERO ═══════════════════════════════════════ -->
+<section id="hero" class="section">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">Robotics Studio 2 · 2026</div>
+      <h1 class="hero-title">
+        Meet <span class="grad">Sort-O</span>
+      </h1>
+      <p class="hero-sub">
+        An autonomous robotic system that detects, picks, and sorts plastic waste in real time — powered by YOLO OBB vision, MoveIt2 motion planning, and a UR3e robotic arm.
+      </p>
+      <div class="hero-ctas">
+        <a href="#how-it-works" class="btn btn-primary">See How It Works →</a>
+        <a href="https://github.com/Jun-Je0ng/Robotics-Studio-2" target="_blank" class="btn btn-outline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.8c.85 0 1.71.11 2.51.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0 0 22 12c0-5.52-4.48-10-10-10z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-value">6-DOF</div>
+          <div class="stat-label">UR3e Robotic Arm</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">3</div>
+          <div class="stat-label">Plastic Categories</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">10 Hz</div>
+          <div class="stat-label">Detection Rate</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">500 Hz</div>
+          <div class="stat-label">Control Loop</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ HOW IT WORKS ════════════════════════════════ -->
+<section id="how-it-works" class="section">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Overview</div>
+      <h2 class="section-title">How <span>Sort-O</span> Works</h2>
+      <p class="section-desc">Four tightly-coupled subsystems work together to turn a pile of mixed plastic into sorted bins — fully autonomously.</p>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">STEP 01</div>
+        <span class="step-icon">🎯</span>
+        <div class="step-title">Detect</div>
+        <div class="step-desc">YOLO OBB model identifies and classifies plastic objects from the RealSense camera feed at 10 Hz with a stability filter.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 02</div>
+        <span class="step-icon">📍</span>
+        <div class="step-title">Localise</div>
+        <div class="step-desc">Depth data + homography calibration maps each detection from pixel coordinates to a precise 3D pose in the robot's world frame.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 03</div>
+        <span class="step-icon">🦾</span>
+        <div class="step-title">Plan</div>
+        <div class="step-desc">MoveIt2 plans a collision-free trajectory using RRTConnect, selecting the lowest-cost path from multiple attempts.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 04</div>
+        <span class="step-icon">✅</span>
+        <div class="step-title">Sort</div>
+        <div class="step-desc">The RG2 gripper grasps the object using stall-detection feedback, lifts it to safe height, and places it in the correct bin.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ MACHINE LEARNING ════════════════════════════ -->
+<section id="machine-learning" class="tech-section reveal">
+  <div class="container">
+    <div class="tech-section-inner accent-purple">
+      <div>
+        <div class="section-label">Machine Learning</div>
+        <h2 class="section-title">YOLO OBB <span>Object Detection</span></h2>
+        <p class="section-desc">A custom-trained YOLOv8 Oriented Bounding Box model identifies plastic objects with rotation awareness — critical for gripper alignment.</p>
+        <ul class="feature-list">
+          <li><span>Oriented bounding boxes capture object yaw angle, enabling precise top-down grasp orientation</span></li>
+          <li><span>Three trained classes: <span class="code-badge">hdpe_bottle</span>, <span class="code-badge">pet_bottle</span>, <span class="code-badge">pp_container</span></span></li>
+          <li><span>Confidence threshold of 0.70 filters low-quality detections before depth processing</span></li>
+          <li><span>Stability filter requires 5 consecutive detections before a pick is triggered</span></li>
+          <li><span>Per-instance tracking with persistent IDs across frames (e.g. <span class="code-badge">pet_bottle_0</span>)</span></li>
+        </ul>
+      </div>
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="info-card-icon">🧠</div>
+          <div class="info-card-title">OBB Model</div>
+          <div class="info-card-desc">YOLOv8 OBB architecture. Outputs class, confidence, centre pixel, and rotation angle for each detection.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">🎲</div>
+          <div class="info-card-title">Stability Filter</div>
+          <div class="info-card-desc">Only publishes objects seen in ≥ 5 consecutive frames. Eliminates false triggers from single-frame glitches.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">🔄</div>
+          <div class="info-card-title">Track Matching</div>
+          <div class="info-card-desc">Each detection is matched to the nearest existing track within 60 px so IDs stay consistent as the arm moves.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">📐</div>
+          <div class="info-card-title">Angle Extraction</div>
+          <div class="info-card-desc">OBB rotation angle is converted to a gripper yaw command, aligning fingers with the object's long axis.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ PERCEPTION ══════════════════════════════════ -->
+<section id="perception" class="tech-section reveal" style="background:var(--bg);">
+  <div class="container">
+    <div class="tech-section-inner">
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="info-card-icon">📷</div>
+          <div class="info-card-title">RealSense D435</div>
+          <div class="info-card-desc">640 × 480 aligned colour + depth at 30 fps. Depth aligned to colour so each pixel has a direct depth reading.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">🗺️</div>
+          <div class="info-card-title">Homography Calibration</div>
+          <div class="info-card-desc">ArUco markers map pixel XY → robot XY using a 3×3 homography matrix. Eliminates perspective distortion.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">📏</div>
+          <div class="info-card-title">Depth Smoothing</div>
+          <div class="info-card-desc">11 × 11 px median kernel + 50 mm spike filter + 5-frame rolling average suppress depth noise.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">📡</div>
+          <div class="info-card-title">ROS Image Bridge</div>
+          <div class="info-card-desc">Annotated frames published to <span class="code-badge">/camera/annotated</span> so the GUI can display a live detection feed.</div>
+        </div>
+      </div>
+      <div>
+        <div class="section-label">Perception</div>
+        <h2 class="section-title">3D Object <span>Localisation</span></h2>
+        <p class="section-desc">Raw pixels become millimetre-accurate 3D poses in the robot's coordinate frame through a calibrated depth-to-world pipeline.</p>
+        <ul class="feature-list">
+          <li><span>Primary: homography matrix maps object centroid pixel to robot XY (mm)</span></li>
+          <li><span>Fallback: 3D ray–table plane intersection using the 4×4 transform matrix</span></li>
+          <li><span>Z computed from fitted plane equation calibrated over the work surface</span></li>
+          <li><span>Class-specific grip offsets account for object height (HDPE vs PET vs PP)</span></li>
+          <li><span>Outputs published to <span class="code-badge">perception/objects</span> as <span class="code-badge">object_msgs/ObjectArray</span></span></li>
+        </ul>
+
+        <div class="pipeline" style="margin-top:28px;">
+          <div class="pipeline-step">
+            <div class="pipeline-num">1</div>
+            <div><div class="pipeline-label">Capture</div><div class="pipeline-sub">RealSense color + depth frame</div></div>
+          </div>
+          <div class="pipeline-step">
+            <div class="pipeline-num">2</div>
+            <div><div class="pipeline-label">Detect</div><div class="pipeline-sub">YOLO OBB → pixel centroids + angles</div></div>
+          </div>
+          <div class="pipeline-step">
+            <div class="pipeline-num">3</div>
+            <div><div class="pipeline-label">Depth Sample</div><div class="pipeline-sub">11×11 median kernel → depth (m)</div></div>
+          </div>
+          <div class="pipeline-step">
+            <div class="pipeline-num">4</div>
+            <div><div class="pipeline-label">Transform</div><div class="pipeline-sub">Homography → robot XY (mm)</div></div>
+          </div>
+          <div class="pipeline-step">
+            <div class="pipeline-num">5</div>
+            <div><div class="pipeline-label">Publish</div><div class="pipeline-sub">Stable detections → ROS topic</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ MOTION PLANNING ═══════════════════════════════ -->
+<section id="motion" class="tech-section reveal">
+  <div class="container">
+    <div class="tech-section-inner accent-green">
+      <div>
+        <div class="section-label">Motion Planning & Control</div>
+        <h2 class="section-title">MoveIt2 <span>Trajectory Planning</span></h2>
+        <p class="section-desc">MoveIt2 turns 3D object poses into safe, collision-free arm trajectories — replanning reactively after each pick to maintain a clear camera view.</p>
+        <ul class="feature-list">
+          <li><span>RRTConnect planner with 8 attempts per goal; executes lowest-cost trajectory to avoid unnecessary joint rotation</span></li>
+          <li><span>Collision objects (table, camera tripod, grasped object) kept live in the MoveIt planning scene</span></li>
+          <li><span>Cartesian path for precise vertical descend and raise during grasp</span></li>
+          <li><span>IterativeParabolicTimeParameterization ensures smooth velocity profiles within hardware limits</span></li>
+          <li><span>DropMonitor background thread detects object drops during transport via gripper re-poll</span></li>
+          <li><span>Repeat-fail guard skips a location after 3 consecutive grasp failures</span></li>
+        </ul>
+      </div>
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="info-card-icon">🤖</div>
+          <div class="info-card-title">UR3e Arm</div>
+          <div class="info-card-desc">6-DOF arm with 500 mm reach. Controlled at 500 Hz via RTDE over Ethernet through <span class="code-badge">ur_ros2_driver</span>.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">✊</div>
+          <div class="info-card-title">OnRobot RG2</div>
+          <div class="info-card-desc">Parallel gripper with 110 mm span. Stall-detection feedback confirms object contact — no force sensor needed.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">🛡️</div>
+          <div class="info-card-title">Collision Scene</div>
+          <div class="info-card-desc">Ground plane, camera tripod, and each picked object are added as MoveIt collision objects before planning.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">🔁</div>
+          <div class="info-card-title">Reactive Loop</div>
+          <div class="info-card-desc">Returns home after each pick to restore the camera view, then waits for the next fresh perception message.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ INTERACTION & EXECUTION ═══════════════════════ -->
+<section id="interaction" class="tech-section reveal" style="background:var(--bg);">
+  <div class="container">
+    <div class="tech-section-inner accent-amber">
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="info-card-icon">🖥️</div>
+          <div class="info-card-title">Status GUI</div>
+          <div class="info-card-desc">Live tkinter dashboard showing robot state, detected objects, camera feed, and bin queue.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">⏹️</div>
+          <div class="info-card-title">ESTOP</div>
+          <div class="info-card-desc">Hardware-safe emergency stop published to <span class="code-badge">/motion_system/command</span> — halts arm mid-trajectory immediately.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">📦</div>
+          <div class="info-card-title">Bin Teaching</div>
+          <div class="info-card-desc">Manually jog the arm to a bin position, press <em>Save Bin</em> in the GUI — pose is persisted to <span class="code-badge">bin_poses.json</span>.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">🎯</div>
+          <div class="info-card-title">Class Priority</div>
+          <div class="info-card-desc">GUI lets you target a specific plastic type so Sort-O picks all of that class before moving to others.</div>
+        </div>
+      </div>
+      <div>
+        <div class="section-label">Interaction & Execution</div>
+        <h2 class="section-title">GUI & <span>Command Interface</span></h2>
+        <p class="section-desc">An operator GUI connects the human to every part of the system — start/stop, live camera feed, bin management, and real-time status.</p>
+        <ul class="feature-list">
+          <li><span>All commands sent via ROS topic <span class="code-badge">/motion_system/command</span> — decoupled from the motion controller</span></li>
+          <li><span>Live annotated camera feed from <span class="code-badge">/camera/annotated</span> displayed in the GUI sidebar</span></li>
+          <li><span>Robot state broadcast on <span class="code-badge">/robot_state</span>: IDLE → WAITING → PREGRASP → GRASPING → TRANSPORTING → DONE</span></li>
+          <li><span>Simulation mode (<span class="code-badge">sim:=true</span>) disables stall detection for testing without a physical object</span></li>
+          <li><span>Single bringup command launches all four subsystems with staggered delays</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ TECH STACK ════════════════════════════════ -->
+<section id="tech-stack" class="section reveal">
+  <div class="container">
+    <div class="section-label">Technologies</div>
+    <h2 class="section-title">Tech <span>Stack</span></h2>
+    <p class="section-desc">Built on industry-standard robotics middleware and modern ML tooling.</p>
+    <div class="tech-grid">
+      <div class="tech-card"><div class="tech-card-icon">🤖</div><div class="tech-card-name">ROS2 Humble</div><div class="tech-card-sub">Middleware</div></div>
+      <div class="tech-card"><div class="tech-card-icon">🦾</div><div class="tech-card-name">MoveIt2</div><div class="tech-card-sub">Motion Planning</div></div>
+      <div class="tech-card"><div class="tech-card-icon">👁️</div><div class="tech-card-name">YOLOv8 OBB</div><div class="tech-card-sub">Object Detection</div></div>
+      <div class="tech-card"><div class="tech-card-icon">📷</div><div class="tech-card-name">RealSense D435</div><div class="tech-card-sub">Depth Camera</div></div>
+      <div class="tech-card"><div class="tech-card-icon">🔩</div><div class="tech-card-name">UR3e</div><div class="tech-card-sub">6-DOF Arm</div></div>
+      <div class="tech-card"><div class="tech-card-icon">✊</div><div class="tech-card-name">OnRobot RG2</div><div class="tech-card-sub">Gripper</div></div>
+      <div class="tech-card"><div class="tech-card-icon">🐍</div><div class="tech-card-name">Python</div><div class="tech-card-sub">Perception / GUI</div></div>
+      <div class="tech-card"><div class="tech-card-icon">⚡</div><div class="tech-card-name">C++</div><div class="tech-card-sub">Motion Controller</div></div>
+      <div class="tech-card"><div class="tech-card-icon">🖼️</div><div class="tech-card-name">OpenCV</div><div class="tech-card-sub">Image Processing</div></div>
+      <div class="tech-card"><div class="tech-card-icon">🔢</div><div class="tech-card-name">NumPy</div><div class="tech-card-sub">Numerics</div></div>
+      <div class="tech-card"><div class="tech-card-icon">🐳</div><div class="tech-card-name">Docker</div><div class="tech-card-sub">URSim</div></div>
+      <div class="tech-card"><div class="tech-card-icon">🐙</div><div class="tech-card-name">GitHub</div><div class="tech-card-sub">Version Control</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ TEAM ═══════════════════════════════════════ -->
+<section id="team">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">The Team</div>
+      <h2 class="section-title">Built <span>By</span></h2>
+      <p class="section-desc">Robotics Studio 2 — 2026</p>
+    </div>
+    <div class="team-grid reveal">
+      <div class="team-card">
+        <div class="team-avatar">J</div>
+        <div class="team-name">Jun Jeong</div>
+        <div class="team-role">Perception &amp; Integration</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">J</div>
+        <div class="team-name">Jarrel</div>
+        <div class="team-role">Motion Planning &amp; Control</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">B</div>
+        <div class="team-name">Bilguun</div>
+        <div class="team-role">Clustering &amp; Pick Ordering</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">T</div>
+        <div class="team-name">Tony</div>
+        <div class="team-role">Gripper Module</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">R</div>
+        <div class="team-name">Rian</div>
+        <div class="team-role">OBB Detection</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ FOOTER ════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <p>Sort-O · Robotics Studio 2 · 2026 ·
+      <a href="https://github.com/Jun-Je0ng/Robotics-Studio-2" target="_blank">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════ JS ══════════════════════════════════════════ -->
+<script>
+  // Scroll-reveal using IntersectionObserver
+  const observer = new IntersectionObserver(
+    (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } }),
+    { threshold: 0.12 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Stagger child cards when parent becomes visible
+  const staggerObs = new IntersectionObserver(
+    (entries) => entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const children = e.target.querySelectorAll('.step, .info-card, .tech-card, .team-card');
+      children.forEach((child, i) => {
+        child.style.transitionDelay = `${i * 80}ms`;
+        child.classList.add('reveal', 'visible');
+      });
+    }),
+    { threshold: 0.08 }
+  );
+  document.querySelectorAll('.steps, .info-cards, .tech-grid, .team-grid').forEach(el => staggerObs.observe(el));
+
+  // Nav highlight on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === `#${current}` ? 'var(--accent)' : '';
+    });
+  }, { passive: true });
+</script>
+</body>
+</html>
