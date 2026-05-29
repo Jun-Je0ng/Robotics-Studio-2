@@ -11,159 +11,151 @@
     html { scroll-behavior: smooth; }
 
     :root {
-      --bg:        #040d1e;
-      --bg-card:   #08152b;
-      --bg-card-h: #0d1f3e;
-      --accent:    #00d4ff;
-      --adim:      rgba(0,212,255,0.10);
-      --aglow:     rgba(0,212,255,0.28);
-      --purple:    #7c3aed;
-      --green:     #10b981;
-      --amber:     #f59e0b;
-      --text:      #e2e8f0;
-      --muted:     #64748b;
-      --border:    rgba(0,212,255,0.09);
-      --border-h:  rgba(0,212,255,0.26);
-      --code-bg:   #020912;
+      --bg:       #040d1e;
+      --bg-card:  #08152b;
+      --accent:   #00d4ff;
+      --adim:     rgba(0,212,255,0.10);
+      --purple:   #7c3aed;
+      --green:    #10b981;
+      --amber:    #f59e0b;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --border:   rgba(0,212,255,0.09);
+      --border-h: rgba(0,212,255,0.26);
+      --code-bg:  #020912;
     }
 
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      line-height: 1.75;
+      background: var(--bg); color: var(--text);
+      font-family: 'Inter', sans-serif; line-height: 1.75;
       overflow-x: hidden;
     }
 
-    .container { max-width: 860px; margin: 0 auto; padding: 0 28px; }
-
-    /* ── Nav ─────────────────────────────────────────────── */
+    /* ── Nav ────────────────────────────────────────────── */
     nav {
       position: fixed; inset: 0 0 auto; z-index: 99;
       padding: 14px 0;
-      background: rgba(4,13,30,0.85);
-      backdrop-filter: blur(18px);
+      background: rgba(4,13,30,0.88);
+      backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
     }
-    nav .wrap {
-      max-width: 860px; margin: 0 auto; padding: 0 28px;
+    .nav-inner {
+      max-width: 1080px; margin: 0 auto; padding: 0 28px;
       display: flex; align-items: center; justify-content: space-between;
     }
     .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .logo-mark svg { display: block; }
     .logo-word {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em;
       background: linear-gradient(120deg, #00d4ff 30%, #7c3aed 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    .back-link {
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
       font-size: 0.82rem; color: var(--muted); text-decoration: none;
-      display: flex; align-items: center; gap: 6px;
-      transition: color 0.2s;
+      padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);
+      transition: color 0.2s, border-color 0.2s;
     }
-    .back-link:hover { color: var(--accent); }
+    .back-btn:hover { color: var(--accent); border-color: var(--border-h); }
 
-    /* ── Sidebar TOC ─────────────────────────────────────── */
-    .page-layout {
-      display: grid;
-      grid-template-columns: 200px 1fr;
-      gap: 48px;
-      max-width: 1080px; margin: 0 auto;
-      padding: 100px 28px 80px;
+    /* ── Page layout ─────────────────────────────────────── */
+    .layout {
+      display: grid; grid-template-columns: 210px 1fr;
+      gap: 52px; max-width: 1080px;
+      margin: 0 auto; padding: 96px 28px 80px;
       align-items: start;
     }
-    @media (max-width: 768px) { .page-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 800px) { .layout { grid-template-columns: 1fr; padding-top: 88px; } }
 
+    /* ── Sidebar TOC ─────────────────────────────────────── */
     .toc {
-      position: sticky; top: 80px;
-      padding: 20px;
+      position: sticky; top: 76px;
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 16px;
     }
-    .toc-title {
-      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--muted);
-      margin-bottom: 12px;
+    @media (max-width: 800px) { .toc { display: none; } }
+    .toc-label {
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 10px;
     }
-    .toc ul { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+    .toc ul { list-style: none; }
+    .toc li + li { margin-top: 2px; }
     .toc a {
-      display: block; font-size: 0.78rem; color: var(--muted);
-      text-decoration: none; padding: 5px 8px; border-radius: 6px;
-      transition: color 0.2s, background 0.2s;
+      display: block; font-size: 0.79rem; color: var(--muted);
+      text-decoration: none; padding: 5px 10px; border-radius: 6px;
       border-left: 2px solid transparent;
+      transition: color 0.18s, background 0.18s, border-color 0.18s;
     }
-    .toc a:hover { color: var(--text); background: var(--adim); border-left-color: var(--accent); }
-    .toc a.active { color: var(--accent); border-left-color: var(--accent); }
-    @media (max-width: 768px) { .toc { display: none; } }
+    .toc a:hover { color: var(--text); background: var(--adim); }
+    .toc a.on { color: var(--accent); border-left-color: var(--accent); background: var(--adim); }
 
-    /* ── Content ─────────────────────────────────────────── */
+    /* ── Content area ────────────────────────────────────── */
     .content { min-width: 0; }
 
+    .page-hero { margin-bottom: 52px; }
+    .page-eyebrow {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 8px; display: block;
+    }
     .page-title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(1.8rem, 4vw, 2.4rem);
-      font-weight: 700; line-height: 1.1;
-      margin-bottom: 10px;
+      font-weight: 700; line-height: 1.1; margin-bottom: 10px;
     }
     .page-title span { color: var(--accent); }
-    .page-intro { font-size: 0.95rem; color: var(--muted); max-width: 560px; margin-bottom: 48px; }
+    .page-sub { font-size: 0.94rem; color: var(--muted); max-width: 520px; }
 
-    /* section heading */
-    .doc-section { margin-bottom: 60px; scroll-margin-top: 88px; }
-    .doc-h2 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.2rem; font-weight: 700;
-      margin-bottom: 16px; padding-bottom: 10px;
+    /* section */
+    .sec { margin-bottom: 64px; scroll-margin-top: 86px; }
+
+    .sec-heading {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 20px; padding-bottom: 12px;
       border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 10px;
     }
-    .doc-h2 .num {
-      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    .sec-num {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
       background: var(--adim); border: 1px solid var(--border-h);
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem; font-weight: 700; color: var(--accent);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem; font-weight: 700; color: var(--accent);
     }
-    .doc-h3 {
-      font-size: 0.85rem; font-weight: 600;
-      color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;
-      margin: 20px 0 8px;
+    .sec-title-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem; font-weight: 700;
     }
-    .doc-p { font-size: 0.92rem; color: var(--muted); line-height: 1.75; margin-bottom: 12px; }
 
-    /* code block */
-    .code-block {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 14px 0;
+    /* sub-heading inside a section */
+    .sub-label {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted);
+      margin: 24px 0 10px;
     }
-    .code-label {
-      padding: 7px 16px;
-      background: rgba(0,212,255,0.05);
-      border-bottom: 1px solid var(--border);
-      font-size: 0.68rem; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--muted);
+
+    p.body { font-size: 0.92rem; color: var(--muted); line-height: 1.75; margin-bottom: 12px; }
+
+    /* ── Code block ──────────────────────────────────────── */
+    .code-wrap { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 12px 0; }
+    .code-top {
       display: flex; align-items: center; gap: 8px;
+      padding: 7px 14px;
+      background: rgba(0,212,255,0.04); border-bottom: 1px solid var(--border);
+      font-size: 0.67rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
     }
-    .code-label::before {
-      content: ''; width: 6px; height: 6px; border-radius: 50%;
-      background: var(--accent);
-    }
-    .code-block pre {
-      padding: 16px;
-      font-family: 'JetBrains Mono', 'Courier New', monospace;
+    .code-top::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+    .code-wrap pre {
+      padding: 16px 18px;
+      font-family: 'JetBrains Mono', monospace;
       font-size: 0.8rem; line-height: 1.7;
-      color: #94d8e4;
-      overflow-x: auto;
-      white-space: pre;
+      color: #94d8e4; overflow-x: auto;
     }
-    .code-block pre .comment { color: #3d5266; }
-    .code-block pre .flag    { color: #a78bfa; }
-    .code-block pre .val     { color: #34d399; }
+    .cm { color: #3d5266; }
+    .fl { color: #a78bfa; }
+    .vl { color: #34d399; }
 
     /* inline code */
     code {
@@ -172,384 +164,490 @@
       background: var(--adim); padding: 1px 5px; border-radius: 4px;
     }
 
-    /* callout / note */
+    /* ── Callout ─────────────────────────────────────────── */
     .callout {
-      padding: 14px 18px;
-      border-radius: 10px;
-      border-left: 3px solid;
-      margin: 16px 0;
-      font-size: 0.86rem;
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 13px 16px; border-radius: 8px;
+      border-left: 3px solid; margin: 14px 0;
+      font-size: 0.86rem; line-height: 1.6;
     }
-    .callout.info  { background: rgba(0,212,255,0.06); border-color: var(--accent); color: #94d8e4; }
-    .callout.warn  { background: rgba(245,158,11,0.06); border-color: var(--amber); color: #fbbf24; }
-    .callout.tip   { background: rgba(16,185,129,0.06); border-color: var(--green); color: #34d399; }
+    .callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .callout.info  { background: rgba(0,212,255,0.05); border-color: var(--accent); color: #9ecfdb; }
+    .callout.warn  { background: rgba(245,158,11,0.05); border-color: var(--amber); color: #d4a44a; }
+    .callout.tip   { background: rgba(16,185,129,0.05); border-color: var(--green); color: #5abf9b; }
 
-    /* step card */
-    .step-card {
-      display: flex; gap: 16px;
-      padding: 18px; margin-bottom: 10px;
-      background: var(--bg-card);
-      border: 1px solid var(--border); border-radius: 10px;
-      transition: border-color 0.2s;
-    }
-    .step-card:hover { border-color: var(--border-h); }
-    .step-n {
-      width: 32px; height: 32px; flex-shrink: 0;
-      border-radius: 50%; background: var(--adim);
-      border: 1px solid var(--border-h);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.78rem; font-weight: 700; color: var(--accent);
-    }
-    .step-body {}
-    .step-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
-    .step-desc  { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
-
-    /* spec table */
-    .spec-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.83rem; }
+    /* ── Camera spec table ───────────────────────────────── */
+    .spec-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.84rem; }
     .spec-table th {
-      text-align: left; padding: 8px 12px;
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border);
-      font-size: 0.68rem; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.08em;
-      color: var(--muted);
+      text-align: left; padding: 9px 14px;
+      background: var(--bg-card); border-bottom: 1px solid var(--border);
+      font-size: 0.67rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
     }
-    .spec-table td {
-      padding: 9px 12px;
-      border-bottom: 1px solid rgba(0,212,255,0.05);
-      color: var(--muted);
-    }
+    .spec-table td { padding: 9px 14px; border-bottom: 1px solid rgba(0,212,255,0.04); color: var(--muted); }
     .spec-table td:first-child { color: var(--text); font-weight: 500; }
     .spec-table tr:last-child td { border-bottom: none; }
 
-    /* camera card */
-    .cam-card {
-      display: grid; grid-template-columns: auto 1fr;
-      gap: 20px; align-items: start;
-      padding: 20px; margin: 14px 0;
+    /* ── Pendant steps — clean numbered list ─────────────── */
+    .ps-list { display: flex; flex-direction: column; gap: 0; margin: 14px 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .ps-row {
+      display: grid; grid-template-columns: 44px 1fr;
+      gap: 0; border-bottom: 1px solid var(--border);
+    }
+    .ps-row:last-child { border-bottom: none; }
+    .ps-row:hover { background: rgba(0,212,255,0.03); }
+    .ps-idx {
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 14px 0 14px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem; font-weight: 700; color: var(--accent);
+      border-right: 1px solid var(--border);
       background: var(--bg-card);
+    }
+    .ps-content { padding: 13px 16px; font-size: 0.87rem; line-height: 1.6; }
+    .ps-content strong { color: var(--text); font-weight: 600; }
+    .ps-note { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── Terminal step cards ─────────────────────────────── */
+    .terminal-steps { display: flex; flex-direction: column; gap: 16px; }
+    .t-card {
       border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; background: var(--bg-card);
+      transition: border-color 0.2s;
     }
-    .cam-icon { font-size: 2.4rem; }
+    .t-card:hover { border-color: var(--border-h); }
+    .t-header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+    }
+    .t-num {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      background: var(--adim); border: 1px solid var(--border-h);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.8rem; font-weight: 700; color: var(--accent);
+    }
+    .t-header-text {}
+    .t-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 700; }
+    .t-desc  { font-size: 0.8rem; color: var(--muted); margin-top: 1px; }
+    .t-body  { padding: 16px 18px; }
+    .t-note  { font-size: 0.79rem; color: var(--muted); margin-top: 10px; line-height: 1.55; }
+    .t-note .ok  { color: #34d399; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+    .t-note .warn { color: var(--amber); }
 
-    /* pendant steps */
-    .pendant-steps { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
-    .ps {
-      display: flex; align-items: flex-start; gap: 12px;
-      font-size: 0.86rem; padding: 10px 14px;
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+    /* ── Bin pose steps ──────────────────────────────────── */
+    .bin-steps { display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
+    .bin-row {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 14px 16px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
     }
-    .ps-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .bin-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .bin-text { font-size: 0.87rem; line-height: 1.6; }
+    .bin-text strong { color: var(--text); }
 
-    /* footer */
-    footer {
-      padding: 32px 0; border-top: 1px solid var(--border);
-      text-align: center; font-size: 0.78rem; color: var(--muted);
-    }
+    footer { padding: 32px 0; border-top: 1px solid var(--border); text-align: center; font-size: 0.78rem; color: var(--muted); }
     footer a { color: var(--accent); text-decoration: none; }
-
-    @keyframes up { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
-    .content > * { animation: up 0.5s ease both; }
   </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
-  <div class="wrap">
+  <div class="nav-inner">
     <a class="logo" href="index.html">
-      <div class="logo-mark">
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-          <path d="M16 4 A12 12 0 0 1 28 16" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/>
-          <path d="M28 16 A12 12 0 0 1 16 28" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
-          <path d="M16 28 A12 12 0 0 1 4 16" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
-          <line x1="16" y1="16" x2="22" y2="10" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/>
-          <line x1="22" y1="10" x2="25" y2="8" stroke="#00d4ff" stroke-width="1.8" stroke-linecap="round"/>
-          <line x1="22" y1="10" x2="24" y2="13" stroke="#00d4ff" stroke-width="1.8" stroke-linecap="round"/>
-          <circle cx="16" cy="16" r="2.5" fill="#00d4ff" opacity="0.8"/>
-          <polyline points="27,13 28,16 25,16" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
-      </div>
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+        <path d="M16 4 A12 12 0 0 1 28 16" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/>
+        <path d="M28 16 A12 12 0 0 1 16 28" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+        <path d="M16 28 A12 12 0 0 1 4 16" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
+        <line x1="16" y1="16" x2="22" y2="10" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/>
+        <line x1="22" y1="10" x2="25" y2="8" stroke="#00d4ff" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="22" y1="10" x2="24" y2="13" stroke="#00d4ff" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="2.5" fill="#00d4ff" opacity="0.8"/>
+        <polyline points="27,13 28,16 25,16" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
       <span class="logo-word">Sort-O</span>
     </a>
-    <a class="back-link" href="index.html">← Back to overview</a>
+    <a class="back-btn" href="index.html">← Back to overview</a>
   </div>
 </nav>
 
-<div class="page-layout">
+<div class="layout">
 
-  <!-- Sidebar TOC -->
+  <!-- SIDEBAR TOC -->
   <aside class="toc">
-    <div class="toc-title">On this page</div>
+    <div class="toc-label">On this page</div>
     <ul>
       <li><a href="#camera">Camera</a></li>
       <li><a href="#prerequisites">Prerequisites</a></li>
+      <li><a href="#calibration">Calibration</a></li>
       <li><a href="#pendant">Teach pendant</a></li>
       <li><a href="#build">Build</a></li>
-      <li><a href="#terminals">Run the system</a></li>
+      <li><a href="#run">Run the system</a></li>
       <li><a href="#bin-poses">Bin poses</a></li>
       <li><a href="#sim">Simulation mode</a></li>
     </ul>
   </aside>
 
-  <!-- Main content -->
+  <!-- MAIN -->
   <main class="content">
 
-    <h1 class="page-title">Setup &amp; <span>Launch Guide</span></h1>
-    <p class="page-intro">Everything you need to get Sort-O running — from plugging in the camera to pressing Start in the GUI.</p>
+    <div class="page-hero">
+      <span class="page-eyebrow">Sort-O documentation</span>
+      <h1 class="page-title">Setup &amp; <span>Launch Guide</span></h1>
+      <p class="page-sub">Everything you need to get Sort-O running — from plugging in the camera to pressing Start in the GUI.</p>
+    </div>
 
-    <!-- ── CAMERA ─────────────────────────────────────────────── -->
-    <div class="doc-section" id="camera">
-      <h2 class="doc-h2"><span class="num">📷</span> Camera — Intel RealSense D435</h2>
-
-      <div class="cam-card">
-        <div class="cam-icon">📷</div>
-        <div>
-          <div style="font-family:'Space Grotesk',sans-serif; font-weight:600; margin-bottom:8px;">Intel RealSense D435</div>
-          <p class="doc-p" style="margin:0;">Depth + RGB camera. Depth is aligned to the colour frame so every pixel has a matching depth reading. Must be connected via USB 3 — USB 2 will work but depth quality and frame rate drop significantly.</p>
-        </div>
+    <!-- ── CAMERA ─────────────────────────────────────── -->
+    <div class="sec" id="camera">
+      <div class="sec-heading">
+        <div class="sec-num">📷</div>
+        <div class="sec-title-text">Camera — Intel RealSense D435</div>
       </div>
+
+      <p class="body">The RealSense D435 provides aligned colour and depth frames. Every pixel in the colour image has a matching depth value, which is what lets the detector compute 3D object positions. Connect it to a <strong>USB 3 (blue) port</strong> — USB 2 drops frame rate and depth quality noticeably.</p>
 
       <table class="spec-table">
         <thead><tr><th>Property</th><th>Value</th></tr></thead>
         <tbody>
           <tr><td>Colour resolution</td><td>640 × 480 px</td></tr>
-          <tr><td>Depth resolution</td><td>640 × 480 px (aligned to colour)</td></tr>
+          <tr><td>Depth resolution</td><td>640 × 480 px — aligned to colour</td></tr>
           <tr><td>Frame rate</td><td>30 fps</td></tr>
           <tr><td>Colour format</td><td>BGR8</td></tr>
           <tr><td>Depth format</td><td>Z16 (millimetres)</td></tr>
           <tr><td>Connection</td><td>USB 3.x (blue port)</td></tr>
-          <tr><td>Mount position</td><td>Tripod, looking straight down at workspace board</td></tr>
-          <tr><td>ROS driver</td><td><code>pyrealsense2</code> (Python, direct SDK)</td></tr>
+          <tr><td>Mount</td><td>Tripod — looking straight down at workspace board</td></tr>
+          <tr><td>ROS driver</td><td><code>pyrealsense2</code> Python SDK — no ROS camera node needed</td></tr>
         </tbody>
       </table>
 
       <div class="callout warn">
-        Moving the camera after calibration means the homography matrix is wrong. Recalibration is required — run <code>obb_detector_node</code>, place all 4 ArUco markers, and save a new <code>camera_to_robot_calibration.json</code>.
+        <span class="callout-icon">⚠️</span>
+        <span>Moving the camera after calibration invalidates the homography matrix. If the camera shifts, run calibration again before starting the system.</span>
       </div>
     </div>
 
-    <!-- ── PREREQUISITES ─────────────────────────────────────── -->
-    <div class="doc-section" id="prerequisites">
-      <h2 class="doc-h2"><span class="num">1</span> Prerequisites</h2>
-      <p class="doc-p">Before running anything, make sure these are installed:</p>
-
-      <div class="code-block">
-        <div class="code-label">Ubuntu 22.04 — install once</div>
-        <pre><span class="comment"># ROS 2 Humble</span>
-sudo apt install ros-humble-desktop ros-humble-ur
-
-<span class="comment"># MoveIt 2</span>
-sudo apt install ros-humble-moveit
-
-<span class="comment"># Python dependencies</span>
-pip install ultralytics pyrealsense2 opencv-python scipy numpy scikit-learn pillow
-
-<span class="comment"># Gripper serial comms</span>
-sudo apt install libnet1-dev</pre>
+    <!-- ── PREREQUISITES ──────────────────────────────── -->
+    <div class="sec" id="prerequisites">
+      <div class="sec-heading">
+        <div class="sec-num">1</div>
+        <div class="sec-title-text">Prerequisites</div>
       </div>
 
-      <div class="code-block">
-        <div class="code-label">Clone &amp; build (once)</div>
+      <p class="body">Run these once on a fresh Ubuntu 22.04 install.</p>
+
+      <div class="code-wrap">
+        <div class="code-top">System dependencies</div>
+        <pre><span class="cm"># ROS 2 Humble + UR driver</span>
+sudo apt install ros-humble-desktop ros-humble-ur
+
+<span class="cm"># MoveIt 2</span>
+sudo apt install ros-humble-moveit
+
+<span class="cm"># Gripper serial comms</span>
+sudo apt install libnet1-dev
+
+<span class="cm"># Python packages</span>
+pip install ultralytics pyrealsense2 opencv-python scipy numpy scikit-learn pillow</pre>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-top">Clone &amp; build</div>
         <pre>git clone https://github.com/Jun-Je0ng/Robotics-Studio-2.git
 cd Robotics-Studio-2
 
-<span class="comment"># Install ROS dependencies</span>
+<span class="cm"># Pull driver dependencies</span>
 vcs import src --input src/ur_onrobot/required.repos --recursive
 rosdep install -y --from-paths src --ignore-src
 
-<span class="comment"># Build</span>
+<span class="cm"># Build</span>
 colcon build --symlink-install
 source install/setup.bash</pre>
       </div>
     </div>
 
-    <!-- ── TEACH PENDANT ─────────────────────────────────────── -->
-    <div class="doc-section" id="pendant">
-      <h2 class="doc-h2"><span class="num">2</span> Teach pendant — External Control setup</h2>
-      <p class="doc-p">This is a one-time setup. The UR robot needs to know your laptop's IP so it can connect back to ROS after you press Play.</p>
-
-      <h3 class="doc-h3">A — Configure Tool I/O for the gripper</h3>
-      <div class="pendant-steps">
-        <div class="ps"><span class="ps-icon">1️⃣</span> On the teach pendant go to <strong>Installation → General → Tool I/O</strong></div>
-        <div class="ps"><span class="ps-icon">⚙️</span> Set <strong>Controlled by: User</strong> &nbsp;·&nbsp; <strong>Tool Output Voltage: 24V</strong></div>
-        <div class="ps"><span class="ps-icon">📡</span> Communication Interface: Baud Rate <strong>1M</strong> · Parity <strong>Even</strong> · Stop Bits <strong>One</strong> · RX Idle Chars <strong>1.5</strong> · TX Idle Chars <strong>3.5</strong></div>
-        <div class="ps"><span class="ps-icon">🔌</span> Standard Output: Digital Output 0 &amp; 1 → <strong>Sinking (NPN)</strong></div>
-        <div class="ps"><span class="ps-icon">🔗</span> Still in Installation, scroll to <strong>URCaps → OnRobot</strong> → set connection to <strong>"No Connection"</strong></div>
+    <!-- ── CALIBRATION ────────────────────────────────── -->
+    <div class="sec" id="calibration">
+      <div class="sec-heading">
+        <div class="sec-num">2</div>
+        <div class="sec-title-text">Camera calibration</div>
       </div>
 
-      <h3 class="doc-h3">B — Set up External Control</h3>
-      <div class="pendant-steps">
-        <div class="ps"><span class="ps-icon">🌐</span> Check your laptop's IP: run <code>hostname -I</code> in a terminal — note the <code>192.168.x.x</code> address</div>
-        <div class="ps"><span class="ps-icon">📋</span> On pendant: <strong>Installation → URCaps → External Control</strong> → set <strong>Host IP</strong> to your laptop's IP</div>
-        <div class="ps"><span class="ps-icon">📝</span> Go to <strong>Program</strong> tab → <strong>URCaps</strong> → add <strong>External Control</strong> to the program list</div>
-        <div class="ps"><span class="ps-icon">▶️</span> Press <strong>Play</strong> — the pendant will wait for ROS to connect. You'll see "Robot connected to reverse interface" in the driver terminal.</div>
+      <p class="body">Calibration maps the camera's pixel coordinates to the robot's world frame. It must be done once after first setup, and again any time the camera or workspace board is moved.</p>
+      <p class="body">Place all four ArUco markers at the corners of the workspace board (numbered 1–4), make sure the camera can see all of them, then run:</p>
+
+      <div class="code-wrap">
+        <div class="code-top">Navigate to the calibration script</div>
+        <pre>cd ~/git/Robotics-Studio-2/src/plastic_detection/plastic_detection/
+python3 camera_calibration.py</pre>
       </div>
 
-      <div class="callout info">
-        Start the ROS robot driver <em>before</em> pressing Play. The driver opens a port and waits; the pendant connects to it when Play is pressed.
-      </div>
+      <p class="body">The script detects the ArUco markers, computes the homography matrix, and writes the result to <code>camera_to_robot_calibration.json</code>. You should see all 4 markers detected — if any are missing, reposition them and rerun.</p>
 
-      <h3 class="doc-h3">URSim (simulator, no physical robot)</h3>
-      <p class="doc-p">If testing without the real robot, use URSim via Docker. The process is the same but the robot IP is <code>192.168.56.101</code> and the Host IP in External Control should be <code>192.168.56.1</code> (your VirtualBox adapter).</p>
-      <div class="code-block">
-        <div class="code-label">Start URSim</div>
-        <pre>ros2 run ur_client_library start_ursim.sh -m ur3e
-<span class="comment"># Then open http://192.168.56.101:6080/vnc.html in a browser</span></pre>
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <span>Keep the workspace lighting consistent between calibration and normal operation. Shadows over the ArUco markers can cause detection to fail.</span>
       </div>
     </div>
 
-    <!-- ── BUILD ─────────────────────────────────────────────── -->
-    <div class="doc-section" id="build">
-      <h2 class="doc-h2"><span class="num">3</span> Build the workspace</h2>
-      <p class="doc-p">Run this once after cloning, and again whenever you change a C++ file. Python nodes don't need a rebuild.</p>
+    <!-- ── TEACH PENDANT ──────────────────────────────── -->
+    <div class="sec" id="pendant">
+      <div class="sec-heading">
+        <div class="sec-num">3</div>
+        <div class="sec-title-text">Teach pendant — robot setup</div>
+      </div>
 
-      <div class="code-block">
-        <div class="code-label">Terminal</div>
+      <p class="body">Two things to configure on the pendant. Both are one-time setups that persist between sessions.</p>
+
+      <!-- Part A -->
+      <div class="sub-label">Part A — Tool I/O (for the RG2 gripper)</div>
+      <div class="ps-list">
+        <div class="ps-row">
+          <div class="ps-idx">1</div>
+          <div class="ps-content">
+            Navigate to <strong>Installation → General → Tool I/O</strong>
+          </div>
+        </div>
+        <div class="ps-row">
+          <div class="ps-idx">2</div>
+          <div class="ps-content">
+            Set <strong>Controlled by</strong> to <strong>User</strong> and <strong>Tool Output Voltage</strong> to <strong>24V</strong>
+          </div>
+        </div>
+        <div class="ps-row">
+          <div class="ps-idx">3</div>
+          <div class="ps-content">
+            Under Communication Interface, configure:
+            <div class="ps-note">Baud Rate: <strong>1M</strong> &nbsp;·&nbsp; Parity: <strong>Even</strong> &nbsp;·&nbsp; Stop Bits: <strong>One</strong> &nbsp;·&nbsp; RX Idle Chars: <strong>1.5</strong> &nbsp;·&nbsp; TX Idle Chars: <strong>3.5</strong></div>
+          </div>
+        </div>
+        <div class="ps-row">
+          <div class="ps-idx">4</div>
+          <div class="ps-content">
+            Under Standard Output, set both <strong>Digital Output 0</strong> and <strong>Digital Output 1</strong> to <strong>Sinking (NPN)</strong>
+          </div>
+        </div>
+        <div class="ps-row">
+          <div class="ps-idx">5</div>
+          <div class="ps-content">
+            Still in Installation, scroll to <strong>URCaps → OnRobot</strong> and set the connection to <strong>No Connection</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part B -->
+      <div class="sub-label">Part B — External Control (connects robot to ROS)</div>
+
+      <div class="callout info" style="margin-bottom:14px;">
+        <span class="callout-icon">ℹ️</span>
+        <span>Find your laptop's IP first: run <code>hostname -I</code> in a terminal and note the <code>192.168.x.x</code> address.</span>
+      </div>
+
+      <div class="ps-list">
+        <div class="ps-row">
+          <div class="ps-idx">1</div>
+          <div class="ps-content">
+            Go to <strong>Installation → URCaps → External Control</strong>
+            <div class="ps-note">Set <strong>Host IP</strong> to your laptop's IP address</div>
+          </div>
+        </div>
+        <div class="ps-row">
+          <div class="ps-idx">2</div>
+          <div class="ps-content">
+            Go to the <strong>Program</strong> tab → open <strong>URCaps</strong> → add <strong>External Control</strong> to the program tree
+          </div>
+        </div>
+        <div class="ps-row">
+          <div class="ps-idx">3</div>
+          <div class="ps-content">
+            Start the ROS robot driver (Terminal 1 below), then press <strong>▶ Play</strong> on the pendant
+            <div class="ps-note">You'll see <span style="color:#34d399;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">Robot connected to reverse interface</span> appear in the driver terminal once connected.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- URSim -->
+      <div class="sub-label">URSim — testing without the physical robot</div>
+      <p class="body" style="margin-bottom:10px;">Start the simulator, then follow Part B above using <code>192.168.56.101</code> as the robot IP and <code>192.168.56.1</code> as the Host IP.</p>
+      <div class="code-wrap">
+        <div class="code-top">Start URSim</div>
+        <pre>ros2 run ur_client_library start_ursim.sh -m ur3e
+<span class="cm"># Open the Polyscope interface at: http://192.168.56.101:6080/vnc.html</span></pre>
+      </div>
+    </div>
+
+    <!-- ── BUILD ──────────────────────────────────────── -->
+    <div class="sec" id="build">
+      <div class="sec-heading">
+        <div class="sec-num">4</div>
+        <div class="sec-title-text">Build the workspace</div>
+      </div>
+
+      <p class="body">Run once after cloning, and again whenever a C++ file changes. Python nodes don't need a rebuild thanks to <code>--symlink-install</code>.</p>
+
+      <div class="code-wrap">
+        <div class="code-top">Terminal</div>
         <pre>cd ~/git/Robotics-Studio-2
 colcon build --symlink-install
 source install/setup.bash</pre>
       </div>
-
-      <div class="callout tip">
-        <code>--symlink-install</code> means Python files (GUI, perception, translator) are linked rather than copied — edits take effect immediately on next run without rebuilding.
-      </div>
     </div>
 
-    <!-- ── TERMINALS ─────────────────────────────────────────── -->
-    <div class="doc-section" id="terminals">
-      <h2 class="doc-h2"><span class="num">4</span> Run the system</h2>
-      <p class="doc-p">Each step runs in its own terminal. Source the workspace in each one first.</p>
+    <!-- ── RUN ────────────────────────────────────────── -->
+    <div class="sec" id="run">
+      <div class="sec-heading">
+        <div class="sec-num">5</div>
+        <div class="sec-title-text">Run the system</div>
+      </div>
+
+      <p class="body">Open four terminals. Source the workspace at the top of each one.</p>
 
       <div class="callout info" style="margin-bottom:20px;">
-        <strong>One-command shortcut:</strong> <code>ros2 launch ur_gripper_demo bringup.launch.py</code> launches all four steps automatically with staggered delays. Use the separate terminals below when you need to see individual logs or debug a specific node.
+        <span class="callout-icon">⚡</span>
+        <span><strong>One-command shortcut:</strong> <code>ros2 launch ur_gripper_demo bringup.launch.py</code> launches all four nodes automatically with staggered delays. Use separate terminals when you want individual logs.</span>
       </div>
 
-      <div class="step-card">
-        <div class="step-n">1</div>
-        <div class="step-body">
-          <div class="step-title">Robot driver</div>
-          <div class="step-desc">Connects to the UR3e over Ethernet and starts the 500 Hz RTDE control loop.</div>
-          <div class="code-block" style="margin-top:10px;">
-            <div class="code-label">Terminal 1</div>
-            <pre>source install/setup.bash
+      <div class="terminal-steps">
+
+        <div class="t-card">
+          <div class="t-header">
+            <div class="t-num">1</div>
+            <div class="t-header-text">
+              <div class="t-title">Robot driver</div>
+              <div class="t-desc">Connects to the UR3e and starts the 500 Hz RTDE control loop</div>
+            </div>
+          </div>
+          <div class="t-body">
+            <div class="code-wrap" style="margin:0;">
+              <div class="code-top">Terminal 1</div>
+              <pre>source install/setup.bash
 ros2 launch ur_onrobot_control start_robot.launch.py \
-    <span class="flag">ur_type</span><span class="val">:=ur3e</span> \
-    <span class="flag">onrobot_type</span><span class="val">:=rg2</span> \
-    <span class="flag">robot_ip</span><span class="val">:=192.168.0.197</span> \
-    <span class="flag">launch_rviz</span><span class="val">:=false</span>
+    <span class="fl">ur_type</span><span class="vl">:=ur3e</span> \
+    <span class="fl">onrobot_type</span><span class="vl">:=rg2</span> \
+    <span class="fl">robot_ip</span><span class="vl">:=192.168.0.197</span> \
+    <span class="fl">launch_rviz</span><span class="vl">:=false</span>
 
-<span class="comment"># For URSim: robot_ip:=192.168.56.101</span></pre>
+<span class="cm"># URSim: use robot_ip:=192.168.56.101 instead</span></pre>
+            </div>
+            <div class="t-note">
+              Wait for: <span class="ok">Robot connected to reverse interface. Ready to receive control commands.</span><br>
+              Then press <strong>▶ Play</strong> on the teach pendant.
+            </div>
           </div>
-          <p style="font-size:0.78rem; color:var(--muted); margin-top:6px;">Wait for: <code style="color:#34d399;">Robot connected to reverse interface. Ready to receive control commands.</code></p>
-          <p style="font-size:0.78rem; color:var(--muted); margin-top:4px;">Then press <strong>▶ Play</strong> on the teach pendant.</p>
         </div>
-      </div>
 
-      <div class="step-card">
-        <div class="step-n">2</div>
-        <div class="step-body">
-          <div class="step-title">MoveIt + motion controller</div>
-          <div class="step-desc">Starts MoveIt2, loads the URDF, and launches the reactive pick-place node.</div>
-          <div class="code-block" style="margin-top:10px;">
-            <div class="code-label">Terminal 2</div>
-            <pre>source install/setup.bash
+        <div class="t-card">
+          <div class="t-header">
+            <div class="t-num">2</div>
+            <div class="t-header-text">
+              <div class="t-title">MoveIt + motion controller</div>
+              <div class="t-desc">Starts MoveIt2 and the reactive pick-place node</div>
+            </div>
+          </div>
+          <div class="t-body">
+            <div class="code-wrap" style="margin:0;">
+              <div class="code-top">Terminal 2</div>
+              <pre>source install/setup.bash
 ros2 launch ur_gripper_demo ur_moveit.launch.py \
-    <span class="flag">ur_type</span><span class="val">:=ur3e</span> \
-    <span class="flag">demo_type</span><span class="val">:=reactive</span> \
-    <span class="flag">sim</span><span class="val">:=false</span>
+    <span class="fl">ur_type</span><span class="vl">:=ur3e</span> \
+    <span class="fl">demo_type</span><span class="vl">:=reactive</span> \
+    <span class="fl">sim</span><span class="vl">:=false</span>
 
-<span class="comment"># Add sim:=true to skip gripper stall detection (testing without objects)</span></pre>
+<span class="cm"># Use sim:=true to skip stall detection when testing without objects</span></pre>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="step-card">
-        <div class="step-n">3</div>
-        <div class="step-body">
-          <div class="step-title">Camera + OBB detector</div>
-          <div class="step-desc">Opens the RealSense, runs YOLO inference, and publishes stable detections. An OpenCV window shows the annotated live feed.</div>
-          <div class="code-block" style="margin-top:10px;">
-            <div class="code-label">Terminal 3</div>
-            <pre>source install/setup.bash
+        <div class="t-card">
+          <div class="t-header">
+            <div class="t-num">3</div>
+            <div class="t-header-text">
+              <div class="t-title">Camera + OBB detector</div>
+              <div class="t-desc">Opens the RealSense and runs YOLO inference. An OpenCV window shows the live annotated feed.</div>
+            </div>
+          </div>
+          <div class="t-body">
+            <div class="code-wrap" style="margin:0;">
+              <div class="code-top">Terminal 3</div>
+              <pre>source install/setup.bash
 ros2 run plastic_detection obb_detector_node</pre>
+            </div>
+            <div class="t-note">
+              Status shows <span class="warn">Stabilising...</span> until 5 consecutive frames, then turns <span style="color:#34d399;">PUBLISHING</span> when detections are stable.
+            </div>
           </div>
-          <p style="font-size:0.78rem; color:var(--muted); margin-top:6px;">Status shows <span style="color:#f59e0b;">Stabilising...</span> (orange) until 5 consecutive frames, then <span style="color:#34d399;">PUBLISHING</span> (green).</p>
         </div>
-      </div>
 
-      <div class="step-card">
-        <div class="step-n">4</div>
-        <div class="step-body">
-          <div class="step-title">GUI</div>
-          <div class="step-desc">Opens the operator control panel with live camera feed, detection list, and Start/ESTOP controls.</div>
-          <div class="code-block" style="margin-top:10px;">
-            <div class="code-label">Terminal 4</div>
-            <pre>source install/setup.bash
+        <div class="t-card">
+          <div class="t-header">
+            <div class="t-num">4</div>
+            <div class="t-header-text">
+              <div class="t-title">GUI</div>
+              <div class="t-desc">Opens the operator panel — live camera feed, detection list, Start / ESTOP controls</div>
+            </div>
+          </div>
+          <div class="t-body">
+            <div class="code-wrap" style="margin:0;">
+              <div class="code-top">Terminal 4</div>
+              <pre>source install/setup.bash
 ros2 run ur_gripper_demo status_gui</pre>
+            </div>
           </div>
         </div>
-      </div>
 
-      <h3 class="doc-h3">Verify each node is publishing</h3>
-      <div class="code-block">
-        <div class="code-label">Check topics (any terminal)</div>
-        <pre><span class="comment"># Raw detections from the camera node</span>
-ros2 topic echo /plastic_detections
-
-<span class="comment"># Structured messages going to the motion controller</span>
-ros2 topic echo /perception/objects
-
-<span class="comment"># Commands sent by the GUI</span>
-ros2 topic echo /motion_system/command
-
-<span class="comment"># Robot state broadcast</span>
-ros2 topic echo /robot_state</pre>
-      </div>
+      </div><!-- /terminal-steps -->
     </div>
 
-    <!-- ── BIN POSES ─────────────────────────────────────────── -->
-    <div class="doc-section" id="bin-poses">
-      <h2 class="doc-h2"><span class="num">5</span> Teaching bin poses</h2>
-      <p class="doc-p">Before pressing Start, the robot needs to know where each bin is. Do this once per session (or when bins move).</p>
+    <!-- ── BIN POSES ──────────────────────────────────── -->
+    <div class="sec" id="bin-poses">
+      <div class="sec-heading">
+        <div class="sec-num">6</div>
+        <div class="sec-title-text">Teaching bin poses</div>
+      </div>
 
-      <div class="pendant-steps">
-        <div class="ps"><span class="ps-icon">🕹️</span> On the teach pendant, enable <strong>Freedrive</strong> and move the arm to the drop position above a bin</div>
-        <div class="ps"><span class="ps-icon">💾</span> In the GUI, type the bin name in the Save Bin field and press <strong>Save Bin</strong> — e.g. <code>hdpe_bottle</code>, <code>pet_bottle</code>, <code>pp_container</code></div>
-        <div class="ps"><span class="ps-icon">✅</span> Repeat for each bin. Poses are written to <code>config/bin_poses.json</code> immediately.</div>
+      <p class="body">Before pressing Start, the robot needs to know where each bin is. Do this once (poses are saved to disk and persist between sessions).</p>
+
+      <div class="bin-steps">
+        <div class="bin-row">
+          <div class="bin-icon">🕹️</div>
+          <div class="bin-text">Enable <strong>Freedrive</strong> on the teach pendant and manually move the arm to the drop position above a bin</div>
+        </div>
+        <div class="bin-row">
+          <div class="bin-icon">💾</div>
+          <div class="bin-text">In the GUI, enter the bin name and press <strong>Save Bin</strong>. Use the class names exactly: <code>hdpe_bottle</code>, <code>pet_bottle</code>, or <code>pp_container</code></div>
+        </div>
+        <div class="bin-row">
+          <div class="bin-icon">🔁</div>
+          <div class="bin-text">Repeat for each bin. Poses are written to <code>config/bin_poses.json</code> immediately and loaded automatically on next launch</div>
+        </div>
       </div>
 
       <div class="callout tip">
-        You can also save from a terminal: <code>ros2 topic pub --once /motion_system/command std_msgs/msg/String "data: 'SAVE_BIN:pet_bottle'"</code>
+        <span class="callout-icon">💡</span>
+        <span>You can also save from a terminal: <code>ros2 topic pub --once /motion_system/command std_msgs/msg/String "data: 'SAVE_BIN:pet_bottle'"</code></span>
       </div>
     </div>
 
-    <!-- ── SIM MODE ──────────────────────────────────────────── -->
-    <div class="doc-section" id="sim">
-      <h2 class="doc-h2"><span class="num">6</span> Simulation mode</h2>
-      <p class="doc-p">Pass <code>sim:=true</code> to the MoveIt launch to disable gripper stall detection. The robot moves through the full pick-place sequence and assumes every grasp succeeds — useful for testing arm motion and GUI controls without needing a physical object under the camera.</p>
+    <!-- ── SIM MODE ───────────────────────────────────── -->
+    <div class="sec" id="sim">
+      <div class="sec-heading">
+        <div class="sec-num">7</div>
+        <div class="sec-title-text">Simulation mode</div>
+      </div>
 
-      <div class="code-block">
-        <div class="code-label">Terminal 2 — sim mode</div>
+      <p class="body">Pass <code>sim:=true</code> to the MoveIt launch to disable gripper stall detection. The robot runs the full pick-place sequence and assumes every grasp succeeds — useful for testing arm motion, GUI controls, and bin poses without needing a physical object under the camera.</p>
+
+      <div class="code-wrap">
+        <div class="code-top">Terminal 2 — sim mode</div>
         <pre>ros2 launch ur_gripper_demo ur_moveit.launch.py \
-    <span class="flag">ur_type</span><span class="val">:=ur3e</span> \
-    <span class="flag">demo_type</span><span class="val">:=reactive</span> \
-    <span class="flag">sim</span><span class="val">:=true</span></pre>
+    <span class="fl">ur_type</span><span class="vl">:=ur3e</span> \
+    <span class="fl">demo_type</span><span class="vl">:=reactive</span> \
+    <span class="fl">sim</span><span class="vl">:=true</span></pre>
       </div>
 
       <div class="callout warn">
-        With <code>sim:=true</code> the gripper will attempt to close on nothing and move to the bin regardless. Don't use this on the real robot with delicate objects nearby.
-      </div>
-
-      <h3 class="doc-h3">Test GUI buttons without the robot</h3>
-      <p class="doc-p">Open the GUI on its own and inject fake status messages from a second terminal to verify the display updates correctly:</p>
-      <div class="code-block">
-        <div class="code-label">Inject fake status</div>
-        <pre><span class="comment"># Fake robot state</span>
-ros2 topic pub --once /robot_state std_msgs/msg/String "{data: 'GRASPING'}"
-
-<span class="comment"># Watch what commands the GUI sends when you click buttons</span>
-ros2 topic echo /motion_system/command</pre>
+        <span class="callout-icon">⚠️</span>
+        <span>With <code>sim:=true</code> the arm will move to the bin even with nothing in the gripper. Keep the workspace clear of obstacles when testing.</span>
       </div>
     </div>
 
@@ -557,24 +655,19 @@ ros2 topic echo /motion_system/command</pre>
 </div>
 
 <footer>
-  <div class="container">
-    <p>Sort-O &nbsp;·&nbsp; Robotics Studio 2 &nbsp;·&nbsp; 2026 &nbsp;·&nbsp;
-      <a href="index.html">Back to overview</a> &nbsp;·&nbsp;
-      <a href="https://github.com/Jun-Je0ng/Robotics-Studio-2" target="_blank">GitHub</a>
-    </p>
-  </div>
+  <p>Sort-O &nbsp;·&nbsp; Robotics Studio 2 &nbsp;·&nbsp; 2026 &nbsp;·&nbsp;
+    <a href="index.html">Back to overview</a> &nbsp;·&nbsp;
+    <a href="https://github.com/Jun-Je0ng/Robotics-Studio-2" target="_blank">GitHub</a>
+  </p>
 </footer>
 
 <script>
-  // Highlight active TOC link on scroll
-  const sections = document.querySelectorAll('.doc-section[id]');
-  const tocLinks  = document.querySelectorAll('.toc a');
+  const sections = document.querySelectorAll('.sec[id]');
+  const links    = document.querySelectorAll('.toc a');
   window.addEventListener('scroll', () => {
     let cur = '';
-    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) cur = s.id; });
-    tocLinks.forEach(a => {
-      a.classList.toggle('active', a.getAttribute('href') === `#${cur}`);
-    });
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 110) cur = s.id; });
+    links.forEach(a => { a.classList.toggle('on', a.getAttribute('href') === `#${cur}`); });
   }, { passive: true });
 </script>
 </body>
