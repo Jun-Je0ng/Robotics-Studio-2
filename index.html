@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sort-O — Autonomous Plastic Sorting Robot</title>
+  <title>Sort-O: Autonomous Plastic Sorting Robot</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -162,7 +162,7 @@
       <div>
         <div class="hero-tag"><i></i> Robotics Studio 2 &nbsp;·&nbsp; 2026</div>
         <h1 class="hero-title">Meet<br><span class="grad">Sort-O</span></h1>
-        <p class="hero-p">A robot that watches, thinks, and sorts. Sort-O uses a depth camera and a trained vision model to find plastic waste, then picks and bins each piece — all on its own.</p>
+        <p class="hero-p">A robot that watches, thinks, and sorts. Sort-O uses a depth camera and a trained vision model to find plastic waste, then picks and bins each piece, all on its own.</p>
         <div class="hero-btns">
           <a href="#how" class="btn btn-cyan">See how it works</a>
           <a href="https://github.com/Jun-Je0ng/Robotics-Studio-2" target="_blank" class="btn btn-ghost">
@@ -211,8 +211,8 @@
       <div>
         <span class="eyebrow" style="color:#a78bfa;">Machine Learning - YoloOBBv8</span>
         <h2 class="sec-title">Trained to see <span style="color:#a78bfa;">rotated objects</span></h2>
-        <p class="sec-body">Standard object detectors give you a rectangle. That's not enough when you need to know which way to rotate the gripper. We use an Oriented Bounding Box model that returns the object's angle alongside its class — so the arm always approaches aligned with the long axis.</p>
-        <p class="sec-body" style="margin-top:14px;">The model was trained on three classes found in typical household recycling: HDPE, PET, and PP plastic. Before any detection reaches the motion planner it has to appear stably in five frames in a row — cutting out flickers and reflections.</p>
+        <p class="sec-body">Standard object detectors give you a rectangle. That's not enough when you need to know which way to rotate the gripper. We use an Oriented Bounding Box model that returns the object's angle alongside its class, so the arm always approaches aligned with the long axis.</p>
+        <p class="sec-body" style="margin-top:14px;">The model was trained on three classes found in typical household recycling: HDPE, PET, and PP plastic. Before any detection reaches the motion planner it has to appear stably in five frames in a row, cutting out flickers and reflections.</p>
         <div class="tags" style="margin-top:20px;">
           <span class="tag purple">hdpe_bottle</span>
           <span class="tag purple">pet_bottle</span>
@@ -228,7 +228,7 @@
             OBB detection screenshot<br><span style="font-size:0.68rem">assets/images/obb-detection.jpg</span>
           </div>
         </div>
-        <p class="img-caption">YOLO OBB output — rotated boxes, class labels, confidence</p>
+        <p class="img-caption">YOLO OBB output: rotated boxes, class labels, confidence</p>
       </figure>
     </div>
   </div>
@@ -290,31 +290,31 @@
             <!-- workspace -->
             <rect x="20" y="20" width="300" height="200" rx="10" fill="rgba(124,58,237,0.04)" stroke="rgba(124,58,237,0.2)" stroke-width="1"/>
             <text x="170" y="14" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="9" fill="#64748b" letter-spacing="0.1em">WORKSPACE</text>
-            <!-- Zone A — LEFT, close to robot base -->
+            <!-- Zone A: LEFT, close to robot base -->
             <ellipse cx="105" cy="175" rx="72" ry="45" fill="rgba(124,58,237,0.1)" stroke="rgba(124,58,237,0.5)" stroke-width="1" stroke-dasharray="5 3"/>
             <text x="105" y="135" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="8" fill="#a78bfa" font-weight="600" letter-spacing="0.05em">ZONE A  (priority 1)</text>
-            <!-- Zone B — RIGHT, far from robot base -->
+            <!-- Zone B: RIGHT, far from robot base -->
             <ellipse cx="255" cy="90" rx="65" ry="55" fill="rgba(0,212,255,0.05)" stroke="rgba(0,212,255,0.25)" stroke-width="1" stroke-dasharray="5 3"/>
             <text x="255" y="38" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="8" fill="#00d4ff" font-weight="600" letter-spacing="0.05em">ZONE B  (priority 2)</text>
-            <!-- Bottle A1 — closer to base within Zone A -->
+            <!-- Bottle A1: closer to base within Zone A -->
             <rect x="78" y="168" width="18" height="28" rx="4" fill="rgba(124,58,237,0.35)" stroke="#a78bfa" stroke-width="1.5"/>
             <text x="87" y="206" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#a78bfa">#1</text>
-            <!-- Bottle A2 — slightly further within Zone A -->
+            <!-- Bottle A2: slightly further within Zone A -->
             <rect x="112" y="158" width="18" height="28" rx="4" fill="rgba(124,58,237,0.2)" stroke="#a78bfa" stroke-width="1.5"/>
             <text x="121" y="196" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#a78bfa">#2</text>
-            <!-- Bottle B1 — in Zone B, far from base -->
+            <!-- Bottle B1: in Zone B, far from base -->
             <rect x="228" y="72" width="18" height="28" rx="4" fill="rgba(0,212,255,0.2)" stroke="#00d4ff" stroke-width="1.5"/>
             <text x="237" y="110" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#00d4ff">#3</text>
-            <!-- Bottle B2 — in Zone B, far from base -->
+            <!-- Bottle B2: in Zone B, far from base -->
             <rect x="262" y="82" width="18" height="28" rx="4" fill="rgba(0,212,255,0.15)" stroke="#00d4ff" stroke-width="1.5"/>
             <text x="271" y="120" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7.5" fill="#00d4ff">#4</text>
-            <!-- Robot base — bottom centre -->
+            <!-- Robot base: bottom centre -->
             <circle cx="170" cy="232" r="13" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="1.5"/>
             <text x="170" y="236" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7" fill="#10b981" font-weight="700">BASE</text>
-            <!-- Distance line to Zone A — short -->
+            <!-- Distance line to Zone A: short -->
             <line x1="162" y1="222" x2="118" y2="205" stroke="rgba(124,58,237,0.6)" stroke-width="1.5" stroke-dasharray="4 2"/>
             <!-- <text x="128" y="220" font-family="'Space Grotesk',sans-serif" font-size="7" fill="#a78bfa">near</text> -->
-            <!-- Distance line to Zone B — long -->
+            <!-- Distance line to Zone B: long -->
             <line x1="178" y1="220" x2="248" y2="145" stroke="rgba(0,212,255,0.3)" stroke-width="1" stroke-dasharray="4 2"/>
             <!-- <text x="222" y="192" font-family="'Space Grotesk',sans-serif" font-size="7" fill="#00d4ff">far</text> -->
             <!-- Cluster centres -->
@@ -329,12 +329,12 @@
           </svg>
           <!-- Legend -->
           <div style="display:flex; gap:20px; justify-content:center; margin-top:12px; flex-wrap:wrap;">
-            <div style="display:flex; align-items:center; gap:6px;"><div style="width:10px;height:10px;border-radius:2px;background:rgba(124,58,237,0.3);border:1px solid #a78bfa;"></div><span style="font-size:0.7rem;color:var(--muted);">Zone A — nearest</span></div>
-            <div style="display:flex; align-items:center; gap:6px;"><div style="width:10px;height:10px;border-radius:2px;background:rgba(0,212,255,0.2);border:1px solid #00d4ff;"></div><span style="font-size:0.7rem;color:var(--muted);">Zone B — further</span></div>
+            <div style="display:flex; align-items:center; gap:6px;"><div style="width:10px;height:10px;border-radius:2px;background:rgba(124,58,237,0.3);border:1px solid #a78bfa;"></div><span style="font-size:0.7rem;color:var(--muted);">Zone A (nearest)</span></div>
+            <div style="display:flex; align-items:center; gap:6px;"><div style="width:10px;height:10px;border-radius:2px;background:rgba(0,212,255,0.2);border:1px solid #00d4ff;"></div><span style="font-size:0.7rem;color:var(--muted);">Zone B (further)</span></div>
             <div style="display:flex; align-items:center; gap:6px;"><div style="width:10px;height:10px;border-radius:50%;background:rgba(16,185,129,0.15);border:1px solid #10b981;"></div><span style="font-size:0.7rem;color:var(--muted);">Robot base</span></div>
           </div>
         </div>
-        <p class="img-caption">Zone-based pick ordering — nearest cluster first, closest object within each zone first</p>
+        <p class="img-caption">Zone-based pick ordering: nearest cluster first, closest object within each zone first</p>
       </figure>
     </div>
 
@@ -343,7 +343,7 @@
       <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
         <div style="padding:10px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
           <span style="font-size:0.72rem; font-weight:700; color:#a78bfa; letter-spacing:0.1em; text-transform:uppercase; font-family:'Space Grotesk',sans-serif;">/pick_queue</span>
-          <span style="font-size:0.7rem; color:var(--muted);">— published by workspace_planner_node</span>
+          <span style="font-size:0.7rem; color:var(--muted);">published by workspace_planner_node</span>
         </div>
         <pre style="padding:20px; margin:0; overflow-x:auto; font-size:0.76rem; line-height:1.7; color:#94a3b8; font-family:'Courier New',monospace; background:transparent;"><span style="color:#64748b;">// Each detection gets four new fields added:</span>
 [
@@ -377,13 +377,13 @@
             Perception feed screenshot<br><span style="font-size:0.68rem">assets/images/perception-feed.jpg</span>
           </div>
         </div>
-        <p class="img-caption">Annotated feed — ArUco overlays, 3D coordinates, calibration corners</p>
+        <p class="img-caption">Annotated feed: ArUco overlays, 3D coordinates, calibration corners</p>
       </figure>
       <div>
         <span class="eyebrow">Perception</span>
         <h2 class="sec-title">Pixels to <span style="color:var(--accent);">millimetres</span></h2>
-        <p class="sec-body">A RealSense D435 gives us aligned colour and depth at 30 fps. The depth alone isn't enough — camera-to-robot calibration is what makes the numbers trustworthy.</p>
-        <p class="sec-body" style="margin-top:14px;">We place ArUco markers at known positions on the table and solve for a homography matrix that maps any pixel directly to a robot XY coordinate. Depth adds the Z. A fitting-plane equation — calibrated over the whole work surface — corrects for any tilt so every pick lands where expected.</p>
+        <p class="sec-body">A RealSense D435 gives us aligned colour and depth at 30 fps. The depth alone isn't enough; camera-to-robot calibration is what makes the numbers trustworthy.</p>
+        <p class="sec-body" style="margin-top:14px;">We place ArUco markers at known positions on the table and solve for a homography matrix that maps any pixel directly to a robot XY coordinate. Depth adds the Z. A fitting-plane equation, calibrated over the whole work surface, corrects for any tilt so every pick lands where expected.</p>
         <div class="detail-row" style="margin-top:24px;">
           <div class="detail"><div class="detail-title">11×11 median kernel</div><div class="detail-desc">Depth is sampled from 121 pixels around the centroid and median-filtered to reject noise and specular spikes.</div></div>
           <div class="detail"><div class="detail-title">5-frame smoother</div><div class="detail-desc">XY position is averaged across the last five readings so the commanded pick location doesn't jitter.</div></div>
@@ -403,7 +403,7 @@
         <span class="eyebrow" style="color:#34d399;">Motion Planning & Control</span>
         <h2 class="sec-title">Getting there <span style="color:#34d399;">without hitting anything</span></h2>
         <p class="sec-body">MoveIt2 handles the hard part: finding a path from the current joint configuration to the grasp pose that doesn't clip the table, the camera tripod, or the object being picked. The planner tries eight different solutions and runs with whichever takes the smallest total joint movement.</p>
-        <p class="sec-body" style="margin-top:14px;">The final descent and raise are Cartesian — the gripper moves in a straight vertical line so it doesn't knock adjacent objects. A background thread watches the gripper during transport and flags a drop if the fingers close all the way unexpectedly.</p>
+        <p class="sec-body" style="margin-top:14px;">The final descent and raise are Cartesian, moving the gripper in a straight vertical line so it doesn't knock adjacent objects. A background thread watches the gripper during transport and flags a drop if the fingers close all the way unexpectedly.</p>
         <div class="tags" style="margin-top:20px;">
           <span class="tag green">RRTConnect</span>
           <span class="tag green">Cartesian descent</span>
@@ -419,7 +419,7 @@
             RViz motion planning screenshot<br><span style="font-size:0.68rem">assets/images/rviz-planning.jpg</span>
           </div>
         </div>
-        <p class="img-caption">MoveIt2 in RViz — planned trajectory with collision objects</p>
+        <p class="img-caption">MoveIt2 in RViz: planned trajectory with collision objects</p>
       </figure>
     </div>
   </div>
@@ -436,18 +436,18 @@
             GUI screenshot<br><span style="font-size:0.68rem">assets/images/gui-screenshot.jpg</span>
           </div>
         </div>
-        <p class="img-caption">The operator GUI — live camera feed, status panel, controls</p>
+        <p class="img-caption">The operator GUI: live camera feed, status panel, controls</p>
       </figure>
       <div>
         <span class="eyebrow" style="color:#fbbf24;">Interaction & Execution</span>
         <h2 class="sec-title">One screen, <span style="color:#fbbf24;">full control</span></h2>
         <p class="sec-body">The GUI gives the operator everything in one place: a live annotated camera feed, what objects are currently detected and where, the robot's current state, and the controls to start, stop, or intervene at any moment.</p>
-        <p class="sec-body" style="margin-top:14px;">Every button publishes a plain string to a ROS topic — keeping the interface completely decoupled from the motion logic. ESTOP halts the arm mid-trajectory. Bin poses are taught by jogging the arm and pressing Save rather than typing coordinates.</p>
+        <p class="sec-body" style="margin-top:14px;">Every button publishes a plain string to a ROS topic, keeping the interface completely decoupled from the motion logic. ESTOP halts the arm mid-trajectory. Bin poses are taught by jogging the arm and pressing Save rather than typing coordinates.</p>
         <div class="detail-row" style="margin-top:24px;">
           <div class="detail"><div class="detail-title">State machine</div><div class="detail-desc">IDLE → WAITING → PREGRASP → GRASPING → TRANSPORTING → DONE, shown live in the GUI.</div></div>
-          <div class="detail"><div class="detail-title">Bin teaching</div><div class="detail-desc">Jog the arm to any bin position, press Save — coordinates written to bin_poses.json immediately.</div></div>
+          <div class="detail"><div class="detail-title">Bin teaching</div><div class="detail-desc">Jog the arm to any bin position, press Save and the coordinates are written to bin_poses.json immediately.</div></div>
           <div class="detail"><div class="detail-title">Class filter</div><div class="detail-desc">Pick a plastic type in the GUI and the robot clears all of that class before moving to others.</div></div>
-          <div class="detail"><div class="detail-title">Sim mode</div><div class="detail-desc">Launch with sim:=true to run the full sequence without a physical object — gripper skips stall detection.</div></div>
+          <div class="detail"><div class="detail-title">Sim mode</div><div class="detail-desc">Launch with sim:=true to run the full sequence without a physical object; the gripper skips stall detection.</div></div>
         </div>
       </div>
     </div>
@@ -465,17 +465,17 @@
             Workspace photo<br><span style="font-size:0.68rem">assets/images/workspace.jpg</span>
           </div>
         </div>
-        <p class="img-caption">The Sort-O workspace — black board, ArUco markers, bin assembly</p>
+        <p class="img-caption">The Sort-O workspace: black board, ArUco markers, bin assembly</p>
       </figure>
       <div>
         <span class="eyebrow">The workspace</span>
         <h2 class="sec-title">A purpose-built <span style="color:var(--accent);">sorting surface</span></h2>
         <p class="sec-body">Everything Sort-O sees and touches is contained within a 500 × 320 mm black board mounted on the trolley. The dark surface gives the camera clean contrast against plastic objects and keeps them from sliding around during picks.</p>
-        <p class="sec-body" style="margin-top:14px;">Four ArUco markers — one at each corner, numbered 1 to 4 — act as the calibration reference. When the camera-to-robot homography is computed, these markers define exactly where the robot coordinate frame maps onto the image plane. A custom plywood bin assembly clips onto the trolley handle with three square openings, one per plastic type.</p>
+        <p class="sec-body" style="margin-top:14px;">Four ArUco markers, one at each corner and numbered 1 to 4, act as the calibration reference. When the camera-to-robot homography is computed, these markers define exactly where the robot coordinate frame maps onto the image plane. A custom plywood bin assembly clips onto the trolley handle with three square openings, one per plastic type.</p>
         <div class="detail-row" style="margin-top:24px;">
           <div class="detail"><div class="detail-title">Board</div><div class="detail-desc">500 × 320 mm black surface on the trolley. Constrains the pick zone and gives depth camera contrast.</div></div>
           <div class="detail"><div class="detail-title">ArUco markers</div><div class="detail-desc">4 markers at board corners (IDs 1 to 4). Used once to calibrate the camera-to-robot homography matrix.</div></div>
-          <div class="detail"><div class="detail-title">Camera mount</div><div class="detail-desc">Tripod positioned to look straight down at the board. Fixed height — moving it requires recalibration.</div></div>
+          <div class="detail"><div class="detail-title">Camera mount</div><div class="detail-desc">Tripod positioned to look straight down at the board. Fixed height; moving it requires recalibration.</div></div>
           <div class="detail"><div class="detail-title">Bin assembly</div><div class="detail-desc">3-slot plywood frame clipped to the trolley handle. Each slot is a named drop-off point for one plastic class.</div></div>
         </div>
       </div>
