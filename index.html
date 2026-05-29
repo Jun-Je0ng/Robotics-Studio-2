@@ -209,10 +209,10 @@
   <div class="container">
     <div class="split reveal">
       <div>
-        <span class="eyebrow" style="color:#a78bfa;">Machine Learning</span>
+        <span class="eyebrow" style="color:#a78bfa;">Machine Learning - YoloOBBv8</span>
         <h2 class="sec-title">Trained to see <span style="color:#a78bfa;">rotated objects</span></h2>
         <p class="sec-body">Standard object detectors give you a rectangle. That's not enough when you need to know which way to rotate the gripper. We use an Oriented Bounding Box model that returns the object's angle alongside its class — so the arm always approaches aligned with the long axis.</p>
-        <p class="sec-body" style="margin-top:14px;">The model was trained on three classes found in typical household recycling: HDPE bottles, PET bottles, and PP containers. Before any detection reaches the motion planner it has to appear stably in five frames in a row — cutting out flickers and reflections.</p>
+        <p class="sec-body" style="margin-top:14px;">The model was trained on three classes found in typical household recycling: HDPE, PET, and PP plastic. Before any detection reaches the motion planner it has to appear stably in five frames in a row — cutting out flickers and reflections.</p>
         <div class="tags" style="margin-top:20px;">
           <span class="tag purple">hdpe_bottle</span>
           <span class="tag purple">pet_bottle</span>
@@ -239,10 +239,10 @@
   <div class="container">
     <div class="split reveal">
       <div>
-        <span class="eyebrow" style="color:#a78bfa;">Machine Learning — Part 2</span>
+        <span class="eyebrow" style="color:#a78bfa;">Machine Learning - K-Means Clustering</span>
         <h2 class="sec-title">Deciding <span style="color:#a78bfa;">what to pick first</span></h2>
-        <p class="sec-body">Detecting objects is only half the problem. When multiple bottles are in the workspace the robot needs to decide which one to pick first. We solve this with a second AI component — a K-Means workspace planner running as its own ROS2 node.</p>
-        <p class="sec-body" style="margin-top:14px;">K-Means clusters all detected objects into spatial zones based on their XY position in robot frame. Each cluster's centre is ranked by distance to the robot base — the nearest zone gets cleared first. Within each zone, objects are ordered by their individual distance to the robot. This is zone-based picking: the arm stays in one area, clears it, then moves on. Fewer large sweeps, higher throughput.</p>
+        <p class="sec-body">Detecting objects is only half the problem. When multiple bottles are in the workspace the robot needs to decide which one to pick first. We solve this with a second AI component: a K-Means workspace planner running as its own ROS2 node.</p>
+        <p class="sec-body" style="margin-top:14px;">K-Means clusters all detected objects into spatial zones based on their XY position in robot frame. Each cluster's centre is ranked by distance to the robot base: the nearest zone gets cleared first. Within each zone, objects are ordered by their individual distance to the robot. This is zone-based picking: the arm stays in one area, clears it, then moves on. Fewer large sweeps, higher throughput.</p>
 
         <div style="margin-top:28px; display:flex; flex-direction:column; gap:12px;">
           <div style="display:flex; gap:14px; align-items:flex-start;">
@@ -289,7 +289,7 @@
             </defs>
             <!-- workspace -->
             <rect x="20" y="20" width="300" height="200" rx="10" fill="rgba(124,58,237,0.04)" stroke="rgba(124,58,237,0.2)" stroke-width="1"/>
-            <text x="170" y="14" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="9" fill="#64748b" letter-spacing="0.1em">WORKSPACE (robot frame mm)</text>
+            <text x="170" y="14" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="9" fill="#64748b" letter-spacing="0.1em">WORKSPACE</text>
             <!-- Zone A — LEFT, close to robot base -->
             <ellipse cx="105" cy="175" rx="72" ry="45" fill="rgba(124,58,237,0.1)" stroke="rgba(124,58,237,0.5)" stroke-width="1" stroke-dasharray="5 3"/>
             <text x="105" y="135" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="8" fill="#a78bfa" font-weight="600" letter-spacing="0.05em">ZONE A  (priority 1)</text>
@@ -474,7 +474,7 @@
         <p class="sec-body" style="margin-top:14px;">Four ArUco markers — one at each corner, numbered 1 to 4 — act as the calibration reference. When the camera-to-robot homography is computed, these markers define exactly where the robot coordinate frame maps onto the image plane. A custom plywood bin assembly clips onto the trolley handle with three square openings, one per plastic type.</p>
         <div class="detail-row" style="margin-top:24px;">
           <div class="detail"><div class="detail-title">Board</div><div class="detail-desc">500 × 320 mm black surface on the trolley. Constrains the pick zone and gives depth camera contrast.</div></div>
-          <div class="detail"><div class="detail-title">ArUco markers</div><div class="detail-desc">4 markers at board corners (IDs 1–4). Used once to calibrate the camera-to-robot homography matrix.</div></div>
+          <div class="detail"><div class="detail-title">ArUco markers</div><div class="detail-desc">4 markers at board corners (IDs 1 to 4). Used once to calibrate the camera-to-robot homography matrix.</div></div>
           <div class="detail"><div class="detail-title">Camera mount</div><div class="detail-desc">Tripod positioned to look straight down at the board. Fixed height — moving it requires recalibration.</div></div>
           <div class="detail"><div class="detail-title">Bin assembly</div><div class="detail-desc">3-slot plywood frame clipped to the trolley handle. Each slot is a named drop-off point for one plastic class.</div></div>
         </div>
