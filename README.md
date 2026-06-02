@@ -6,6 +6,11 @@
 
 UR3e robotic arm + OnRobot RG2 gripper + Intel RealSense D435. Detects, classifies, and sorts plastic waste autonomously using YOLOv8 OBB detection and MoveIt2 motion planning.
 
+## Resources
+
+- [Final Video](https://youtu.be/zdC3X74QhE4)
+- Additional Documentation: [Sort-O Technical Documentation.pdf](Sort-O%20Technical%20Documentation.pdf)
+
 ---
 
 ## Dependencies
