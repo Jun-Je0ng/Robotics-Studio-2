@@ -674,7 +674,7 @@ class StatusGui(Node):
         self._bin_custom_var.set("")
 
     # ══════════════════════════════════════════════════════════════════════════
-    # ROS callbacks — existing topics
+    # ROS callbacks — existing topics 
     # ══════════════════════════════════════════════════════════════════════════
 
     def _cb_sys_status(self, msg):
