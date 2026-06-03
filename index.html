@@ -54,6 +54,8 @@
     .btn-cyan:hover { background: #33ddff; box-shadow: 0 0 36px var(--aglow); transform: translateY(-2px); }
     .btn-ghost { border: 1px solid var(--border-h); color: var(--text); }
     .btn-ghost:hover { background: var(--adim); border-color: var(--accent); transform: translateY(-2px); }
+    .btn-red { border: 1px solid rgba(255,0,0,0.5); color: var(--text); background: rgba(255,0,0,0.12); }
+    .btn-red:hover { background: #ff0000; border-color: #ff0000; color: #fff; transform: translateY(-2px); }
     .hero-stats { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); animation: up 0.7s 0.4s ease both; }
     .stat-n { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--accent); line-height: 1; }
     .stat-l { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
@@ -170,7 +172,7 @@
         </p>
         <div class="hero-btns">
           <a href="#how" class="btn btn-cyan">See how it works</a>
-          <a href="https://youtu.be/zdC3X74QhE4" target="_blank" class="btn btn-ghost">
+          <a href="https://youtu.be/zdC3X74QhE4" target="_blank" class="btn btn-red">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
             Video
           </a>
@@ -568,10 +570,48 @@
   </div>
 </section>
 
+<!-- BIBTEX -->
+<section class="sec sec-alt">
+  <div class="container reveal">
+    <span class="eyebrow">Cite</span>
+    <h2 class="sec-title">BibTeX</h2>
+    <div style="margin-top:28px; background:var(--bg); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+      <div style="padding:10px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-size:0.72rem; font-weight:700; color:var(--accent); letter-spacing:0.1em; text-transform:uppercase; font-family:'Space Grotesk',sans-serif;">BibTeX</span>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('bibtex-text').innerText)" style="background:var(--adim); border:1px solid var(--border-h); color:var(--muted); font-size:0.7rem; padding:4px 10px; border-radius:6px; cursor:pointer; font-family:'Space Grotesk',sans-serif;">Copy</button>
+      </div>
+      <pre id="bibtex-text" style="padding:24px; margin:0; overflow-x:auto; font-size:0.82rem; line-height:1.9; color:#94a3b8; font-family:'Courier New',monospace; background:transparent; white-space:pre;">@project{sorto2026,
+  author       = {Jeong, Hyeokjun and Edwards, Rian and Redoblado, Jarrel and Wicks, Bilguun},
+  title        = {Sort-O: Autonomous Plastic Sorting Robot},
+  subject      = {AI in Robotics, Robotics Studio 2},
+  institution  = {University of Technology Sydney},
+  year         = {2026},
+  url          = {https://jun-je0ng.github.io/Robotics-Studio-2}
+}</pre>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
-<footer>
+<footer style="padding:48px 0 32px; border-top:1px solid var(--border); text-align:center;">
   <div class="container">
-    <p>Sort-O &nbsp;·&nbsp; Robotics Studio 2 &nbsp;·&nbsp; AI in Robotics &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; <a href="https://github.com/Jun-Je0ng/Robotics-Studio-2" target="_blank">GitHub</a></p>
+    <div style="display:flex; justify-content:center; gap:20px; margin-bottom:20px;">
+      <a href="https://youtu.be/zdC3X74QhE4" target="_blank" title="Video" style="color:var(--muted); transition:color 0.2s;" onmouseover="this.style.color='#ff0000'" onmouseout="this.style.color='var(--muted)'">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </a>
+      <a href="https://github.com/Jun-Je0ng/Robotics-Studio-2" target="_blank" title="GitHub" style="color:var(--muted); transition:color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.8c.85 0 1.71.11 2.51.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0 0 22 12c0-5.52-4.48-10-10-10z"/></svg>
+      </a>
+    </div>
+    <p style="font-size:0.8rem; color:var(--muted); margin-bottom:10px;">
+      Sort-O &nbsp;·&nbsp; Robotics Studio 2 &nbsp;·&nbsp; AI in Robotics &nbsp;·&nbsp; University of Technology Sydney &nbsp;·&nbsp; 2026
+    </p>
+    <p style="font-size:0.75rem; color:var(--muted); margin-bottom:6px;">
+      This website is licensed under a <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" style="color:var(--accent);">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    </p>
+    <p style="font-size:0.73rem; color:#475569; max-width:600px; margin:0 auto;">
+      You are free to borrow the <a href="https://github.com/Jun-Je0ng/Robotics-Studio-2" target="_blank" style="color:var(--accent);">source code</a> of this website. We ask that you link back to this page in the footer. Please remove any analytics code you do not want on your own website.
+    </p>
   </div>
 </footer>
 
