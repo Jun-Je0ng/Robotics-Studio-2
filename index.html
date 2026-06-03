@@ -509,7 +509,7 @@
     <!-- Results -->
     <div class="reveal" style="margin-top:48px;">
       <h3 style="font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; margin-bottom:14px; color:var(--accent);">Results</h3>
-      <p class="sec-body">Sort-O successfully demonstrated end-to-end autonomous plastic sorting across three material classes — HDPE, PET, and PP — using a live depth camera and a trained vision model. The YOLOv8 OBB detector ran at 10 Hz with a minimum confidence threshold of 0.70, and the 5-frame stability filter effectively eliminated transient false positives caused by reflections and camera noise. The K-Means workspace planner reduced unnecessary arm travel by grouping objects into spatial zones and clearing the nearest zone first. MoveIt2 path planning with eight candidate trajectories produced reliable, collision-free motion across the full workspace, including the approach, descent, and bin-drop phases. The operator GUI provided real-time visibility of system state throughout all test runs, and the E-STOP and Reset functions behaved correctly under both normal and fault conditions.</p>
+      <p class="sec-body">Sort-O successfully demonstrated end-to-end autonomous plastic sorting across three material classes (HDPE, PET, and PP) using a live depth camera and a trained vision model. The YOLOv8 OBB detector ran at 10 Hz with a minimum confidence threshold of 0.70, and the 5-frame stability filter effectively eliminated transient false positives caused by reflections and camera noise. The K-Means workspace planner reduced unnecessary arm travel by grouping objects into spatial zones and clearing the nearest zone first. MoveIt2 path planning with eight candidate trajectories produced reliable, collision-free motion across the full workspace, including the approach, descent, and bin-drop phases. The operator GUI provided real-time visibility of system state throughout all test runs, and the E-STOP and Reset functions behaved correctly under both normal and fault conditions.</p>
     </div>
 
     <!-- Discussion & Limitations -->
@@ -539,7 +539,7 @@
         </div>
         <div class="detail">
           <div class="detail-title">Sequential execution</div>
-          <div class="detail-desc">Objects are processed one at a time. If the scene changes mid-run — an object is moved or added — the planner does not adapt until the current pick cycle completes.</div>
+          <div class="detail-desc">Objects are processed one at a time. If the scene changes mid-run, for example if an object is moved or added, the planner does not adapt until the current pick cycle completes.</div>
         </div>
       </div>
     </div>
@@ -547,7 +547,7 @@
     <!-- Reflection -->
     <div class="reveal" style="margin-top:44px;">
       <h3 style="font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; margin-bottom:14px; color:#34d399;">Reflection</h3>
-      <p class="sec-body">The project demonstrated that integrating a trained machine learning model with classical motion planning is achievable within a semester, but the interface between the two systems — coordinate frame consistency, timing, and message format — required more iteration than anticipated. Camera calibration proved to be the most sensitive dependency in the stack; a 5 mm shift in the camera mount could move a pick target by over 20 mm in robot space.</p>
+      <p class="sec-body">The project demonstrated that integrating a trained machine learning model with classical motion planning is achievable within a semester, but the interface between the two systems, specifically coordinate frame consistency, timing, and message format, required more iteration than anticipated. Camera calibration proved to be the most sensitive dependency in the stack, where a 5 mm shift in the camera mount could move a pick target by over 20 mm in robot space.</p>
       <p class="sec-body" style="margin-top:14px;">Working across four subsystems in parallel with separate branches highlighted the importance of agreeing on message formats early. The /plastic_detections JSON schema became a shared contract between the perception, ML, and motion teams, and late changes to it caused integration delays. Future iterations would benefit from a force-sensing gripper for reliable grasp confirmation, a multi-camera setup to handle occlusion, and a larger training dataset covering more plastic types and lighting conditions. The GUI's hardcoded paths and the static collision geometry in the motion controller are two areas that would need to be addressed before deploying the system in a different physical environment.</p>
     </div>
 
@@ -580,8 +580,8 @@
         <span style="font-size:0.72rem; font-weight:700; color:var(--accent); letter-spacing:0.1em; text-transform:uppercase; font-family:'Space Grotesk',sans-serif;">BibTeX</span>
         <button onclick="navigator.clipboard.writeText(document.getElementById('bibtex-text').innerText)" style="background:var(--adim); border:1px solid var(--border-h); color:var(--muted); font-size:0.7rem; padding:4px 10px; border-radius:6px; cursor:pointer; font-family:'Space Grotesk',sans-serif;">Copy</button>
       </div>
-      <pre id="bibtex-text" style="padding:24px; margin:0; overflow-x:auto; font-size:0.82rem; line-height:1.9; color:#94a3b8; font-family:'Courier New',monospace; background:transparent; white-space:pre;">@project{sorto2026,
-  author       = {Jeong, Hyeokjun and Edwards, Rian and Redoblado, Jarrel and Wicks, Bilguun},
+      <pre id="bibtex-text" style="padding:24px; margin:0; overflow-x:auto; font-size:0.82rem; line-height:1.9; color:#94a3b8; font-family:'Courier New',monospace; background:transparent; white-space:pre;">@misc{sorto2026,
+  author       = {Hyeokjun Jeong and Rian Edwards and Jarrel Redoblado and Bilguun Wicks},
   title        = {Sort-O: Autonomous Plastic Sorting Robot},
   subject      = {AI in Robotics, Robotics Studio 2},
   institution  = {University of Technology Sydney},
