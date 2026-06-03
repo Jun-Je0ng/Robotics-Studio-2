@@ -33,11 +33,20 @@
     .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
     .logo-mark svg { display: block; }
     .logo-word { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; background: linear-gradient(120deg, #00d4ff 30%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .nav-links { display: flex; gap: 4px; list-style: none; }
+    .nav-links { display: flex; gap: 4px; list-style: none; align-items: center; }
     .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.83rem; font-weight: 500; padding: 5px 11px; border-radius: 6px; transition: color 0.2s, background 0.2s; }
     .nav-links a:hover { color: var(--text); background: var(--adim); }
     .nav-links a.nav-cta { background: var(--adim); color: var(--accent); border: 1px solid var(--border-h); }
     .nav-links a.nav-cta:hover { background: var(--accent); color: #040d1e; }
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-btn { color: var(--muted); background: none; border: none; font-size: 0.83rem; font-weight: 500; padding: 5px 11px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: color 0.2s, background 0.2s; font-family: inherit; }
+    .nav-dropdown-btn:hover { color: var(--text); background: var(--adim); }
+    .nav-dropdown-btn svg { transition: transform 0.2s; }
+    .nav-dropdown:hover .nav-dropdown-btn svg { transform: rotate(180deg); }
+    .nav-dropdown-menu { display: none; position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: rgba(8,21,43,0.97); border: 1px solid var(--border-h); border-radius: 10px; padding: 6px; min-width: 160px; backdrop-filter: blur(18px); z-index: 200; }
+    .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+    .nav-dropdown-menu a { display: block; color: var(--muted); text-decoration: none; font-size: 0.81rem; font-weight: 500; padding: 7px 12px; border-radius: 6px; transition: color 0.2s, background 0.2s; white-space: nowrap; }
+    .nav-dropdown-menu a:hover { color: var(--text); background: var(--adim); }
     #hero { position: relative; min-height: 100vh; display: flex; align-items: center; padding-top: 80px; overflow: hidden; }
     .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(0,212,255,0.06) 0%, transparent 70%), radial-gradient(ellipse 45% 35% at 85% 85%, rgba(124,58,237,0.05) 0%, transparent 60%); }
     .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,212,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.035) 1px, transparent 1px); background-size: 56px 56px; mask-image: radial-gradient(ellipse 75% 65% at 50% 25%, black, transparent); }
@@ -141,13 +150,22 @@
       <span class="logo-word">Sort-O</span>
     </a>
     <ul class="nav-links">
+      <li><a href="#abstract">Abstract</a></li>
       <li><a href="#how">How it works</a></li>
-      <li><a href="#ml">ML</a></li>
-      <li><a href="#kmeans">K-Means</a></li>
-      <li><a href="#perception">Perception</a></li>
-      <li><a href="#motion">Motion</a></li>
-      <li><a href="#interaction">Execution</a></li>
-      <li><a href="#workspace">Workspace</a></li>
+      <li class="nav-dropdown">
+        <button class="nav-dropdown-btn">
+          Subsystems
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="#ml">ML / YOLOv8</a>
+          <a href="#kmeans">K-Means Planner</a>
+          <a href="#perception">Perception</a>
+          <a href="#motion">Motion Planning</a>
+          <a href="#interaction">Execution &amp; GUI</a>
+          <a href="#workspace">Workspace</a>
+        </div>
+      </li>
       <li><a href="#stack">Stack</a></li>
       <li><a href="#results">Results</a></li>
       <li><a href="#team">Team</a></li>
@@ -191,6 +209,19 @@
       <div class="hero-visual">
         <img src="assets/images/robot-setup.JPG" alt="Sort-O robot setup">
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABSTRACT -->
+<section id="abstract" style="padding: 80px 0;">
+  <div class="container">
+    <div class="reveal" style="max-width: 760px; margin: 0 auto; text-align: center;">
+      <span class="eyebrow">Abstract</span>
+      <h2 class="sec-title" style="margin-bottom: 28px;">Overview</h2>
+      <p class="sec-body" style="margin-bottom: 18px;">Plastic recycling depends on getting the right material into the right bin. In most facilities today, that step still relies on people. Sort-O is our attempt to change that at a small scale, and to understand what it actually takes to make a robot do it reliably.</p>
+      <p class="sec-body" style="margin-bottom: 18px;">The system uses a UR3e robotic arm, an Intel RealSense depth camera, and a fine-tuned YOLOv8 model to detect, classify, and sort three types of plastic waste: PET, HDPE, and PP. The key challenge was not just recognising objects but knowing exactly where and how to grab them. We trained the model to output oriented bounding boxes, so the gripper always approaches aligned with the object's long axis. Depth data and a calibrated homography matrix convert pixel detections into millimetre-accurate robot coordinates, and a K-Means planner organises the pick order so the arm clears the nearest objects first. MoveIt2 handles the motion, planning collision-free paths and executing a straight vertical descent on each pick.</p>
+      <p class="sec-body">The result is a fully autonomous sorting pipeline running at 10 Hz that requires no human input once started.</p>
     </div>
   </div>
 </section>
@@ -581,7 +612,7 @@
         <button onclick="navigator.clipboard.writeText(document.getElementById('bibtex-text').innerText)" style="background:var(--adim); border:1px solid var(--border-h); color:var(--muted); font-size:0.7rem; padding:4px 10px; border-radius:6px; cursor:pointer; font-family:'Space Grotesk',sans-serif;">Copy</button>
       </div>
       <pre id="bibtex-text" style="padding:24px; margin:0; overflow-x:auto; font-size:0.82rem; line-height:1.9; color:#94a3b8; font-family:'Courier New',monospace; background:transparent; white-space:pre;">@misc{sorto2026,
-  author       = {Hyeokjun Jeong and Rian Edwards and Jarrel Redoblado and Bilguun Wicks},
+  author       = {Jeong, Hyeokjun and Edwards, Rian and Redoblado, Jarrel and Wicks, Bilguun},
   title        = {Sort-O: Autonomous Plastic Sorting Robot},
   subject      = {AI in Robotics, Robotics Studio 2},
   institution  = {University of Technology Sydney},
