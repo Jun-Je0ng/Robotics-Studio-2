@@ -147,6 +147,7 @@
       <li><a href="#interaction">Execution</a></li>
       <li><a href="#workspace">Workspace</a></li>
       <li><a href="#stack">Stack</a></li>
+      <li><a href="#results">Results</a></li>
       <li><a href="#team">Team</a></li>
       <li><a href="getting-started.html" class="nav-cta">Setup guide ↗</a></li>
     </ul>
@@ -163,8 +164,16 @@
         <div class="hero-tag"><i></i> Robotics Studio 2 &nbsp;·&nbsp; AI in Robotics &nbsp;·&nbsp; 2026</div>
         <h1 class="hero-title">Meet<br><span class="grad">Sort-O</span></h1>
         <p class="hero-p">A robot that watches, thinks, and sorts. Sort-O uses a depth camera and a trained vision model to find plastic waste, then picks and bins each piece, all on its own.</p>
+        <p style="font-size:0.83rem; color:var(--muted); margin-bottom:18px; animation: up 0.7s 0.25s ease both;">
+          Hyeokjun Jeong &nbsp;·&nbsp; Rian Edwards &nbsp;·&nbsp; Jarrel Redoblado &nbsp;·&nbsp; Bilguun Wicks<br>
+          <span style="font-size:0.76rem;">University of Technology Sydney, 2026</span>
+        </p>
         <div class="hero-btns">
           <a href="#how" class="btn btn-cyan">See how it works</a>
+          <a href="https://youtu.be/zdC3X74QhE4" target="_blank" class="btn btn-ghost">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            Video
+          </a>
           <a href="https://github.com/Jun-Je0ng/Robotics-Studio-2" target="_blank" class="btn btn-ghost">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.8c.85 0 1.71.11 2.51.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0 0 22 12c0-5.52-4.48-10-10-10z"/></svg>
             GitHub
@@ -487,6 +496,62 @@
   </div>
 </section>
 
+<!-- RESULTS, DISCUSSION & REFLECTION -->
+<section id="results" class="sec sec-alt">
+  <div class="container">
+    <div class="reveal">
+      <span class="eyebrow">Outcomes</span>
+      <h2 class="sec-title">Results, Discussion <span style="color:var(--accent);">&amp; Reflection</span></h2>
+    </div>
+
+    <!-- Results -->
+    <div class="reveal" style="margin-top:48px;">
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; margin-bottom:14px; color:var(--accent);">Results</h3>
+      <p class="sec-body">Sort-O successfully demonstrated end-to-end autonomous plastic sorting across three material classes — HDPE, PET, and PP — using a live depth camera and a trained vision model. The YOLOv8 OBB detector ran at 10 Hz with a minimum confidence threshold of 0.70, and the 5-frame stability filter effectively eliminated transient false positives caused by reflections and camera noise. The K-Means workspace planner reduced unnecessary arm travel by grouping objects into spatial zones and clearing the nearest zone first. MoveIt2 path planning with eight candidate trajectories produced reliable, collision-free motion across the full workspace, including the approach, descent, and bin-drop phases. The operator GUI provided real-time visibility of system state throughout all test runs, and the E-STOP and Reset functions behaved correctly under both normal and fault conditions.</p>
+    </div>
+
+    <!-- Discussion & Limitations -->
+    <div class="reveal" style="margin-top:44px;">
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; margin-bottom:14px; color:#fbbf24;">Discussion &amp; Limitations</h3>
+      <p class="sec-body" style="margin-bottom:20px;">While the system met its primary objectives, several limitations were identified during development and testing.</p>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div class="detail">
+          <div class="detail-title">Reflective &amp; transparent objects</div>
+          <div class="detail-desc">Clear PET bottles and shiny surfaces cause depth drop-outs in the RealSense sensor. The median kernel and spike filter mitigate this but cannot fully compensate, leading to occasional mislocalisation.</div>
+        </div>
+        <div class="detail">
+          <div class="detail-title">Grasp verification</div>
+          <div class="detail-desc">Success is inferred from gripper finger width alone. The physical RG2 does not expose force feedback over RS-485, so the system cannot detect slipping, over-clamping fragile items, or early contact.</div>
+        </div>
+        <div class="detail">
+          <div class="detail-title">Fixed calibration</div>
+          <div class="detail-desc">The camera-to-robot homography is computed once and stored. Any physical movement of the camera or workspace board requires a full recalibration before picks are reliable again.</div>
+        </div>
+        <div class="detail">
+          <div class="detail-title">Single camera &amp; occlusion</div>
+          <div class="detail-desc">The top-down monocular setup cannot detect objects hidden beneath others. Stacked or overlapping items result in partial or missed detections.</div>
+        </div>
+        <div class="detail">
+          <div class="detail-title">Side grasp strategies</div>
+          <div class="detail-desc">SIDE_VERTICAL is disabled on the physical robot to prevent table collisions. SIDE_HORIZONTAL exists but is overridden in real tests as tall objects were always lying on their side in practice.</div>
+        </div>
+        <div class="detail">
+          <div class="detail-title">Sequential execution</div>
+          <div class="detail-desc">Objects are processed one at a time. If the scene changes mid-run — an object is moved or added — the planner does not adapt until the current pick cycle completes.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reflection -->
+    <div class="reveal" style="margin-top:44px;">
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; margin-bottom:14px; color:#34d399;">Reflection</h3>
+      <p class="sec-body">The project demonstrated that integrating a trained machine learning model with classical motion planning is achievable within a semester, but the interface between the two systems — coordinate frame consistency, timing, and message format — required more iteration than anticipated. Camera calibration proved to be the most sensitive dependency in the stack; a 5 mm shift in the camera mount could move a pick target by over 20 mm in robot space.</p>
+      <p class="sec-body" style="margin-top:14px;">Working across four subsystems in parallel with separate branches highlighted the importance of agreeing on message formats early. The /plastic_detections JSON schema became a shared contract between the perception, ML, and motion teams, and late changes to it caused integration delays. Future iterations would benefit from a force-sensing gripper for reliable grasp confirmation, a multi-camera setup to handle occlusion, and a larger training dataset covering more plastic types and lighting conditions. The GUI's hardcoded paths and the static collision geometry in the motion controller are two areas that would need to be addressed before deploying the system in a different physical environment.</p>
+    </div>
+
+  </div>
+</section>
+
 <!-- TEAM -->
 <section id="team">
   <div class="container">
@@ -495,10 +560,10 @@
       <h2 class="sec-title">Meet the <span style="color:var(--accent);">team</span></h2>
     </div>
     <div class="team-grid reveal">
-      <div class="team-card"><div class="avatar"><span>J</span></div><div class="team-name">Jun Jeong</div><div class="team-role">Perception</div></div>
-      <div class="team-card"><div class="avatar"><span>J</span></div><div class="team-name">Jarrel</div><div class="team-role">Interaction & Execution</div></div>
-      <div class="team-card"><div class="avatar"><span>B</span></div><div class="team-name">Bilguun</div><div class="team-role">Motion Planning & Control</div></div>
-      <div class="team-card"><div class="avatar"><span>R</span></div><div class="team-name">Rian</div><div class="team-role">Machine Learning</div></div>
+      <div class="team-card"><div class="avatar"><span>H</span></div><div class="team-name">Hyeokjun Jeong</div><div class="team-role">Perception</div></div>
+      <div class="team-card"><div class="avatar"><span>J</span></div><div class="team-name">Jarrel Redoblado</div><div class="team-role">Interaction & Execution</div></div>
+      <div class="team-card"><div class="avatar"><span>B</span></div><div class="team-name">Bilguun Wicks</div><div class="team-role">Motion Planning & Control</div></div>
+      <div class="team-card"><div class="avatar"><span>R</span></div><div class="team-name">Rian Edwards</div><div class="team-role">Machine Learning</div></div>
     </div>
   </div>
 </section>
