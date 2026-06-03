@@ -42,9 +42,9 @@
     .nav-dropdown-btn { color: var(--muted); background: none; border: none; font-size: 0.83rem; font-weight: 500; padding: 5px 11px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: color 0.2s, background 0.2s; font-family: inherit; }
     .nav-dropdown-btn:hover { color: var(--text); background: var(--adim); }
     .nav-dropdown-btn svg { transition: transform 0.2s; }
-    .nav-dropdown:hover .nav-dropdown-btn svg { transform: rotate(180deg); }
-    .nav-dropdown-menu { display: none; position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: rgba(8,21,43,0.97); border: 1px solid var(--border-h); border-radius: 10px; padding: 6px; min-width: 160px; backdrop-filter: blur(18px); z-index: 200; }
-    .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+    .nav-dropdown-menu { display: none; position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: rgba(8,21,43,0.97); border: 1px solid var(--border-h); border-radius: 10px; padding: 6px; min-width: 170px; backdrop-filter: blur(18px); z-index: 200; }
+    .nav-dropdown-menu.open { display: block; }
+    .nav-dropdown-btn.open svg { transform: rotate(180deg); }
     .nav-dropdown-menu a { display: block; color: var(--muted); text-decoration: none; font-size: 0.81rem; font-weight: 500; padding: 7px 12px; border-radius: 6px; transition: color 0.2s, background 0.2s; white-space: nowrap; }
     .nav-dropdown-menu a:hover { color: var(--text); background: var(--adim); }
     #hero { position: relative; min-height: 100vh; display: flex; align-items: center; padding-top: 80px; overflow: hidden; }
@@ -647,6 +647,27 @@
 </footer>
 
 <script>
+  // Dropdown toggle
+  const dropBtn = document.querySelector('.nav-dropdown-btn');
+  const dropMenu = document.querySelector('.nav-dropdown-menu');
+  dropBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = dropMenu.classList.toggle('open');
+    dropBtn.classList.toggle('open', isOpen);
+  });
+  // Close when clicking a link inside the dropdown
+  dropMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      dropMenu.classList.remove('open');
+      dropBtn.classList.remove('open');
+    });
+  });
+  // Close when clicking anywhere else
+  document.addEventListener('click', () => {
+    dropMenu.classList.remove('open');
+    dropBtn.classList.remove('open');
+  });
+
   const obs = new IntersectionObserver(
     entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
     { threshold: 0.1 }
